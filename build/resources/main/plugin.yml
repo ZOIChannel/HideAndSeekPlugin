@@ -1,0 +1,4 @@
+name: Ryokno
+version: 1.0-SNAPSHOT
+main: test.ryokno.Game
+api-version: 1.17
