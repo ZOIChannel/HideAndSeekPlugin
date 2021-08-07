@@ -1,9 +1,8 @@
-package test.ryokno.player;
+package jp.hack.minecraft.hideandseek.player;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
@@ -89,6 +88,10 @@ public class Hider extends GamePlayer {
         vec.setX(to.getX() - from.getX());
         vec.setZ(to.getZ() - from.getZ());
         this.fallingBlock.setVelocity(vec);
+        if (this.fallingBlock.isOnGround()) {
+            Location loc = this.fallingBlock.getLocation();
+            loc.setY(loc.getY()+0.01);
+        }
     }
 
     public void spawnFallingBlock() {
@@ -100,7 +103,12 @@ public class Hider extends GamePlayer {
         this.fallingBlock.setGravity(false);
         this.fallingBlock.setInvulnerable(true);
         this.fallingBlock.setPersistent(true);
-        this.fallingBlock.getLocation().add(0.0, 0.1, 0.0);
+        Location loc = this.fallingBlock.getLocation();
+        loc.setY(loc.getY()+0.01);
+        Vector velocity = getPlayer().getVelocity();
+        velocity.setY(velocity.getY() > 0 ? velocity.getY() : 0);
+        this.fallingBlock.setVelocity(velocity);
+        this.fallingBlock.setFallDistance(0);
     }
 
     private void destroyFallingBlock() {
