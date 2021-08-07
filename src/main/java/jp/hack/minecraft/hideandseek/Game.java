@@ -1,24 +1,63 @@
 package jp.hack.minecraft.hideandseek;
 
-import jp.hack.minecraft.hideandseek.event.EventManager;
-import jp.hack.minecraft.hideandseek.event.EventWatcher;
-import org.bukkit.plugin.java.JavaPlugin;
-
+import jp.hack.minecraft.hideandseek.event.*;
+import jp.hack.minecraft.hideandseek.command.CommandManager;
+import jp.hack.minecraft.hideandseek.command.hideandseek.HideAndSeekCommand;
+import jp.hack.minecraft.hideandseek.player.*;
+import jp.hack.minecraft.hideandseek.data.*;
+import jp.hack.minecraft.hideandseek.system.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import jp.hack.minecraft.hideandseek.player.GamePlayer;
-import jp.hack.minecraft.hideandseek.player.Hider;
-import jp.hack.minecraft.hideandseek.player.Seeker;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 public final class Game extends JavaPlugin {
+
+    private List<GamePlayer> playerList;
+    private GameState currentState;
+    private GameLogic gameLogic;
+    private ConfigLoader configLoader;
+    private StageData stageData;
+    private CommandManager commandManager;
     private static Economy econ = null;
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
+
+
+    @Override
+    public void onEnable() {
+        // Plugin startup logic
+        super.onEnable();
+        getServer().getPluginManager().registerEvents(eventManager, this);
+
+        if (!setupEconomy() ) {
+            getServer().getLogger().info("Vault plugin is not found.");
+        }
+        commandManager = new CommandManager(this);
+        commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
+
+        configLoader = new ConfigLoader(this);
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+        super.onDisable();
+    }
+
+    public void start() {}
+    public void stop() {}
+    public GameState getCurrentState() {
+        return currentState;
+    }
+
+    public ConfigLoader getConfigLoader() {
+        return configLoader;
+    }
 
     public static Economy getEconomy() {
         return econ;
@@ -66,22 +105,5 @@ public final class Game extends JavaPlugin {
 
     public Boolean isSameBlockLocation(Location loc1, Location loc2) {
         return (loc1.getBlockX() == loc2.getBlockX() && loc1.getBlockY() == loc2.getBlockY() && loc1.getBlockZ() == loc2.getBlockZ());
-    }
-
-    @Override
-    public void onEnable() {
-        // Plugin startup logic
-        super.onEnable();
-        getServer().getPluginManager().registerEvents(eventManager, this);
-
-        if (!setupEconomy() ) {
-            getServer().getLogger().info("Vault plugin is not found.");
-        }
-    }
-
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-        super.onDisable();
     }
 }

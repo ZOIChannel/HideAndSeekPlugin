@@ -2,6 +2,8 @@ package jp.hack.minecraft.hideandseek.command.hideandseek.admin;
 
 import jp.hack.minecraft.hideandseek.command.AdminCommandMaster;
 import jp.hack.minecraft.hideandseek.command.CommandManager;
+import jp.hack.minecraft.hideandseek.data.GameState;
+import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -19,7 +21,12 @@ public class StopCommand extends AdminCommandMaster {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return false;
+        if (manager.game.getCurrentState() != GameState.LOBBY) {
+            sender.sendMessage(Messages.error("game.notStarted"));
+            return true;
+        }
+        manager.game.stop();
+        return true;
     }
 
     @Override
