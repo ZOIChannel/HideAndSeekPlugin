@@ -100,8 +100,7 @@ public class Hider extends GamePlayer {
         this.fallingBlock.setGravity(false);
         this.fallingBlock.setInvulnerable(true);
         this.fallingBlock.setPersistent(true);
-        Vector vec = new Vector(0.0, 0.001, 0.0);
-        this.fallingBlock.setVelocity(vec);
+        this.fallingBlock.getLocation().add(0.0, 0.1, 0.0);
     }
 
     private void destroyFallingBlock() {
