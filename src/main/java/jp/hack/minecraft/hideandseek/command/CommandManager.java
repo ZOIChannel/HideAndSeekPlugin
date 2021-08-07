@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.command;
 
+import jp.hack.minecraft.hideandseek.Game;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -8,10 +9,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
 
 public class CommandManager implements TabExecutor {
-    public JavaPlugin plugin;
+    public Game game;
 
-    public CommandManager(JavaPlugin plugin) {
-        this.plugin = plugin;
+    public CommandManager(Game game) {
+        this.game = game;
     }
 
     private final Map<String, CommandMaster> rootCommands = new HashMap<>();
@@ -19,8 +20,8 @@ public class CommandManager implements TabExecutor {
     public void addRootCommand(CommandMaster command) {
         rootCommands.remove(command.getName());
         rootCommands.put(command.getName(), command);
-        Objects.requireNonNull(plugin.getCommand(command.getName())).setExecutor(this);
-        Objects.requireNonNull(plugin.getCommand(command.getName())).setTabCompleter(this);
+        Objects.requireNonNull(game.getCommand(command.getName())).setExecutor(this);
+        Objects.requireNonNull(game.getCommand(command.getName())).setTabCompleter(this);
     }
 
     private boolean onCommandImpl(CommandSender sender, Command command, String label, String[] args) {

@@ -11,15 +11,20 @@ public class Messages {
 
     {
         // この二つはバニラのメッセージと同じなので変えたほうがいいかもしれない
-        messages.put("you.joinGame", "ゲームに参加しました");
-        messages.put("other.joinGame", "%sがゲームに参加しました");
+        messages.put("game.youJoinGame", "ゲームに参加しました");
+        messages.put("game.otherJoinGame", "%sがゲームに参加しました");
 
-        messages.put("you.found", "あなたは見つかってしまいました");
+        messages.put("game.youFound", "あなたは見つかってしまいました");
+        messages.put("game.otherFound", "%sは見つかってしまいました");
+
 
         errors.put("game.alreadyStarted", "すでにゲームは始まっています");
+        errors.put("game.notStarted", "まだゲームが始まっていません");
         errors.put("game.noData", "%sの設定がありません");
         errors.put("game.noPlayers", "プレイヤーがいません");
+        errors.put("command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("command.illegalArgument","正しい引数を入力してください");
+
         errors.put("messages.notExistKey", "存在しないコードのメッセージを取得しようとしました");
     }
 
