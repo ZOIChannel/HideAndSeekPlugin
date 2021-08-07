@@ -28,10 +28,9 @@ public class EventManager implements Listener {
         game.getGamePlayers().values().forEach(gamePlayer -> {
             if (!gamePlayer.isHider()) return;
             Hider hider = (Hider) gamePlayer;
-            if (hider.isFrozen()) return;
+            if (hider.isFrozen() || !hider.isFBLived()) return;
             if (! game.isSameBlockLocation(hider.getLocation(), hider.getFallingBlock().getLocation())) {
-                hider.getFallingBlock().teleport(hider.getLocation());
-                hider.getFallingBlock().setVelocity(new Vector(0, 0.01, 0));
+                hider.teleportFBToHider();
             }
         });
     }
@@ -76,10 +75,15 @@ public class EventManager implements Listener {
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
         if (!gamePlayer.isHider()) return;
         Hider hider = (Hider) gamePlayer;
+
+        hider.spawnFallingBlock();
         hider.setFBVelocity(from, to);
+
+        if (hider.isFBLived())
+        if (! game.isSameBlockLocation(hider.getLocation(), hider.getFallingBlock().getLocation())) hider.teleportFBToHider();
+        if (!hider.isFrozen()) return;
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ() && from.getBlockY() == to.getBlockY()) return;
-        if (hider.isFrozen()) hider.blockMelt();
-        if (hider.getFallingBlock().isDead()) hider.spawnFallingBlock();
+        hider.blockMelt();
     }
 
     @EventHandler

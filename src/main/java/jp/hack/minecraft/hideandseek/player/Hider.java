@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
@@ -39,6 +40,11 @@ public class Hider extends GamePlayer {
 
     public Boolean isFrozen() {
         return isFrozen;
+    }
+
+    public Boolean isFBLived() {
+        if (this.fallingBlock == null) return false;
+        return !this.fallingBlock.isDead();
     }
 
     public Long getFreezeTicks() {
@@ -82,37 +88,36 @@ public class Hider extends GamePlayer {
         this.isFrozen = false;
     }
 
+    public void teleportFBToHider() {
+        if (!isFBLived() || this.isFrozen) return;
+        this.fallingBlock.teleport(getLocation().add(0d, 0.05, 0d));
+        this.fallingBlock.setVelocity(new Vector());
+    }
+
     public void setFBVelocity(Location from, Location to) {
-        if (this.fallingBlock == null) return;
+        if (!isFBLived() || this.isFrozen) return;
+
         Vector vec = getPlayer().getVelocity();
+        if (((LivingEntity) getPlayer()).isOnGround()) vec.setY(0d);
         vec.setX(to.getX() - from.getX());
         vec.setZ(to.getZ() - from.getZ());
         this.fallingBlock.setVelocity(vec);
-        if (this.fallingBlock.isOnGround()) {
-            Location loc = this.fallingBlock.getLocation();
-            loc.setY(loc.getY()+0.01);
-        }
     }
 
     public void spawnFallingBlock() {
-        if (this.fallingBlock != null && !this.fallingBlock.isDead()) return;
+        if (isFBLived()) return;
         MaterialData materialData = new MaterialData(material);
-        this.fallingBlock = getPlayer().getWorld().spawnFallingBlock(getPlayer().getLocation(), materialData);
+        this.fallingBlock = getPlayer().getWorld().spawnFallingBlock(getPlayer().getLocation().add(0d, 0.05, 0d), materialData);
         this.fallingBlock.setDropItem(false);
         this.fallingBlock.setHurtEntities(false);
         this.fallingBlock.setGravity(false);
         this.fallingBlock.setInvulnerable(true);
         this.fallingBlock.setPersistent(true);
-        Location loc = this.fallingBlock.getLocation();
-        loc.setY(loc.getY()+0.01);
-        Vector velocity = getPlayer().getVelocity();
-        velocity.setY(velocity.getY() > 0 ? velocity.getY() : 0);
-        this.fallingBlock.setVelocity(velocity);
-        this.fallingBlock.setFallDistance(0);
+        this.fallingBlock.setVelocity(new Vector());
     }
 
     private void destroyFallingBlock() {
-        if (this.fallingBlock == null) return;
+        if (!isFBLived()) return;
         this.fallingBlock.remove();
         this.fallingBlock = null;
     }
