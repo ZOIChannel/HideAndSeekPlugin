@@ -2,3 +2,8 @@ name: HideAndSeek
 version: @version@
 main: jp.hack.minecraft.hideandseek.Game
 api-version: 1.16
+commands:
+  hideandseek:
+    aliases: hs
+    description: hide and seek game command
+    usage: "Usage: /<command>"
