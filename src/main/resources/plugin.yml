@@ -1,4 +1,4 @@
-name: Ryokno
+name: HideAndSeek
 version: @version@
-main: test.ryokno.Game
-api-version: 1.17
+main: jp.hack.minecraft.hideandseek.Main
+api-version: 1.16

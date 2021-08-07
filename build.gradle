@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group = 'Test'
+group = 'jp.hack.minecraft'
 version = '1.0-SNAPSHOT'
 
 sourceCompatibility = '1.8'
@@ -20,14 +20,10 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
-    maven {
-        url = 'https://jitpack.io'
-    }
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
-    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
 }
 
 processResources {
