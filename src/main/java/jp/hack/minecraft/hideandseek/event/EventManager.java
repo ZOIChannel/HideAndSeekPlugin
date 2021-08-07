@@ -1,22 +1,19 @@
-package test.ryokno.events;
+package jp.hack.minecraft.hideandseek.event;
 
+import jp.hack.minecraft.hideandseek.Game;
 import org.bukkit.Location;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
-import test.ryokno.Game;
-import test.ryokno.player.GamePlayer;
-import test.ryokno.player.Hider;
+import jp.hack.minecraft.hideandseek.player.GamePlayer;
+import jp.hack.minecraft.hideandseek.player.Hider;
 
 public class EventManager implements Listener {
     private final Game game;
@@ -34,7 +31,7 @@ public class EventManager implements Listener {
             if (hider.isFrozen()) return;
             if (! game.isSameBlockLocation(hider.getLocation(), hider.getFallingBlock().getLocation())) {
                 hider.getFallingBlock().teleport(hider.getLocation());
-                hider.getFallingBlock().setVelocity(new Vector(0, 0, 0));
+                hider.getFallingBlock().setVelocity(new Vector(0, 0.01, 0));
             }
         });
     }
@@ -71,7 +68,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        //System.out.println(event.getEventName());
+        System.out.println(event.getEventName());
         Location from = event.getFrom();
         Location to = event.getTo();
         if (from.getX() == to.getX() && from.getZ() == to.getZ() && from.getY() == to.getY()) return;

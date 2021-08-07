@@ -1,4 +1,4 @@
-package test.ryokno.player;
+package jp.hack.minecraft.hideandseek.player;
 
 import org.bukkit.entity.Player;
 
