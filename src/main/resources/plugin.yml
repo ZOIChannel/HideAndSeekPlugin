@@ -1,4 +1,4 @@
 name: HideAndSeek
 version: @version@
-main: jp.hack.minecraft.hideandseek.Main
+main: jp.hack.minecraft.hideandseek.Game
 api-version: 1.16

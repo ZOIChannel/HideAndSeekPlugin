@@ -2,7 +2,7 @@ package jp.hack.minecraft.hideandseek;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class Main extends JavaPlugin {
+public final class Game extends JavaPlugin {
 
     @Override
     public void onEnable() {
