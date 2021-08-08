@@ -1,6 +1,7 @@
 package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -28,10 +29,7 @@ public class EventManager implements Listener {
         game.getGamePlayers().values().forEach(gamePlayer -> {
             if (!gamePlayer.isHider()) return;
             Hider hider = (Hider) gamePlayer;
-            if (hider.isFrozen() || !hider.isFBLived()) return;
-            if (! game.isSameBlockLocation(hider.getLocation(), hider.getFallingBlock().getLocation())) {
-                hider.teleportFBToHider();
-            }
+            teleportFBToHider(hider);
         });
     }
 
@@ -52,37 +50,44 @@ public class EventManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         //System.out.println(event.getEventName());
         Player player = event.getPlayer();
-        Hider hider = game.createHider(player);
+        game.createHider(player);
+        game.getGameWatcher().start();
 
         player.setInvisible(true);
-        player.setCollidable(true);
-        hider.spawnFallingBlock();
     }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         System.out.println(event.getEventName());
-        game.getGameWatcher().start();
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         System.out.println(event.getEventName());
-        Location from = event.getFrom();
-        Location to = event.getTo();
-        if (from.getX() == to.getX() && from.getZ() == to.getZ() && from.getY() == to.getY()) return;
+
         Player player = event.getPlayer();
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
         if (!gamePlayer.isHider()) return;
         Hider hider = (Hider) gamePlayer;
 
+        hider.resetFBVelocity();
+
+        Location from = event.getFrom();
+        Location to = event.getTo();
+
+        if (to == null) return;
+        if (player.getGameMode() == GameMode.SPECTATOR)
+            if (from.getY() != to.getY()) {
+                event.setCancelled(true);
+                return;
+            }
+
+        if (game.isSameLocation(from, to)) return;
         hider.spawnFallingBlock();
         hider.setFBVelocity(from, to);
+        teleportFBToHider(hider);
 
-        if (hider.isFBLived())
-        if (! game.isSameBlockLocation(hider.getLocation(), hider.getFallingBlock().getLocation())) hider.teleportFBToHider();
-        if (!hider.isFrozen()) return;
-        if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ() && from.getBlockY() == to.getBlockY()) return;
+        if (game.isSameBlockLocation(from, to)) return;
         hider.blockMelt();
     }
 
@@ -90,6 +95,13 @@ public class EventManager implements Listener {
     public void onPlayerDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) event.setCancelled(true);
         if (event.getEntity() instanceof FallingBlock) event.setCancelled(true);
+    }
+
+    private void teleportFBToHider(Hider hider) {
+        if (!hider.isFBLived()) return;
+        if (game.isDistant(hider.getLocation(), hider.getFallingBlock().getLocation())) {
+            hider.teleportFBToHider();
+        }
     }
 }
 

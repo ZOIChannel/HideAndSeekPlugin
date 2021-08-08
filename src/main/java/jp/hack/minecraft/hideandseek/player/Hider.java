@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -72,31 +73,42 @@ public class Hider extends GamePlayer {
     }
 
 
-
-
     public void blockFreeze() {
         if (this.isFrozen) return;
+        this.isFrozen = true;
+        Player player = getPlayer();
+        player.setGameMode(GameMode.SPECTATOR);
         destroyFallingBlock();
         placeBlock();
-        this.isFrozen = true;
     }
 
     public void blockMelt() {
         if (!this.isFrozen) return;
+        this.isFrozen = false;
+        Player player = getPlayer();
+        player.setGameMode(GameMode.SURVIVAL);
         removeBlock();
         spawnFallingBlock();
-        this.isFrozen = false;
     }
 
     public void teleportFBToHider() {
         if (!isFBLived() || this.isFrozen) return;
         this.fallingBlock.teleport(getLocation().add(0d, 0.05, 0d));
-        this.fallingBlock.setVelocity(new Vector());
+        resetFBVelocity();
+    }
+
+    public void reduceFBVelocity() {
+        if (!isFBLived() || this.isFrozen) return;
+        this.fallingBlock.setVelocity(this.getFallingBlock().getVelocity().multiply(0.8));
+    }
+
+    public void resetFBVelocity() {
+        if (!isFBLived() || this.isFrozen) return;
+        this.fallingBlock.setVelocity(new Vector(0d, 0d, 0d));
     }
 
     public void setFBVelocity(Location from, Location to) {
         if (!isFBLived() || this.isFrozen) return;
-
         Vector vec = getPlayer().getVelocity();
         if (((LivingEntity) getPlayer()).isOnGround()) vec.setY(0d);
         vec.setX(to.getX() - from.getX());
@@ -105,7 +117,7 @@ public class Hider extends GamePlayer {
     }
 
     public void spawnFallingBlock() {
-        if (isFBLived()) return;
+        if (isFBLived() || this.isFrozen) return;
         MaterialData materialData = new MaterialData(material);
         this.fallingBlock = getPlayer().getWorld().spawnFallingBlock(getPlayer().getLocation().add(0d, 0.05, 0d), materialData);
         this.fallingBlock.setDropItem(false);
@@ -117,7 +129,7 @@ public class Hider extends GamePlayer {
     }
 
     private void destroyFallingBlock() {
-        if (!isFBLived()) return;
+        if (!isFBLived() || !this.isFrozen) return;
         this.fallingBlock.remove();
         this.fallingBlock = null;
     }

@@ -49,6 +49,18 @@ public final class Game extends JavaPlugin {
         super.onDisable();
     }
 
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        econ = rsp.getProvider();
+        return econ != null;
+    }
+
     public void start() {}
     public void stop() {}
     public GameState getCurrentState() {
@@ -91,19 +103,15 @@ public final class Game extends JavaPlugin {
         return hider;
     }
 
-    private boolean setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
-        }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {
-            return false;
-        }
-        econ = rsp.getProvider();
-        return econ != null;
+    public Boolean isSameLocation(Location loc1, Location loc2) {
+        return (loc1.getX() == loc2.getX() && loc1.getY() == loc2.getY() && loc1.getZ() == loc2.getZ());
     }
 
     public Boolean isSameBlockLocation(Location loc1, Location loc2) {
         return (loc1.getBlockX() == loc2.getBlockX() && loc1.getBlockY() == loc2.getBlockY() && loc1.getBlockZ() == loc2.getBlockZ());
+    }
+
+    public Boolean isDistant(Location loc1, Location loc2) {
+        return (loc1.distance(loc2) > 0.7d);
     }
 }
