@@ -8,11 +8,14 @@ import jp.hack.minecraft.hideandseek.data.*;
 import jp.hack.minecraft.hideandseek.system.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class Game extends JavaPlugin {
 
@@ -26,6 +29,9 @@ public final class Game extends JavaPlugin {
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
+
+    private Integer attackDamage;
+    private final int DEF_ATTACK_DAMAGE = 4;
 
 
     @Override
@@ -41,6 +47,7 @@ public final class Game extends JavaPlugin {
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
 
         configLoader = new ConfigLoader(this);
+        initializeConst();
     }
 
     @Override
@@ -58,11 +65,26 @@ public final class Game extends JavaPlugin {
             return false;
         }
         econ = rsp.getProvider();
-        return econ != null;
+        return true;
+    }
+
+    private void initializeConst() {
+        attackDamage = configLoader.getInt("attackDamage");
+        if (attackDamage == null) attackDamage = DEF_ATTACK_DAMAGE;
+        configLoader.setData("attackDamage", attackDamage);
     }
 
     public void start() {}
     public void stop() {}
+
+    public EventWatcher getEventWatcher() {
+        return eventWatcher;
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
     public GameState getCurrentState() {
         return currentState;
     }
@@ -83,12 +105,8 @@ public final class Game extends JavaPlugin {
         return gamePlayers.get(uuid);
     }
 
-    public EventWatcher getGameWatcher() {
-        return eventWatcher;
-    }
-
-    public EventManager getEventManager() {
-        return eventManager;
+    public List<Hider> getHiders() {
+        return gamePlayers.values().stream().filter(GamePlayer::isHider).map(p -> (Hider)p).collect(Collectors.toList());
     }
 
     public Seeker createSeeker(Player player) {
@@ -101,6 +119,18 @@ public final class Game extends JavaPlugin {
         Hider hider = new Hider(player);
         gamePlayers.put(hider.getPlayerUuid(), hider);
         return hider;
+    }
+
+    public void damageHider(Hider hider) {
+        hider.damage(attackDamage);
+    }
+
+    public Hider findHiderByBlock(Block block) {
+        return getHiders().stream().filter(p->p.getBlock() == block).findFirst().orElseGet(null);
+    }
+
+    public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
+        return getHiders().stream().filter(p->p.getFallingBlock() == fallingBlock).findFirst().orElseGet(null);
     }
 
     public Boolean isSameLocation(Location loc1, Location loc2) {

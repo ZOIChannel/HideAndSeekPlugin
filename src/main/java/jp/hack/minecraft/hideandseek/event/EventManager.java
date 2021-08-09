@@ -3,16 +3,17 @@ package jp.hack.minecraft.hideandseek.event;
 import jp.hack.minecraft.hideandseek.Game;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.util.Vector;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Hider;
 
@@ -51,14 +52,38 @@ public class EventManager implements Listener {
         //System.out.println(event.getEventName());
         Player player = event.getPlayer();
         game.createHider(player);
-        game.getGameWatcher().start();
+        game.getEventWatcher().start();
 
         player.setInvisible(true);
     }
 
     @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        System.out.println(event.getEventName());
+        if (event.getEntity() instanceof Player) {
+            event.setCancelled(true);
+            return;
+        }
+        if (!(event.getEntity() instanceof FallingBlock)) return;
+        event.setCancelled(true);
+        FallingBlock fallingBlock = (FallingBlock) event.getEntity();
+        Hider hider = game.findHiderByFallingBlock(fallingBlock);
+        if (hider == null) return;
+        game.damageHider(hider);
+    }
+
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         System.out.println(event.getEventName());
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+
+        if (gamePlayer.isHider()) return;
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        Block block = event.getClickedBlock();
+        Hider hider = game.findHiderByBlock(block);
+        if (hider == null) return;
+        game.damageHider(hider);
     }
 
     @EventHandler
@@ -89,12 +114,6 @@ public class EventManager implements Listener {
 
         if (game.isSameBlockLocation(from, to)) return;
         hider.blockMelt();
-    }
-
-    @EventHandler
-    public void onPlayerDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) event.setCancelled(true);
-        if (event.getEntity() instanceof FallingBlock) event.setCancelled(true);
     }
 
     private void teleportFBToHider(Hider hider) {

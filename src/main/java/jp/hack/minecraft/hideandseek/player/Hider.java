@@ -3,6 +3,7 @@ package jp.hack.minecraft.hideandseek.player;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
@@ -73,6 +74,13 @@ public class Hider extends GamePlayer {
     }
 
 
+    public void damage(int damage) {
+        blockMelt();
+        setFreezeTicks(0L);
+        getPlayer().damage(damage);
+        getPlayer().playSound(getLocation(), Sound.ENTITY_PLAYER_HURT, 1F, 1F);
+    }
+
     public void blockFreeze() {
         if (this.isFrozen) return;
         this.isFrozen = true;
@@ -86,7 +94,7 @@ public class Hider extends GamePlayer {
         if (!this.isFrozen) return;
         this.isFrozen = false;
         Player player = getPlayer();
-        player.setGameMode(GameMode.SURVIVAL);
+        player.setGameMode(GameMode.ADVENTURE);
         removeBlock();
         spawnFallingBlock();
     }
