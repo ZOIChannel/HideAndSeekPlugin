@@ -17,14 +17,18 @@ public class SetLobbyCommand extends AdminCommandMaster {
 
     @Override
     public String getName() {
-        return "setLobby";
+        return "setlobby";
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player)) sender.sendMessage(Messages.error("command.notPlayer"));
-        manager.game.getConfigLoader().setData("game.location.lobby", sender);
-        return false;
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(Messages.error("command.notPlayer"));
+            return false;
+        }
+        Player player = (Player) sender;
+        manager.game.getConfigLoader().setData("game.location.lobby", player.getLocation());
+        return true;
     }
 
     @Override

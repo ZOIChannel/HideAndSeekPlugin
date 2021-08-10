@@ -16,18 +16,22 @@ public class SetStageCommand extends AdminCommandMaster {
 
     @Override
     public String getName() {
-        return "setStage";
+        return "setstage";
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return false;
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(Messages.error("command.notPlayer"));
+            return false;
+        }
+        Player player = (Player)sender;
+        manager.game.getConfigLoader().setData("game.location.stage", player.getLocation());
+        return true;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if(!(sender instanceof Player)) sender.sendMessage(Messages.error("command.notPlayer"));
-        manager.game.getConfigLoader().setData("game.location.stage", sender);
         return null;
     }
 }
