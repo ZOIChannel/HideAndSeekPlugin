@@ -17,6 +17,7 @@ public class HideAndSeekCommand extends PlayerCommandMaster {
         super(manager);
         addSubCommand(new SetLobbyCommand(manager));
         addSubCommand(new SetStageCommand(manager));
+        addSubCommand(new SetSeekerLobbyCommand(manager));
         addSubCommand(new StartCommand(manager));
         addSubCommand(new StopCommand(manager));
         addSubCommand(new CancelCommand(manager));

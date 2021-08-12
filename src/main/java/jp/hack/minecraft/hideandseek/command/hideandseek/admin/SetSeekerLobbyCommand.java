@@ -1,8 +1,7 @@
-package jp.hack.minecraft.hideandseek.command.hideandseek.player;
+package jp.hack.minecraft.hideandseek.command.hideandseek.admin;
 
+import jp.hack.minecraft.hideandseek.command.AdminCommandMaster;
 import jp.hack.minecraft.hideandseek.command.CommandManager;
-import jp.hack.minecraft.hideandseek.command.PlayerCommandMaster;
-import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -10,29 +9,26 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class JoinCommand extends PlayerCommandMaster {
-    public JoinCommand(CommandManager manager) {
+public class SetSeekerLobbyCommand extends AdminCommandMaster {
+
+    public SetSeekerLobbyCommand(CommandManager manager) {
         super(manager);
     }
 
     @Override
     public String getName() {
-        return "join";
+        return "setseekerlobby";
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (manager.game.getCurrentState() == GameState.PLAYING) {
-            sender.sendMessage(Messages.error("game.alreadyStarted"));
-            return true;
-        }
         if (!(sender instanceof Player)) {
             sender.sendMessage(Messages.error("command.notPlayer"));
             return false;
         }
-        Player player = (Player)sender;
-        manager.game.join(player);
-        return false;
+        Player player = (Player) sender;
+        manager.game.getConfigLoader().setData("game.location.seekerLobby", player.getLocation());
+        return true;
     }
 
     @Override

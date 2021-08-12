@@ -13,6 +13,8 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,6 +31,7 @@ public final class Game extends JavaPlugin {
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
+    private BukkitTask seekerTeleportTimer;
 
     private Integer attackDamage;
     private final int DEF_ATTACK_DAMAGE = 4;
@@ -40,7 +43,7 @@ public final class Game extends JavaPlugin {
         super.onEnable();
         getServer().getPluginManager().registerEvents(eventManager, this);
 
-        if (!setupEconomy() ) {
+        if (!setupEconomy()) {
             getServer().getLogger().info("Vault plugin is not found.");
         }
         commandManager = new CommandManager(this);
@@ -72,10 +75,67 @@ public final class Game extends JavaPlugin {
         attackDamage = configLoader.getInt("attackDamage");
         if (attackDamage == null) attackDamage = DEF_ATTACK_DAMAGE;
         configLoader.setData("attackDamage", attackDamage);
+
+        stageData = new StageData((Location)configLoader.getData("location.stage"),configLoader.getInt("borderRadius"));
     }
 
-    public void start() {}
-    public void stop() {}
+    public void start() {
+        // この時点でConfigに値が設定されていなければエラーを出し、処理を中断する
+        currentState = GameState.PLAYING;
+        int seekerRate = configLoader.getInt("seekerRate"); // nullの場合の場合分けが必要
+        int seekerCount = (int) Math.ceil(gamePlayers.size() / (float) seekerRate);
+        List<Integer> randomOrderList = new ArrayList<>();
+        for (int i = 0; i < gamePlayers.size(); i++) {
+            randomOrderList.add(i);
+        }
+        Collections.shuffle(randomOrderList);
+        List<Integer> seekerIndex = randomOrderList.subList(0, seekerCount);
+        List<LobbyPlayer> lobbyPlayers = gamePlayers.values().stream()
+                .map(gamePlayer -> (LobbyPlayer) gamePlayer)
+                .collect(Collectors.toList());
+        for (int i = 0; i < lobbyPlayers.size(); i++) {
+            LobbyPlayer lobbyPlayer = lobbyPlayers.get(i);
+            if (seekerIndex.contains(i)) {
+                lobbyPlayer.createSeeker(gamePlayers);
+            } else {
+                lobbyPlayer.createHider(gamePlayers);
+            }
+        }
+        // ここでPlayerにメッセージなどを送信
+        gamePlayers.values().forEach(player -> player.getPlayer().sendTitle("ゲーム開始", "", 10, 20, 10));
+
+        stageData.createBorder();
+
+        Location stage = (Location) configLoader.getData("game.location.stage");
+        getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
+
+        Location seekerLobby = (Location) configLoader.getData("game.location.seekerLobby");
+        getSeekers().forEach(seeker -> seeker.getPlayer().teleport(seekerLobby));
+
+        int seekerWaitTime = configLoader.getInt("game.seekerWaitTime");
+        seekerTeleportTimer = new BukkitRunnable() {
+            int seekerWaitRemainTime = seekerWaitTime;
+
+            @Override
+            public void run() {
+                if (seekerWaitRemainTime > 0) {
+                    getSeekers().forEach(seeker -> seeker.getPlayer().sendMessage("残り " + seekerWaitRemainTime + "秒")); // 経験値バーの利用? Messagesクラスへの移植?
+                    getHiders().forEach(hider -> hider.getPlayer().sendMessage("残り " + seekerWaitRemainTime + "秒で鬼が放出されます")); // 経験値バーの利用? Messagesクラスへの移植?
+                    seekerWaitRemainTime -= 1;
+                } else {
+                    getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
+                    getHiders().forEach(hider -> hider.getPlayer().sendMessage("鬼が放出されました")); // 経験値バーの利用? Messagesクラスへの移植? Titleの利用?
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(this, 20, seekerWaitTime * 20L);
+    }
+
+    public void stop() {
+        currentState = GameState.LOBBY;
+        seekerTeleportTimer.cancel();
+        stageData.deleteBorder();
+    }
 
     public EventWatcher getEventWatcher() {
         return eventWatcher;
@@ -106,19 +166,36 @@ public final class Game extends JavaPlugin {
     }
 
     public List<Hider> getHiders() {
-        return gamePlayers.values().stream().filter(GamePlayer::isHider).map(p -> (Hider)p).collect(Collectors.toList());
+        return gamePlayers.values().stream().filter(GamePlayer::isHider).map(p -> (Hider) p).collect(Collectors.toList());
     }
 
-    public Seeker createSeeker(Player player) {
-        Seeker seeker = new Seeker(player);
-        gamePlayers.put(seeker.getPlayerUuid(), seeker);
-        return seeker;
+    public List<Seeker> getSeekers() {
+        return gamePlayers.values().stream().filter(GamePlayer::isSeeker).map(p -> (Seeker) p).collect(Collectors.toList());
     }
 
+    // gamePlayersへのSeekerのputはLobbyPlayerから行う
+//    public Seeker createSeeker(Player player) {
+//        Seeker seeker = new Seeker(player);
+//        gamePlayers.put(seeker.getPlayerUuid(), seeker);
+//        return seeker;
+//    }
+
+    // 仮コード・削除予定。gamePlayersへのHiderのputはLobbyPlayerから行う
     public Hider createHider(Player player) {
         Hider hider = new Hider(player);
         gamePlayers.put(hider.getPlayerUuid(), hider);
         return hider;
+    }
+
+    public void join(Player player) {
+        if (gamePlayers.containsKey(player.getUniqueId())) {
+            player.sendMessage(Messages.error("game.alreadyJoined"));
+            return;
+        }
+        Location lobby = (Location) configLoader.getData("game.location.lobby"); // nullの場合の場合分けが必要
+        player.teleport(lobby);
+        gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
+        // ここでPlayerにメッセージなどを送信
     }
 
     public void damageHider(Hider hider) {
@@ -126,11 +203,11 @@ public final class Game extends JavaPlugin {
     }
 
     public Hider findHiderByBlock(Block block) {
-        return getHiders().stream().filter(p->p.getBlock() == block).findFirst().orElseGet(null);
+        return getHiders().stream().filter(p -> p.getBlock() == block).findFirst().orElseGet(null);
     }
 
     public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
-        return getHiders().stream().filter(p->p.getFallingBlock() == fallingBlock).findFirst().orElseGet(null);
+        return getHiders().stream().filter(p -> p.getFallingBlock() == fallingBlock).findFirst().orElseGet(null);
     }
 
     public Boolean isSameLocation(Location loc1, Location loc2) {

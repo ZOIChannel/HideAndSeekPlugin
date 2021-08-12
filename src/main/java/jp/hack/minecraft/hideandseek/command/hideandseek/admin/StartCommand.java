@@ -25,6 +25,10 @@ public class StartCommand extends AdminCommandMaster {
             sender.sendMessage(Messages.error("game.alreadyStarted"));
             return true;
         }
+        if(manager.game.getGamePlayers().size() < 2){
+            sender.sendMessage(Messages.error("game.notEnoughPlayer"));
+            return true;
+        }
         manager.game.start();
         return true;
     }

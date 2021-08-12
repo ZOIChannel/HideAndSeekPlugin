@@ -25,4 +25,7 @@ abstract public class GamePlayer {
     public Boolean isHider() {
         return this instanceof Hider;
     }
+    public Boolean isSeeker() {
+        return this instanceof Seeker;
+    }
 }

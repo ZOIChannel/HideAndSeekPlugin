@@ -1,0 +1,8 @@
+attackDamage: 4
+seekerRate: 5
+seekerWaitTime: 30
+borderRadius: 50
+location:
+  lobby:
+  seekerLobby:
+  stage:

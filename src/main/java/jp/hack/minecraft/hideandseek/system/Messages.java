@@ -20,11 +20,14 @@ public class Messages {
 
 
         errors.put("game.alreadyStarted", "すでにゲームは始まっています");
+        errors.put("game.alreadyJoined", "すでにゲームに参加しています");
         errors.put("game.notStarted", "まだゲームが始まっていません");
         errors.put("game.noData", "%sの設定がありません");
-        errors.put("game.noPlayers", "プレイヤーがいません");
+        errors.put("game.notEnoughPlayer", "ゲームを開始するのに十分なプレイヤーが参加していません");
+        errors.put("game.noPlayer", "そのようなプレイヤーはいません");
         errors.put("command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("command.illegalArgument","正しい引数を入力してください");
+        errors.put("config.noSetting","設定「%s」が存在しません");
 
         errors.put("error.notExistKey", "存在しないコードのメッセージを取得しようとしました");
     }
