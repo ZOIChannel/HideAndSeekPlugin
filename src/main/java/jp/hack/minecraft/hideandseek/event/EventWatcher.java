@@ -7,10 +7,12 @@ import org.bukkit.scheduler.BukkitTask;
 import jp.hack.minecraft.hideandseek.player.Hider;
 
 public class EventWatcher {
+    private final long DELAY = 5L;
+    private final long LIMIT = 60L;
+
     private final Game game;
     private BukkitTask task;
     private Boolean isStarted = false;
-    private Boolean isCalledEvent = false;
 
     public EventWatcher(Game game) {
         this.game = game;
@@ -34,16 +36,12 @@ public class EventWatcher {
     }
 
     class MyRunTask extends BukkitRunnable {
-        private final long DELAY = 5L;
-        private final long LIMIT = 60L;
-
         @Override
         public void run() {
             EventWatcherEvent eventWatcherEvent = new EventWatcherEvent();
             game.getServer().getPluginManager().callEvent(eventWatcherEvent);
 
             game.getGamePlayers().values().forEach(player -> {
-
                 if (!player.isHider()) return;
                 Hider hider = (Hider) player;
 
@@ -53,21 +51,12 @@ public class EventWatcher {
                     Location loc = hider.getLocation();
                     if (game.isSameBlockLocation(prevLoc, loc)) {
 
-                        hider.addFreezeTick(DELAY);
-                        System.out.println(hider.getFreezeTicks());
-
-                        if (hider.getFreezeTicks() >= LIMIT) {
-                            if (!isCalledEvent) {
-                                HiderFrozenEvent hiderFrozenEvent = new HiderFrozenEvent(hider);
-                                game.getServer().getPluginManager().callEvent(hiderFrozenEvent);
-                                isCalledEvent = true;
-
-                            }
-                        }
+                        callEvent(hider);
 
                     } else {
-                        hider.setFreezeTicks(0L);
-                        isCalledEvent = false;
+
+                        resetCount(hider);
+
                     }
                 }
 
@@ -76,5 +65,26 @@ public class EventWatcher {
             });
             task = new MyRunTask().runTaskLater(game, DELAY);
         }
+    }
+
+
+
+    private void callEvent(Hider hider) {
+        hider.addFreezeTick(DELAY);
+        System.out.println(hider.getFreezeTicks());
+
+        if (hider.getFreezeTicks() >= LIMIT) {
+            if (!hider.isCalledEvent()) {
+                HiderFrozenEvent hiderFrozenEvent = new HiderFrozenEvent(hider);
+                game.getServer().getPluginManager().callEvent(hiderFrozenEvent);
+                hider.setCalledEvent(true);
+
+            }
+        }
+    }
+
+    private void resetCount(Hider hider) {
+        hider.setFreezeTicks(0L);
+        hider.setCalledEvent(false);
     }
 }

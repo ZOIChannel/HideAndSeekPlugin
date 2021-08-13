@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -45,6 +46,9 @@ public class EventManager implements Listener {
     public void onHiderFrozen(HiderFrozenEvent event) {
         //System.out.println(event.getEventName());
         Hider hider = event.getHider();
+
+        if (hider.isDead()) return;
+
         hider.blockFreeze();
     }
 
@@ -52,10 +56,8 @@ public class EventManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         //System.out.println(event.getEventName());
         Player player = event.getPlayer();
-//        game.createHider(player); // 一旦コメントアウト
-//        game.getEventWatcher().start(); // Game.onEnableへ移動(reloadしたとき反映されないから)
-
-//        player.setInvisible(true); // Hiderへ移動
+        game.createHider(player); // コメントアウト外しました　完成してからコメントアウトをお願いします
+        game.getEventWatcher().start(); // Game.onEnableへ移動(reloadしたとき反映されないから)
     }
 
     @EventHandler
@@ -97,6 +99,8 @@ public class EventManager implements Listener {
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
         if (!gamePlayer.isHider()) return;
         Hider hider = (Hider) gamePlayer;
+
+        if (hider.isDead()) return;
 
         hider.resetFBVelocity();
 

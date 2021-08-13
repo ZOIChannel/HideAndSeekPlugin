@@ -182,18 +182,18 @@ public final class Game extends JavaPlugin {
     }
 
     // gamePlayersへのSeekerのputはLobbyPlayerから行う
-//    public Seeker createSeeker(Player player) {
-//        Seeker seeker = new Seeker(player);
-//        gamePlayers.put(seeker.getPlayerUuid(), seeker);
-//        return seeker;
-//    }
+    public Seeker createSeeker(Player player) {
+        Seeker seeker = new Seeker(player);
+        gamePlayers.put(seeker.getPlayerUuid(), seeker);
+        return seeker;
+    }
 
     // 仮コード・削除予定。gamePlayersへのHiderのputはLobbyPlayerから行う
-//    public Hider createHider(Player player) {
-//        Hider hider = new Hider(player);
-//        gamePlayers.put(hider.getPlayerUuid(), hider);
-//        return hider;
-//    }
+    public Hider createHider(Player player) {
+        Hider hider = new Hider(player);
+        gamePlayers.put(hider.getPlayerUuid(), hider);
+        return hider;
+    }
 
     public void join(Player player) {
         if (gamePlayers.containsKey(player.getUniqueId())) {
@@ -214,11 +214,11 @@ public final class Game extends JavaPlugin {
     }
 
     public Hider findHiderByBlock(Block block) {
-        return getHiders().stream().filter(p -> p.getBlock() == block).findFirst().orElse(null);
+        return getHiders().stream().filter(p -> p.getBlock().equals(block)).findFirst().orElse(null);
     }
 
     public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
-        return getHiders().stream().filter(p -> p.getFallingBlock() == fallingBlock).findFirst().orElse(null);
+        return getHiders().stream().filter(p -> p.getFallingBlock().equals(fallingBlock)).findFirst().orElse(null);
     }
 
     public Boolean isSameLocation(Location loc1, Location loc2) {

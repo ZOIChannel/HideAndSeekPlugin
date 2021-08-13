@@ -15,9 +15,13 @@ public class Hider extends GamePlayer {
     private Material material;
     private Block block;
     private FallingBlock fallingBlock;
-    private Boolean isFrozen = false;
+
     private Long freezeTicks = 0L;
     private Location prevLoc;
+
+    private Boolean isDead = false;
+    private Boolean isFrozen = false;
+    private Boolean isCalledEvent = false;
 
     public Hider(Player player) {
         super(player);
@@ -41,8 +45,20 @@ public class Hider extends GamePlayer {
         return fallingBlock;
     }
 
+    public Boolean isDead() {
+        return isDead;
+    }
+
     public Boolean isFrozen() {
         return isFrozen;
+    }
+
+    public Boolean isCalledEvent() {
+        return isCalledEvent;
+    }
+
+    public void setCalledEvent(Boolean calledEvent) {
+        isCalledEvent = calledEvent;
     }
 
     public Boolean isFBLived() {
@@ -76,14 +92,18 @@ public class Hider extends GamePlayer {
 
 
     public void damage(int damage) {
+        isDead = true;
+        getPlayer().setGameMode(GameMode.SPECTATOR);
+        /*
         blockMelt();
         setFreezeTicks(0L);
         getPlayer().damage(damage);
         getPlayer().playSound(getLocation(), Sound.ENTITY_PLAYER_HURT, 1F, 1F);
+        */
     }
 
     public void blockFreeze() {
-        if (this.isFrozen) return;
+        if (this.isFrozen || this.isDead) return;
         this.isFrozen = true;
         Player player = getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
@@ -92,7 +112,7 @@ public class Hider extends GamePlayer {
     }
 
     public void blockMelt() {
-        if (!this.isFrozen) return;
+        if (!this.isFrozen || this.isDead) return;
         this.isFrozen = false;
         Player player = getPlayer();
         player.setGameMode(GameMode.ADVENTURE);
@@ -101,23 +121,23 @@ public class Hider extends GamePlayer {
     }
 
     public void teleportFBToHider() {
-        if (!isFBLived() || this.isFrozen) return;
-        this.fallingBlock.teleport(getLocation().add(0d, 0.05, 0d));
+        if (!isFBLived() || this.isFrozen || this.isDead) return;
+        this.fallingBlock.teleport(getLocation().add(0d, 0.0001, 0d));
         resetFBVelocity();
     }
 
     public void reduceFBVelocity() {
-        if (!isFBLived() || this.isFrozen) return;
+        if (!isFBLived() || this.isFrozen || this.isDead) return;
         this.fallingBlock.setVelocity(this.getFallingBlock().getVelocity().multiply(0.8));
     }
 
     public void resetFBVelocity() {
-        if (!isFBLived() || this.isFrozen) return;
+        if (!isFBLived() || this.isFrozen || this.isDead) return;
         this.fallingBlock.setVelocity(new Vector(0d, 0d, 0d));
     }
 
     public void setFBVelocity(Location from, Location to) {
-        if (!isFBLived() || this.isFrozen) return;
+        if (!isFBLived() || this.isFrozen || this.isDead) return;
         Vector vec = getPlayer().getVelocity();
         if (((LivingEntity) getPlayer()).isOnGround()) vec.setY(0d);
         vec.setX(to.getX() - from.getX());
@@ -126,31 +146,30 @@ public class Hider extends GamePlayer {
     }
 
     public void spawnFallingBlock() {
-        if (isFBLived() || this.isFrozen) return;
+        if (isFBLived() || this.isFrozen || this.isDead) return;
         MaterialData materialData = new MaterialData(material);
-        this.fallingBlock = getPlayer().getWorld().spawnFallingBlock(getPlayer().getLocation().add(0d, 0.05, 0d), materialData);
+        this.fallingBlock = getPlayer().getWorld().spawnFallingBlock(getPlayer().getLocation().add(0d, 0.0001, 0d), materialData);
         this.fallingBlock.setDropItem(false);
         this.fallingBlock.setHurtEntities(false);
         this.fallingBlock.setGravity(false);
-        this.fallingBlock.setInvulnerable(true);
         this.fallingBlock.setPersistent(true);
         this.fallingBlock.setVelocity(new Vector());
     }
 
     private void destroyFallingBlock() {
-        if (!isFBLived() || !this.isFrozen) return;
+        if (!isFBLived() || !this.isFrozen || this.isDead) return;
         this.fallingBlock.remove();
         this.fallingBlock = null;
     }
 
     private void placeBlock() {
-        if (this.block != null) return;
+        if (this.block != null || this.isDead) return;
         this.block = getPlayer().getLocation().getBlock();
         this.block.setType(material);
     }
 
     private void removeBlock() {
-        if (this.block == null) return;
+        if (this.block == null || this.isDead) return;
         this.block.setType(Material.AIR);
         this.block = null;
     }
