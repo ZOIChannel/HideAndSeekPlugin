@@ -7,6 +7,8 @@ import jp.hack.minecraft.hideandseek.player.*;
 import jp.hack.minecraft.hideandseek.data.*;
 import jp.hack.minecraft.hideandseek.system.*;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
@@ -50,12 +52,14 @@ public final class Game extends JavaPlugin {
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
 
         configLoader = new ConfigLoader(this);
+        eventWatcher.start();
         initializeConst();
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        eventWatcher.stop();
         super.onDisable();
     }
 
@@ -75,11 +79,10 @@ public final class Game extends JavaPlugin {
         attackDamage = configLoader.getInt("attackDamage");
         if (attackDamage == null) attackDamage = DEF_ATTACK_DAMAGE;
         configLoader.setData("attackDamage", attackDamage);
-
-        stageData = new StageData((Location)configLoader.getData("location.stage"),configLoader.getInt("borderRadius"));
     }
 
     public void start() {
+        stageData = new StageData((Location) configLoader.getData("location.stage"), configLoader.getInt("borderRadius"));
         // この時点でConfigに値が設定されていなければエラーを出し、処理を中断する
         currentState = GameState.PLAYING;
         int seekerRate = configLoader.getInt("seekerRate"); // nullの場合の場合分けが必要
@@ -102,17 +105,20 @@ public final class Game extends JavaPlugin {
             }
         }
         // ここでPlayerにメッセージなどを送信
-        gamePlayers.values().forEach(player -> player.getPlayer().sendTitle("ゲーム開始", "", 10, 20, 10));
+        gamePlayers.values().forEach(gamePlayer -> {
+            Player player = gamePlayer.getPlayer();
+            player.sendTitle("ゲーム開始", "", 10, 20, 10);
+        });
 
         stageData.createBorder();
 
-        Location stage = (Location) configLoader.getData("game.location.stage");
-        getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
+        Location stage = (Location) configLoader.getData("location.stage");
+        getHiders().forEach(hider -> hider.getPlayer().teleport(stage));
 
-        Location seekerLobby = (Location) configLoader.getData("game.location.seekerLobby");
+        Location seekerLobby = (Location) configLoader.getData("location.seekerLobby");
         getSeekers().forEach(seeker -> seeker.getPlayer().teleport(seekerLobby));
 
-        int seekerWaitTime = configLoader.getInt("game.seekerWaitTime");
+        int seekerWaitTime = configLoader.getInt("seekerWaitTime");
         seekerTeleportTimer = new BukkitRunnable() {
             int seekerWaitRemainTime = seekerWaitTime;
 
@@ -128,10 +134,12 @@ public final class Game extends JavaPlugin {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(this, 20, seekerWaitTime * 20L);
+        }.runTaskTimer(this, 20, 20);
     }
 
     public void stop() {
+        gamePlayers.clear();
+
         currentState = GameState.LOBBY;
         seekerTeleportTimer.cancel();
         stageData.deleteBorder();
@@ -181,20 +189,23 @@ public final class Game extends JavaPlugin {
 //    }
 
     // 仮コード・削除予定。gamePlayersへのHiderのputはLobbyPlayerから行う
-    public Hider createHider(Player player) {
-        Hider hider = new Hider(player);
-        gamePlayers.put(hider.getPlayerUuid(), hider);
-        return hider;
-    }
+//    public Hider createHider(Player player) {
+//        Hider hider = new Hider(player);
+//        gamePlayers.put(hider.getPlayerUuid(), hider);
+//        return hider;
+//    }
 
     public void join(Player player) {
         if (gamePlayers.containsKey(player.getUniqueId())) {
             player.sendMessage(Messages.error("game.alreadyJoined"));
             return;
         }
-        Location lobby = (Location) configLoader.getData("game.location.lobby"); // nullの場合の場合分けが必要
+        Location lobby = (Location) configLoader.getData("location.lobby"); // nullの場合の場合分けが必要
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
+        // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setInvisible(false);
         // ここでPlayerにメッセージなどを送信
     }
 
@@ -203,11 +214,11 @@ public final class Game extends JavaPlugin {
     }
 
     public Hider findHiderByBlock(Block block) {
-        return getHiders().stream().filter(p -> p.getBlock() == block).findFirst().orElseGet(null);
+        return getHiders().stream().filter(p -> p.getBlock() == block).findFirst().orElse(null);
     }
 
     public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
-        return getHiders().stream().filter(p -> p.getFallingBlock() == fallingBlock).findFirst().orElseGet(null);
+        return getHiders().stream().filter(p -> p.getFallingBlock() == fallingBlock).findFirst().orElse(null);
     }
 
     public Boolean isSameLocation(Location loc1, Location loc2) {

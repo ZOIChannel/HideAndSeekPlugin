@@ -26,7 +26,7 @@ public class SetStageCommand extends AdminCommandMaster {
             return false;
         }
         Player player = (Player)sender;
-        manager.game.getConfigLoader().setData("game.location.stage", player.getLocation());
+        manager.game.getConfigLoader().setData("location.stage", player.getLocation());
         return true;
     }
 

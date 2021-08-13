@@ -1,15 +1,15 @@
 package jp.hack.minecraft.hideandseek.player;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
+
+import java.util.Map;
+import java.util.UUID;
 
 public class Hider extends GamePlayer {
     private Material material;
@@ -22,6 +22,7 @@ public class Hider extends GamePlayer {
     public Hider(Player player) {
         super(player);
         this.material = Material.ACACIA_LOG;
+        player.setInvisible(true);
     }
 
     public Material getMaterial() {

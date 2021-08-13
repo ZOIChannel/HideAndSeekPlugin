@@ -1,6 +1,7 @@
 package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -51,10 +52,10 @@ public class EventManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         //System.out.println(event.getEventName());
         Player player = event.getPlayer();
-        game.createHider(player);
-        game.getEventWatcher().start();
+//        game.createHider(player); // 一旦コメントアウト
+//        game.getEventWatcher().start(); // Game.onEnableへ移動(reloadしたとき反映されないから)
 
-        player.setInvisible(true);
+//        player.setInvisible(true); // Hiderへ移動
     }
 
     @EventHandler
@@ -76,6 +77,7 @@ public class EventManager implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         System.out.println(event.getEventName());
         Player player = event.getPlayer();
+        if(!game.getGamePlayers().containsKey(player.getUniqueId())) return;
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
 
         if (gamePlayer.isHider()) return;
@@ -91,6 +93,7 @@ public class EventManager implements Listener {
         System.out.println(event.getEventName());
 
         Player player = event.getPlayer();
+        if(!game.getGamePlayers().containsKey(player.getUniqueId())) return;
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
         if (!gamePlayer.isHider()) return;
         Hider hider = (Hider) gamePlayer;

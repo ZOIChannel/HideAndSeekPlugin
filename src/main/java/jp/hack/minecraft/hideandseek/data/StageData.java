@@ -15,6 +15,7 @@ public class StageData {
     public StageData(Location center, double radius){
         this.center = center;
         this.radius = radius;
+        // NullならOP持っている人(またはstart打った人)へエラー/警告だす　これはGameにConfigの値の確認を実装すれば不要
         stageBorder = Objects.requireNonNull(center.getWorld()).getWorldBorder();
     }
 

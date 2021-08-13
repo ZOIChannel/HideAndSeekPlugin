@@ -27,7 +27,7 @@ public class SetLobbyCommand extends AdminCommandMaster {
             return false;
         }
         Player player = (Player) sender;
-        manager.game.getConfigLoader().setData("game.location.lobby", player.getLocation());
+        manager.game.getConfigLoader().setData("location.lobby", player.getLocation());
         return true;
     }
 

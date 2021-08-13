@@ -10,7 +10,7 @@ public class ConfigLoader {
 
     public ConfigLoader(JavaPlugin plugin) {
         this.plugin = plugin;
-        plugin.saveDefaultConfig();
+        plugin.saveDefaultConfig(); // 未定義の要素があっても、configファイルが空でなければ追加しない
         config = plugin.getConfig();
     }
 

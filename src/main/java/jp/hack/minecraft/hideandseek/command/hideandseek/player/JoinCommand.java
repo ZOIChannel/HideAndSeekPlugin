@@ -28,11 +28,11 @@ public class JoinCommand extends PlayerCommandMaster {
         }
         if (!(sender instanceof Player)) {
             sender.sendMessage(Messages.error("command.notPlayer"));
-            return false;
+            return true;
         }
         Player player = (Player)sender;
         manager.game.join(player);
-        return false;
+        return true;
     }
 
     @Override
