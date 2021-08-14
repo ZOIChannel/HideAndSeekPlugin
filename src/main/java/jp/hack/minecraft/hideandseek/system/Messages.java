@@ -21,6 +21,7 @@ public class Messages {
 
         errors.put("game.alreadyStarted", "すでにゲームは始まっています");
         errors.put("game.alreadyJoined", "すでにゲームに参加しています");
+        errors.put("game.notJoined", "あなたはゲームに参加していません");
         errors.put("game.notStarted", "まだゲームが始まっていません");
         errors.put("game.noData", "%sの設定がありません");
         errors.put("game.notEnoughPlayer", "ゲームを開始するのに十分なプレイヤーが参加していません");

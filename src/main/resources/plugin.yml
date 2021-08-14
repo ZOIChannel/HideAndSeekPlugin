@@ -7,3 +7,8 @@ commands:
     aliases: hs
     description: hide and seek game command
     usage: "Usage: /<command>"
+permissions:
+  hideandseek.admin:
+      default: op
+  hideandseek.player:
+    default: true

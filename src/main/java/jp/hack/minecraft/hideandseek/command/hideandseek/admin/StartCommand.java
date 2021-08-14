@@ -2,6 +2,7 @@ package jp.hack.minecraft.hideandseek.command.hideandseek.admin;
 
 import jp.hack.minecraft.hideandseek.command.AdminCommandMaster;
 import jp.hack.minecraft.hideandseek.command.CommandManager;
+import jp.hack.minecraft.hideandseek.command.CommandMaster;
 import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.command.Command;
@@ -31,6 +32,11 @@ public class StartCommand extends AdminCommandMaster {
         }
         manager.game.start();
         return true;
+    }
+
+    @Override
+    public boolean getExecutable(CommandSender sender, CommandMaster command){
+        return super.getExecutable(sender, this) && manager.game.getCurrentState() == GameState.LOBBY;
     }
 
     @Override

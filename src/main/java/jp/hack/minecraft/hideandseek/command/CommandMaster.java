@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -29,6 +30,12 @@ public abstract class CommandMaster {
 
     public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);
 
+    public boolean getExecutable(CommandSender sender, CommandMaster command){
+        Bukkit.getLogger().info("command.getName() = " + command.getName());
+        Bukkit.getLogger().info("command.getPermission() = " + command.getPermission());
+        if(command.getPermission() == null) return true;
+        return sender.hasPermission(command.getPermission());
+    }
 
     public abstract List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args);
     // return new ArrayList<>(subCommands.keySet());

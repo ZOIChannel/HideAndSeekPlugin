@@ -22,6 +22,7 @@ public class CommandManager implements TabExecutor {
         rootCommands.put(command.getName(), command);
         Objects.requireNonNull(game.getCommand(command.getName())).setExecutor(this);
         Objects.requireNonNull(game.getCommand(command.getName())).setTabCompleter(this);
+        Objects.requireNonNull(game.getCommand(command.getName())).setPermission(command.getPermission());
     }
 
     private boolean onCommandImpl(CommandSender sender, Command command, String label, String[] args) {

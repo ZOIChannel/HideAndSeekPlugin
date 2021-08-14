@@ -15,7 +15,7 @@ public abstract class PlayerCommandMaster extends CommandMaster{
 
     @Override
     public String getPermission() {
-        return null;
+        return "hideandseek.player";
     }
 
     @Override

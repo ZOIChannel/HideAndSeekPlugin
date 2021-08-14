@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public final class Game extends JavaPlugin {
 
     private List<GamePlayer> playerList;
-    private GameState currentState;
+    private GameState currentState = GameState.LOBBY;
     private GameLogic gameLogic;
     private ConfigLoader configLoader;
     private StageData stageData;
@@ -208,8 +208,22 @@ public final class Game extends JavaPlugin {
         player.setInvisible(false);
         // ここでPlayerにメッセージなどを送信
     }
+    public void cancel(Player player) {
+        if (!gamePlayers.containsKey(player.getUniqueId())) {
+            player.sendMessage(Messages.error("game.notJoined"));
+            return;
+        }
+        // playerをどこか(スポーン地?)へTPさせるべきかもしれない
+
+        gamePlayers.remove(player.getUniqueId());
+        // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setInvisible(false);
+        // ここでPlayerにメッセージなどを送信
+    }
 
     public void damageHider(Hider hider) {
+        Bukkit.getLogger().info("damage!!!");
         hider.damage(attackDamage);
     }
 

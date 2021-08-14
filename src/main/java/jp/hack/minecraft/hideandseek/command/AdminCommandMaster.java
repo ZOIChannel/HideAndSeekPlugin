@@ -16,7 +16,7 @@ public abstract class AdminCommandMaster extends CommandMaster{
 
     @Override
     public String getPermission() {
-        return "op";
+        return "hideandseek.admin";
     }
 
     @Override
