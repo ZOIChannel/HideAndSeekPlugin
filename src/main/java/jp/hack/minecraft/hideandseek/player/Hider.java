@@ -2,14 +2,10 @@ package jp.hack.minecraft.hideandseek.player;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
-
-import java.util.Map;
-import java.util.UUID;
 
 public class Hider extends GamePlayer {
     private Material material;
@@ -92,8 +88,11 @@ public class Hider extends GamePlayer {
 
 
     public void damage(int damage) {
-        isDead = true;
         getPlayer().setGameMode(GameMode.SPECTATOR);
+        removeBlock();
+        Firework firework = getFirework();
+        firework.detonate();
+        isDead = true;
         /*
         blockMelt();
         setFreezeTicks(0L);
@@ -172,5 +171,19 @@ public class Hider extends GamePlayer {
         if (this.block == null || this.isDead) return;
         this.block.setType(Material.AIR);
         this.block = null;
+    }
+
+    private Firework getFirework() {
+        Firework firework = (Firework) getPlayer().getWorld().spawnEntity(getLocation(), EntityType.FIREWORK);
+        FireworkMeta meta = firework.getFireworkMeta();
+        meta.addEffect(FireworkEffect.builder()
+                .with(FireworkEffect.Type.STAR)
+                .withFlicker()
+                .withColor(Color.RED, Color.YELLOW)
+                .build()
+        );
+        meta.setPower(0);
+        firework.setFireworkMeta(meta);
+        return firework;
     }
 }

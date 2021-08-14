@@ -1,7 +1,6 @@
 package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -11,8 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -61,12 +59,14 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void onEntityDamage(EntityDamageEvent event) {
+    public void onEntityDamage(EntityDamageByEntityEvent event) {
         System.out.println(event.getEventName());
+
         if (event.getEntity() instanceof Player) {
             event.setCancelled(true);
             return;
         }
+
         if (!(event.getEntity() instanceof FallingBlock)) return;
         event.setCancelled(true);
         FallingBlock fallingBlock = (FallingBlock) event.getEntity();
