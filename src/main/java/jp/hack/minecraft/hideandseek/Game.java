@@ -34,6 +34,7 @@ public final class Game extends JavaPlugin {
     private final EventManager eventManager = new EventManager(this);
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private BukkitTask seekerTeleportTimer;
+    private BukkitTask gameOverTimer;
 
     private Integer attackDamage;
     private final int DEF_ATTACK_DAMAGE = 4;
@@ -118,7 +119,24 @@ public final class Game extends JavaPlugin {
         Location seekerLobby = (Location) configLoader.getData("location.seekerLobby");
         getSeekers().forEach(seeker -> seeker.getPlayer().teleport(seekerLobby));
 
+        int gameTime = configLoader.getInt("gameTime");
         int seekerWaitTime = configLoader.getInt("seekerWaitTime");
+        Game game = this;
+        BukkitRunnable gameOverRunnable = new BukkitRunnable() {
+            int gameRemainTime = gameTime;
+
+            @Override
+            public void run() {
+                if (gameRemainTime > 0) {
+                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("残り " + gameRemainTime + "秒")); // 経験値バーの利用? Messagesクラスへの移植?
+                    gameRemainTime -= 1;
+                } else {
+                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("ゲーム終了です")); // 経験値バーの利用? Messagesクラスへの移植? Titleの利用?
+                    game.gameOver();
+                    this.cancel();
+                }
+            }
+        };
         seekerTeleportTimer = new BukkitRunnable() {
             int seekerWaitRemainTime = seekerWaitTime;
 
@@ -131,17 +149,36 @@ public final class Game extends JavaPlugin {
                 } else {
                     getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
                     getHiders().forEach(hider -> hider.getPlayer().sendMessage("鬼が放出されました")); // 経験値バーの利用? Messagesクラスへの移植? Titleの利用?
+                    gameOverTimer = gameOverRunnable.runTaskTimer(game, 20, 20);
                     this.cancel();
                 }
             }
         }.runTaskTimer(this, 20, 20);
     }
 
+    public void gameOver() {
+        String wonRole = judge();
+        getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendTitle(wonRole + "の勝利!!!", "", 20, 20, 20));
+        stop();
+    }
+
+    private String judge() {
+        if (gamePlayers.values().stream().anyMatch(gamePlayer -> {
+            if (!gamePlayer.isHider()) return false;
+            Hider hider = (Hider) gamePlayer;
+            return !hider.isDead();
+        })) return "Hider";
+        else return "Seeker";
+    }
+
     public void stop() {
+        // プレイヤーをどこかへTPさせる?
+        gamePlayers.forEach((uuid, gamePlayer) ->gamePlayer.getPlayer().setGameMode(GameMode.SURVIVAL));
         gamePlayers.clear();
 
         currentState = GameState.LOBBY;
         seekerTeleportTimer.cancel();
+        gameOverTimer.cancel();
         stageData.deleteBorder();
     }
 
@@ -208,6 +245,7 @@ public final class Game extends JavaPlugin {
         player.setInvisible(false);
         // ここでPlayerにメッセージなどを送信
     }
+
     public void cancel(Player player) {
         if (!gamePlayers.containsKey(player.getUniqueId())) {
             player.sendMessage(Messages.error("game.notJoined"));
