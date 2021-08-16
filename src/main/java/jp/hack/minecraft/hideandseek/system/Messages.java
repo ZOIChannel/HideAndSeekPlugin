@@ -18,6 +18,8 @@ public class Messages {
         messages.put("game.you.found", "あなたは見つかってしまいました");
         messages.put("game.other.found", "%sは見つかってしまいました");
 
+        messages.put("stage.crated", "ステージ「%s」を作成しました");
+        messages.put("stage.edited", "ステージ「%s」の「%s」の設定を変更しました");
 
         errors.put("game.alreadyStarted", "すでにゲームは始まっています");
         errors.put("game.alreadyJoined", "すでにゲームに参加しています");
@@ -28,7 +30,10 @@ public class Messages {
         errors.put("game.noPlayer", "そのようなプレイヤーはいません");
         errors.put("command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("command.illegalArgument","正しい引数を入力してください");
+        errors.put("command.tooLongArgument","引数が長すぎます");
         errors.put("config.noSetting","設定「%s」が存在しません");
+        errors.put("stage.alreadyExist", "「%s」という名前のステージはすでに存在します");
+        errors.put("stage.notFoundName", "「%s」という名前のステージは存在しません");
 
         errors.put("error.notExistKey", "存在しないコードのメッセージを取得しようとしました");
     }

@@ -31,8 +31,6 @@ public abstract class CommandMaster {
     public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);
 
     public boolean getExecutable(CommandSender sender, CommandMaster command){
-        Bukkit.getLogger().info("command.getName() = " + command.getName());
-        Bukkit.getLogger().info("command.getPermission() = " + command.getPermission());
         if(command.getPermission() == null) return true;
         return sender.hasPermission(command.getPermission());
     }

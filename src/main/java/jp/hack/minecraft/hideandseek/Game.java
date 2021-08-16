@@ -7,9 +7,7 @@ import jp.hack.minecraft.hideandseek.player.*;
 import jp.hack.minecraft.hideandseek.data.*;
 import jp.hack.minecraft.hideandseek.system.*;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -27,7 +25,8 @@ public final class Game extends JavaPlugin {
     private GameState currentState = GameState.LOBBY;
     private GameLogic gameLogic;
     private ConfigLoader configLoader;
-    private StageData stageData;
+    private int currentStageIndex = 0;
+    private List<StageData> stageList = new ArrayList<>();
     private CommandManager commandManager;
     private static Economy econ = null;
     private final EventWatcher eventWatcher = new EventWatcher(this);
@@ -80,10 +79,25 @@ public final class Game extends JavaPlugin {
         attackDamage = configLoader.getInt("attackDamage");
         if (attackDamage == null) attackDamage = DEF_ATTACK_DAMAGE;
         configLoader.setData("attackDamage", attackDamage);
+        if (!(configLoader.getData("stage") instanceof List)
+                || ((List<?>) configLoader.getData("stage")).stream().noneMatch(Objects::nonNull)) {
+            stageList = new ArrayList<>();
+            configLoader.setData("stage", stageList);
+        } else {
+            stageList = (ArrayList<StageData>) configLoader.getData("stage");
+        }
     }
 
     public void start() {
-        stageData = new StageData((Location) configLoader.getData("location.stage"), configLoader.getInt("borderRadius"));
+        StageData stageData = getCurrentStage();
+        if(stageData == null) {
+            Bukkit.getLogger().info("ステージが存在しない");// プレイヤーへのメッセージに変更
+            return;
+        }
+        if(!stageData.isInitialized()){
+            Bukkit.getLogger().info("stageの設定が不十分");// プレイヤーへのメッセージに変更
+            return;
+        }
         // この時点でConfigに値が設定されていなければエラーを出し、処理を中断する
         currentState = GameState.PLAYING;
         int seekerRate = configLoader.getInt("seekerRate"); // nullの場合の場合分けが必要
@@ -113,10 +127,10 @@ public final class Game extends JavaPlugin {
 
         stageData.createBorder();
 
-        Location stage = (Location) configLoader.getData("location.stage");
+        Location stage = getCurrentStage().getStage();
         getHiders().forEach(hider -> hider.getPlayer().teleport(stage));
 
-        Location seekerLobby = (Location) configLoader.getData("location.seekerLobby");
+        Location seekerLobby = getCurrentStage().getSeekerLobby();
         getSeekers().forEach(seeker -> seeker.getPlayer().teleport(seekerLobby));
 
         int gameTime = configLoader.getInt("gameTime");
@@ -143,12 +157,14 @@ public final class Game extends JavaPlugin {
             @Override
             public void run() {
                 if (seekerWaitRemainTime > 0) {
+                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
                     getSeekers().forEach(seeker -> seeker.getPlayer().sendMessage("残り " + seekerWaitRemainTime + "秒")); // 経験値バーの利用? Messagesクラスへの移植?
                     getHiders().forEach(hider -> hider.getPlayer().sendMessage("残り " + seekerWaitRemainTime + "秒で鬼が放出されます")); // 経験値バーの利用? Messagesクラスへの移植?
                     seekerWaitRemainTime -= 1;
                 } else {
+                    Objects.requireNonNull(stage.getWorld()).playSound(stage, Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.AMBIENT, 1, 1);
                     getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
-                    getHiders().forEach(hider -> hider.getPlayer().sendMessage("鬼が放出されました")); // 経験値バーの利用? Messagesクラスへの移植? Titleの利用?
+                    getHiders().forEach(hider -> hider.getPlayer().sendTitle("鬼が放出された", "", 20, 40, 20)); // Messagesクラスへの移植?
                     gameOverTimer = gameOverRunnable.runTaskTimer(game, 20, 20);
                     this.cancel();
                 }
@@ -173,13 +189,13 @@ public final class Game extends JavaPlugin {
 
     public void stop() {
         // プレイヤーをどこかへTPさせる?
-        gamePlayers.forEach((uuid, gamePlayer) ->gamePlayer.getPlayer().setGameMode(GameMode.SURVIVAL));
+        gamePlayers.forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setGameMode(GameMode.SURVIVAL));
         gamePlayers.clear();
 
         currentState = GameState.LOBBY;
         seekerTeleportTimer.cancel();
         gameOverTimer.cancel();
-        stageData.deleteBorder();
+        getCurrentStage().deleteBorder();
     }
 
     public EventWatcher getEventWatcher() {
@@ -196,6 +212,10 @@ public final class Game extends JavaPlugin {
 
     public ConfigLoader getConfigLoader() {
         return configLoader;
+    }
+
+    public List<StageData> getStageList() {
+        return stageList;
     }
 
     public static Economy getEconomy() {
@@ -237,7 +257,7 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.alreadyJoined"));
             return;
         }
-        Location lobby = (Location) configLoader.getData("location.lobby"); // nullの場合の場合分けが必要
+        Location lobby = getCurrentStage().getLobby(); // nullの場合の場合分けが必要
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
@@ -285,5 +305,27 @@ public final class Game extends JavaPlugin {
 
     public Boolean isDistant(Location loc1, Location loc2) {
         return (loc1.distance(loc2) > 0.7d);
+    }
+
+    public StageData getCurrentStage() {
+        if (stageList.size() == 0) return null;
+        return stageList.get(currentStageIndex);
+    }
+
+    public void selectNextStage() {
+        System.out.println(currentStageIndex);
+        currentStageIndex++;
+        System.out.println(currentStageIndex);
+        if (currentStageIndex >= stageList.size()) currentStageIndex = 0;
+        System.out.println(currentStageIndex);
+    }
+
+    public StageData createNewStage(String name) {
+        Optional<StageData> optionalStageData = stageList.stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        if(optionalStageData.isPresent()) return null; // この二行、普通にstreamとif使って一行で完結させてもいいかも
+        StageData stageData = new StageData(name);
+        stageList.add(stageData);
+        System.out.println(stageList);
+        return stageData;
     }
 }

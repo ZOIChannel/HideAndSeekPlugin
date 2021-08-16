@@ -1,7 +1,8 @@
 package jp.hack.minecraft.hideandseek.system;
 
+import jp.hack.minecraft.hideandseek.data.StageData;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConfigLoader {
@@ -10,6 +11,7 @@ public class ConfigLoader {
 
     public ConfigLoader(JavaPlugin plugin) {
         this.plugin = plugin;
+        ConfigurationSerialization.registerClass(StageData.class);
         plugin.saveDefaultConfig(); // 未定義の要素があっても、configファイルが空でなければ追加しない
         config = plugin.getConfig();
     }

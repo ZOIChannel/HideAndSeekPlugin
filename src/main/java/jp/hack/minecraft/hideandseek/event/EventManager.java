@@ -4,6 +4,7 @@ import jp.hack.minecraft.hideandseek.Game;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -77,9 +78,10 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        onPlayerClickSign(event);
         System.out.println(event.getEventName());
         Player player = event.getPlayer();
-        if(!game.getGamePlayers().containsKey(player.getUniqueId())) return;
+        if (!game.getGamePlayers().containsKey(player.getUniqueId())) return;
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
 
         if (gamePlayer.isHider()) return;
@@ -90,12 +92,30 @@ public class EventManager implements Listener {
         game.damageHider(hider);
     }
 
+
+    private void onPlayerClickSign(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (!event.hasBlock()) return;
+        if (!(event.getClickedBlock().getState() instanceof Sign)) return;
+        Sign sign = (Sign) event.getClickedBlock().getState();
+        changeStage(sign);
+    }
+
+    private void changeStage(Sign sign) {
+        if (!sign.getLines()[0].equals("[StageSelector]")) return;
+        game.selectNextStage();
+        System.out.println("event.getEventName()");
+        if (game.getCurrentStage() == null) sign.setLine(2, ">> Stage not set <<");
+        sign.setLine(2, ">> " + game.getCurrentStage().getName() + " <<");
+        sign.update();
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         System.out.println(event.getEventName());
 
         Player player = event.getPlayer();
-        if(!game.getGamePlayers().containsKey(player.getUniqueId())) return;
+        if (!game.getGamePlayers().containsKey(player.getUniqueId())) return;
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
         if (!gamePlayer.isHider()) return;
         Hider hider = (Hider) gamePlayer;

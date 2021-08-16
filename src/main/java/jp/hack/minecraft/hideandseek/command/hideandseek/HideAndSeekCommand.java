@@ -15,9 +15,7 @@ import java.util.stream.Stream;
 public class HideAndSeekCommand extends PlayerCommandMaster {
     public HideAndSeekCommand(CommandManager manager) {
         super(manager);
-        addSubCommand(new SetLobbyCommand(manager));
-        addSubCommand(new SetStageCommand(manager));
-        addSubCommand(new SetSeekerLobbyCommand(manager));
+        addSubCommand(new StageCommand(manager));
         addSubCommand(new StartCommand(manager));
         addSubCommand(new StopCommand(manager));
         addSubCommand(new CancelCommand(manager));
@@ -46,6 +44,7 @@ public class HideAndSeekCommand extends PlayerCommandMaster {
             return Stream.of(getName()).filter(s -> s.startsWith(args[0])).collect(Collectors.toList());
         if (args.length <= 2)
             return executableCommands.keySet().stream().filter(s -> s.startsWith(args[1])).collect(Collectors.toList());
-        return executableCommands.get(args[1]).onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length - 1));
+        if(!executableCommands.containsKey(args[1])) return new ArrayList<>();
+        return executableCommands.get(args[1]).onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
     }
 }
