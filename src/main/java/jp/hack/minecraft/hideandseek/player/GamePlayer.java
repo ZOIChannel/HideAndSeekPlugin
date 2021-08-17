@@ -14,6 +14,8 @@ abstract public class GamePlayer {
         this.player.setCollidable(true);
     }
 
+    public void equipItem() {}
+
     public UUID getPlayerUuid() {
         return playerUuid;
     }

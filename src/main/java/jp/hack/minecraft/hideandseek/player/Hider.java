@@ -3,9 +3,13 @@ package jp.hack.minecraft.hideandseek.player;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
+
+import java.util.Random;
 
 public class Hider extends GamePlayer {
     private Material material;
@@ -23,6 +27,7 @@ public class Hider extends GamePlayer {
         super(player);
         this.material = Material.ACACIA_LOG;
         player.setInvisible(true);
+        equipItem();
     }
 
     public Material getMaterial() {
@@ -86,8 +91,13 @@ public class Hider extends GamePlayer {
         this.prevLoc = prevLoc;
     }
 
+    @Override
+    public void equipItem() {
+        Inventory inventory = getPlayer().getInventory();
+    }
 
     public void damage(int damage) {
+        if (isDead) return;
         getPlayer().setGameMode(GameMode.SPECTATOR);
         removeBlock();
         Firework firework = getFirework();
@@ -182,7 +192,7 @@ public class Hider extends GamePlayer {
                 .withColor(Color.RED, Color.YELLOW)
                 .build()
         );
-        meta.setPower(0);
+        meta.setPower(1);
         firework.setFireworkMeta(meta);
         return firework;
     }

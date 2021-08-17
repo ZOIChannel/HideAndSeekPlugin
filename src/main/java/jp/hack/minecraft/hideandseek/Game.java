@@ -8,6 +8,10 @@ import jp.hack.minecraft.hideandseek.data.*;
 import jp.hack.minecraft.hideandseek.system.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -37,7 +41,56 @@ public final class Game extends JavaPlugin {
 
     private Integer attackDamage;
     private final int DEF_ATTACK_DAMAGE = 4;
+    private Material captureType = Material.GLASS_BOTTLE;
+    private Material meltType = Material.WOODEN_PICKAXE;
 
+    public EventWatcher getEventWatcher() {
+        return eventWatcher;
+    }
+
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public GameState getCurrentState() {
+        return currentState;
+    }
+
+    public ConfigLoader getConfigLoader() {
+        return configLoader;
+    }
+
+    public static Economy getEconomy() {
+        return econ;
+    }
+
+    public List<StageData> getStageList() {
+        return stageList;
+    }
+
+    public Map<UUID, GamePlayer> getGamePlayers() {
+        return gamePlayers;
+    }
+
+    public GamePlayer getGamePlayer(UUID uuid) {
+        return gamePlayers.get(uuid);
+    }
+
+    public List<Hider> getHiders() {
+        return gamePlayers.values().stream().filter(GamePlayer::isHider).map(p -> (Hider) p).collect(Collectors.toList());
+    }
+
+    public List<Seeker> getSeekers() {
+        return gamePlayers.values().stream().filter(GamePlayer::isSeeker).map(p -> (Seeker) p).collect(Collectors.toList());
+    }
+
+    public Material getCaptureType() {
+        return captureType;
+    }
+
+    public Material getMeltType() {
+        return meltType;
+    }
 
     @Override
     public void onEnable() {
@@ -198,46 +251,6 @@ public final class Game extends JavaPlugin {
         getCurrentStage().deleteBorder();
     }
 
-    public EventWatcher getEventWatcher() {
-        return eventWatcher;
-    }
-
-    public EventManager getEventManager() {
-        return eventManager;
-    }
-
-    public GameState getCurrentState() {
-        return currentState;
-    }
-
-    public ConfigLoader getConfigLoader() {
-        return configLoader;
-    }
-
-    public List<StageData> getStageList() {
-        return stageList;
-    }
-
-    public static Economy getEconomy() {
-        return econ;
-    }
-
-    public Map<UUID, GamePlayer> getGamePlayers() {
-        return gamePlayers;
-    }
-
-    public GamePlayer getGamePlayer(UUID uuid) {
-        return gamePlayers.get(uuid);
-    }
-
-    public List<Hider> getHiders() {
-        return gamePlayers.values().stream().filter(GamePlayer::isHider).map(p -> (Hider) p).collect(Collectors.toList());
-    }
-
-    public List<Seeker> getSeekers() {
-        return gamePlayers.values().stream().filter(GamePlayer::isSeeker).map(p -> (Seeker) p).collect(Collectors.toList());
-    }
-
     // gamePlayersへのSeekerのputはLobbyPlayerから行う
     public Seeker createSeeker(Player player) {
         Seeker seeker = new Seeker(player);
@@ -283,6 +296,16 @@ public final class Game extends JavaPlugin {
     public void damageHider(Hider hider) {
         Bukkit.getLogger().info("damage!!!");
         hider.damage(attackDamage);
+    }
+
+    public Seeker findSeeker(UUID uuid) {
+        if (uuid == null) return null;
+        return (getSeekers().stream().filter(s -> s.getPlayerUuid().equals(uuid)).findAny().orElse(null));
+    }
+
+    public Hider findHider(UUID uuid) {
+        if (uuid == null) return null;
+        return (getHiders().stream().filter(h -> h.getPlayerUuid().equals(uuid)).findAny().orElse(null));
     }
 
     public Hider findHiderByBlock(Block block) {

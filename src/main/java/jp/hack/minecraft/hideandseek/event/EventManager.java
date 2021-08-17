@@ -1,21 +1,23 @@
 package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
+import jp.hack.minecraft.hideandseek.player.Seeker;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Hider;
 
 public class EventManager implements Listener {
@@ -60,18 +62,26 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void onEntityDamage(EntityDamageByEntityEvent event) {
-        System.out.println(event.getEventName());
+    public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
+        System.out.println(event.getEventName() +"; Entity:" + event.getRightClicked().getName());
 
-        if (event.getEntity() instanceof Player) {
-            event.setCancelled(true);
-            return;
+        Player player = event.getPlayer();
+        Entity rightClicked = event.getRightClicked();
+        Material havingItemType = player.getInventory().getItemInMainHand().getType();
+        if (!game.getCaptureType().equals(havingItemType)) return;
+
+        Seeker seeker = game.findSeeker(player.getUniqueId());
+        if (seeker == null) return;
+
+        if (!(rightClicked instanceof FallingBlock || rightClicked instanceof Player)) return;
+
+        Hider hider;
+
+        if (rightClicked instanceof FallingBlock) {
+            hider = game.findHiderByFallingBlock((FallingBlock) rightClicked);
+        } else {
+            hider = game.findHider(rightClicked.getUniqueId());
         }
-
-        if (!(event.getEntity() instanceof FallingBlock)) return;
-        event.setCancelled(true);
-        FallingBlock fallingBlock = (FallingBlock) event.getEntity();
-        Hider hider = game.findHiderByFallingBlock(fallingBlock);
         if (hider == null) return;
         game.damageHider(hider);
     }
@@ -80,16 +90,19 @@ public class EventManager implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         onPlayerClickSign(event);
         System.out.println(event.getEventName());
-        Player player = event.getPlayer();
-        if (!game.getGamePlayers().containsKey(player.getUniqueId())) return;
-        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
 
-        if (gamePlayer.isHider()) return;
+        Player player = event.getPlayer();
+        Material havingItemType = player.getInventory().getItemInMainHand().getType();
+        if (!game.getMeltType().equals(havingItemType)) return;
+
+        Seeker seeker = game.findSeeker(player.getUniqueId());
+        if (seeker == null) return;
+
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         Block block = event.getClickedBlock();
         Hider hider = game.findHiderByBlock(block);
         if (hider == null) return;
-        game.damageHider(hider);
+        hider.blockMelt();
     }
 
 
@@ -115,11 +128,8 @@ public class EventManager implements Listener {
         System.out.println(event.getEventName());
 
         Player player = event.getPlayer();
-        if (!game.getGamePlayers().containsKey(player.getUniqueId())) return;
-        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-        if (!gamePlayer.isHider()) return;
-        Hider hider = (Hider) gamePlayer;
-
+        Hider hider = game.findHider(player.getUniqueId());
+        if (hider == null) return;
         if (hider.isDead()) return;
 
         hider.resetFBVelocity();
