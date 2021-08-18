@@ -35,10 +35,13 @@ public class StageCommand extends AdminCommandMaster {
             return true;
         }
         Player player = (Player) sender;
-        // ゲームステージへの指定コマンド
-        // 削除コマンド
-        // 半径の指定コマンド
         switch (args[1]) {
+            case "set":
+                setStage(player, args);
+                break;
+            case "delete":
+                deleteStage(player, args);
+                break;
             case "create":
                 createStage(player, args);
                 break;
@@ -66,8 +69,40 @@ public class StageCommand extends AdminCommandMaster {
         if (args[1].equals("edit") && args.length == 3)
             return manager.game.getStageList().stream().map(StageData::getName).collect(Collectors.toList());
         if (args[1].equals("edit") && args.length == 4)
-            return new ArrayList<>(Arrays.asList("lobby", "seekerLobby", "stage"));
+            return new ArrayList<>(Arrays.asList("lobby", "seekerLobby", "stage", "radius"));
         return new ArrayList<>();
+    }
+
+    private void setStage(Player player, String[] args) {
+        if (args.length <= 2) {
+            player.sendMessage(Messages.error("command.illegalArgument"));
+            return;
+        }
+        String name = args[2];
+        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        if (!stageDataOptional.isPresent()) {
+            player.sendMessage(Messages.error("stage.notFoundName", name));
+            return;
+        }
+        StageData stageData = stageDataOptional.get();
+        manager.game.setStage(stageData);
+        player.sendMessage(Messages.message("stage.crated", name));
+    }
+
+    private void deleteStage(Player player, String[] args) {
+        if (args.length <= 2) {
+            player.sendMessage(Messages.error("command.illegalArgument"));
+            return;
+        }
+        String name = args[2];
+        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        if (!stageDataOptional.isPresent()) {
+            player.sendMessage(Messages.error("stage.notFoundName", name));
+            return;
+        }
+        StageData stageData = stageDataOptional.get();
+        manager.game.deleteStage(stageData);
+        player.sendMessage(Messages.message("stage.deleted", name));
     }
 
     private void createStage(Player player, String[] args) {
@@ -95,43 +130,72 @@ public class StageCommand extends AdminCommandMaster {
             player.sendMessage(Messages.error("command.illegalArgument"));
             return;
         }
-        String editStageName = args[2];
-        if (manager.game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(editStageName))) {
-            player.sendMessage(Messages.error("stage.notFoundName", editStageName));
+        String name = args[2];
+        if (manager.game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
+            player.sendMessage(Messages.error("stage.notFoundName", name));
             return;
         }
-        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(editStageName)).findFirst();
+        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) return;
         StageData stageData = stageDataOptional.get();
-        String name = args[3];
+        String type = args[3];
         StageType stageType = null;
-        switch (name) {
+        switch (type) {
             case "lobby":
                 stageType = LOBBY;
+                stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
+                manager.game.getConfigLoader().setData("location.stage", player.getLocation());
+                player.sendMessage(Messages.message("stage.edited", name, type));
                 break;
             case "seekerLobby":
                 stageType = SEEKER_LOBBY;
+                stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
+                manager.game.getConfigLoader().setData("location.stage", player.getLocation());
+                player.sendMessage(Messages.message("stage.edited", name, type));
                 break;
             case "stage":
                 stageType = STAGE;
                 break;
+            case "radius":
+                editStageRadius(player, args);
+                return;
             default:
                 player.sendMessage(Messages.error("command.illegalArgument"));
                 break;
         }
         stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
-        manager.game.getConfigLoader().setData("location.stage", player.getLocation());
-        player.sendMessage(Messages.message("stage.edited", editStageName, name));
+//        manager.game.getConfigLoader().setData("location.stage", player.getLocation());
+        player.sendMessage(Messages.message("stage.edited", name, type));
+    }
+
+    private void editStageRadius(Player player, String[] args) {
+        if (args.length <= 3) {
+            player.sendMessage(Messages.error("command.illegalArgument"));
+            return;
+        }
+        String name = args[2];
+        if (manager.game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
+            player.sendMessage(Messages.error("stage.notFoundName", name));
+            return;
+        }
+        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        if (!stageDataOptional.isPresent()) return;
+        StageData stageData = stageDataOptional.get();
+//        String type = args[3];
+        double radius = Double.parseDouble(args[4]);
+        stageData.setRadius(radius, manager.game.getConfigLoader());
+        player.sendMessage(Messages.message("stage.edited", name, StageType.RADIUS));
     }
 
     private void listStage(Player player, String[] args) {
-        List<String> sendTexts = new ArrayList<>(Arrays.asList("|--- name ---|-- lobby --|-- seekerLobby --|-- stage --|"));
+        List<String> sendTexts = new ArrayList<>(Arrays.asList("|--- name ---|-- lobby --|-- seekerLobby --|-- stage --|-- radius --|"));
         manager.game.getStageList().forEach(stageData -> {
             StringBuilder builder = new StringBuilder();
             builder.append("| ").append(String.format("%-14s", stageData.getName()));
             builder.append("| ").append(String.format("%-12s", (stageData.getLobby() != null)));
             builder.append("| ").append(String.format("%-22s", (stageData.getSeekerLobby() != null)));
             builder.append("| ").append(String.format("%-12s", (stageData.getStage() != null)));
+            builder.append("| ").append(String.format("%-14s", (stageData.getRadius() != 0)));
             builder.append("|");
             sendTexts.add(builder.toString());
         });

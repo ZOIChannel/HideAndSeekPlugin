@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
 import jp.hack.minecraft.hideandseek.player.Hider;
+import org.bukkit.inventory.ItemStack;
 
 public class EventManager implements Listener {
     private final Game game;
@@ -88,6 +89,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         onPlayerClickSign(event);
+        onPlayerClickItem(event);
         System.out.println(event.getEventName());
 
         Player player = event.getPlayer();
@@ -111,6 +113,15 @@ public class EventManager implements Listener {
         if (!(event.getClickedBlock().getState() instanceof Sign)) return;
         Sign sign = (Sign) event.getClickedBlock().getState();
         changeStage(sign);
+    }
+
+    private void onPlayerClickItem(PlayerInteractEvent event){
+        ItemStack item = event.getItem();
+        if(item == null) return;
+        if(item.getItemMeta() == null) return;
+        if(!item.getItemMeta().hasDisplayName()) return;
+        if(!item.getItemMeta().getDisplayName().equals("Select Block")) return;
+        game.getBlockGui().openGui(event.getPlayer());
     }
 
     private void changeStage(Sign sign) {

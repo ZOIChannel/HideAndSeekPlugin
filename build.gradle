@@ -1,7 +1,19 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
 import org.apache.tools.ant.filters.ReplaceTokens
 
-plugins {
-    id 'java'
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+shadowJar {
+    relocate 'com.github.stefvanschie.inventoryframework', 'jp.hack.minecraft.hideandseek.inventoryframework'
 }
 
 group = 'jp.hack.minecraft'
@@ -28,6 +40,7 @@ repositories {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+    compile "com.github.stefvanschie.inventoryframework:IF:0.10.1"
 }
 
 processResources {

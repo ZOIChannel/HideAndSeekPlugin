@@ -4,4 +4,5 @@ public enum StageType {
     LOBBY,
     SEEKER_LOBBY,
     STAGE,
+    RADIUS,
 }

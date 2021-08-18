@@ -13,12 +13,14 @@ public class Messages {
         // この二つはバニラのメッセージと同じなので変えたほうがいいかもしれない
         messages.put("game.youJoinGame", "ゲームに参加しました");
         messages.put("game.otherJoinGame", "%sがゲームに参加しました");
+        messages.put("game.youCancelGame", "ゲームから退出しました");
 
         messages.put("game.you.cannotHideHere", "ここで隠れることはできません");
         messages.put("game.you.found", "あなたは見つかってしまいました");
         messages.put("game.other.found", "%sは見つかってしまいました");
 
         messages.put("stage.crated", "ステージ「%s」を作成しました");
+        messages.put("stage.deleted", "ステージ「%s」を削除しました");
         messages.put("stage.edited", "ステージ「%s」の「%s」の設定を変更しました");
 
         errors.put("game.alreadyStarted", "すでにゲームは始まっています");
@@ -32,6 +34,7 @@ public class Messages {
         errors.put("command.illegalArgument","正しい引数を入力してください");
         errors.put("command.tooLongArgument","引数が長すぎます");
         errors.put("config.noSetting","設定「%s」が存在しません");
+        errors.put("stage.none", "ステージが設定されていません");
         errors.put("stage.alreadyExist", "「%s」という名前のステージはすでに存在します");
         errors.put("stage.notFoundName", "「%s」という名前のステージは存在しません");
 

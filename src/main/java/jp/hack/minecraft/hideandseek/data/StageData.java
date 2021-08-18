@@ -104,6 +104,10 @@ public class StageData implements ConfigurationSerializable {
         return stageLocation;
     }
 
+    public Double getRadius() {
+        return radius;
+    }
+
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> serialized = new HashMap<>();
