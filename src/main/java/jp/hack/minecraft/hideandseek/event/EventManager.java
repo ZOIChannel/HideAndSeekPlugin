@@ -14,10 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.*;
 import jp.hack.minecraft.hideandseek.player.Hider;
 
 public class EventManager implements Listener {
@@ -39,8 +37,17 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-        System.out.println(event.getEventName());
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerItemDamage(PlayerItemDamageEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player) event.setCancelled(true);
     }
 
     @EventHandler
@@ -51,14 +58,6 @@ public class EventManager implements Listener {
         if (hider.isDead()) return;
 
         hider.blockFreeze();
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        //System.out.println(event.getEventName());
-        Player player = event.getPlayer();
-        game.createHider(player); // コメントアウト外しました　完成してからコメントアウトをお願いします
-        game.getEventWatcher().start(); // Game.onEnableへ移動(reloadしたとき反映されないから)
     }
 
     @EventHandler
