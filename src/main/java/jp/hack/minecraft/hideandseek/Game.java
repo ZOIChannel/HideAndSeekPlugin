@@ -8,7 +8,6 @@ import jp.hack.minecraft.hideandseek.data.*;
 import jp.hack.minecraft.hideandseek.system.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.*;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +16,6 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -154,16 +152,22 @@ public final class Game extends JavaPlugin {
     public void start() {
         StageData stageData = getCurrentStage();
         if (stageData == null) {
-            Bukkit.getLogger().info("ステージが存在しない");// プレイヤーへのメッセージに変更
+            this.gamePlayers.values().forEach(gamePlayer -> {
+                if (!gamePlayer.getPlayer().hasPermission("op")) return;
+                gamePlayer.getPlayer().sendMessage("ステージが存在しません。設定をしてください。");
+            });
             return;
         }
         if (!stageData.isInitialized()) {
-            Bukkit.getLogger().info("stageの設定が不十分");// プレイヤーへのメッセージに変更
+            this.gamePlayers.values().forEach(gamePlayer -> {
+                if (!gamePlayer.getPlayer().hasPermission("op")) return;
+                gamePlayer.getPlayer().sendMessage("ステージの設定が不十分です。設定をしてください。");
+            });
             return;
         }
-        // この時点でConfigに値が設定されていなければエラーを出し、処理を中断する
+
         currentState = GameState.PLAYING;
-        int seekerRate = configLoader.getInt("seekerRate"); // nullの場合の場合分けが必要
+        int seekerRate = configLoader.getInt("seekerRate");
         int seekerCount = (int) Math.ceil(gamePlayers.size() / (float) seekerRate);
         List<Integer> randomOrderList = new ArrayList<>();
         for (int i = 0; i < gamePlayers.size(); i++) {
@@ -182,7 +186,6 @@ public final class Game extends JavaPlugin {
                 lobbyPlayer.createHider(gamePlayers);
             }
         }
-        // ここでPlayerにメッセージなどを送信
         gamePlayers.values().forEach(gamePlayer -> {
             Player player = gamePlayer.getPlayer();
             player.sendTitle("ゲーム開始", "", 10, 20, 10);
@@ -223,10 +226,9 @@ public final class Game extends JavaPlugin {
             @Override
             public void run() {
                 if (gameRemainTime > 0) {
-                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("残り " + gameRemainTime + "秒")); // 経験値バーの利用? Messagesクラスへの移植?
+                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setLevel(gameRemainTime));
                     gameRemainTime -= 1;
                 } else {
-                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("ゲーム終了です")); // 経験値バーの利用? Messagesクラスへの移植? Titleの利用?
                     game.gameOver();
                     this.cancel();
                 }
@@ -239,13 +241,12 @@ public final class Game extends JavaPlugin {
             public void run() {
                 if (seekerWaitRemainTime > 0) {
                     getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
-                    getSeekers().forEach(seeker -> seeker.getPlayer().sendMessage("残り " + seekerWaitRemainTime + "秒")); // 経験値バーの利用? Messagesクラスへの移植?
-                    getHiders().forEach(hider -> hider.getPlayer().sendMessage("残り " + seekerWaitRemainTime + "秒で鬼が放出されます")); // 経験値バーの利用? Messagesクラスへの移植?
+                    getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
                     seekerWaitRemainTime -= 1;
                 } else {
                     Objects.requireNonNull(stage.getWorld()).playSound(stage, Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.AMBIENT, 1, 1);
                     getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
-                    getHiders().forEach(hider -> hider.getPlayer().sendTitle("鬼が放出された", "", 20, 40, 20)); // Messagesクラスへの移植?
+                    getHiders().forEach(hider -> hider.getPlayer().sendTitle("鬼が放出された", "", 20, 40, 20));
                     gameOverTimer = gameOverRunnable.runTaskTimer(game, 20, 20);
                     this.cancel();
                 }
@@ -254,6 +255,7 @@ public final class Game extends JavaPlugin {
     }
 
     public void gameOver() {
+        getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("ゲーム終了です"));
         String wonRole = judge();
         getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendTitle(wonRole + "の勝利!!!", "", 20, 20, 20));
         stop();
@@ -270,7 +272,7 @@ public final class Game extends JavaPlugin {
 
     public void stop() {
         // プレイヤーをどこかへTPさせる?
-        gamePlayers.forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setGameMode(GameMode.SURVIVAL));
+        gamePlayers.forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setGameMode(GameMode.ADVENTURE));
         gamePlayers.clear();
 
         currentState = GameState.LOBBY;
@@ -298,7 +300,7 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.alreadyJoined"));
             return;
         }
-        Location lobby = getCurrentStage().getLobby(); // nullの場合の場合分けが必要
+        Location lobby = getCurrentStage().getLobby();
         if (lobby == null) {
             gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.error("stage.none")));
             return;
@@ -308,7 +310,13 @@ public final class Game extends JavaPlugin {
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
         player.setGameMode(GameMode.SURVIVAL);
         player.setInvisible(false);
-        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.message("game.youJoinGame")));
+        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> {
+            if (pl.getUniqueId() == player.getUniqueId()) {
+                pl.sendMessage(Messages.message("game.youJoinGame"));
+                return;
+            }
+            pl.sendMessage(Messages.message("game.otherJoinGame"));
+        });
     }
 
     public void cancel(Player player) {
@@ -316,11 +324,6 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.notJoined"));
             return;
         }
-//        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> {
-//            if (pl.getBedSpawnLocation() == null) return;
-//            pl.teleport(pl.getBedSpawnLocation());
-//        });
-
         gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.message("game.youCancelGame")));
         gamePlayers.remove(player.getUniqueId());
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
@@ -329,8 +332,22 @@ public final class Game extends JavaPlugin {
     }
 
     public void damageHider(Hider hider) {
-        Bukkit.getLogger().info("damage!!!");
+        gamePlayers.values().forEach(gamePlayer -> {
+            if (hider == gamePlayer) {
+                gamePlayer.getPlayer().sendMessage(Messages.message("game.you.found", hider.getPlayer().getDisplayName()));
+                return;
+            }
+            gamePlayer.getPlayer().sendMessage(Messages.message("game.other.found", hider.getPlayer().getDisplayName()));
+        });
         hider.damage(attackDamage);
+        hider.getPlayer().teleport(getCurrentStage().getLobby());
+        if (gamePlayers.values().stream().noneMatch(gamePlayer -> {
+            if (!gamePlayer.isHider()) return false;
+            Hider h = (Hider) gamePlayer;
+            return !h.isDead();
+        })) {
+            gameOver();
+        }
     }
 
     public Seeker findSeeker(UUID uuid) {
@@ -381,9 +398,6 @@ public final class Game extends JavaPlugin {
     }
 
     public void deleteStage(StageData stageData) {
-//        int index = stageList.indexOf(stageData);
-//        if(index < 0) return;
-//        stageList.remove(index);
         stageList.remove(stageData);
     }
 
@@ -401,7 +415,6 @@ public final class Game extends JavaPlugin {
         if (optionalStageData.isPresent()) return null;
         StageData stageData = new StageData(name);
         stageList.add(stageData);
-        System.out.println(stageList);
         return stageData;
     }
 

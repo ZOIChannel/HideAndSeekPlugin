@@ -3,8 +3,4 @@ seekerRate: 5
 seekerWaitTime: 5
 gameTime: 10
 borderRadius: 50
-location:
-  lobby:
-  seekerLobby:
-  stage:
 stage: []

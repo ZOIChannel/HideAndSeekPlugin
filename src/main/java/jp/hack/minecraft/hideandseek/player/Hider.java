@@ -6,10 +6,9 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
-
-import java.util.Random;
 
 public class Hider extends GamePlayer {
     private Material material;
@@ -36,6 +35,8 @@ public class Hider extends GamePlayer {
 
     public void setMaterial(Material material) {
         this.material = material;
+        freezeTicks = 0L;
+        blockMelt();
     }
 
     public Block getBlock() {
@@ -94,12 +95,20 @@ public class Hider extends GamePlayer {
     @Override
     public void equipItem() {
         Inventory inventory = getPlayer().getInventory();
+        inventory.clear();
+
+        ItemStack item = new ItemStack(Material.CARROT_ON_A_STICK);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("Select Block");
+        item.setItemMeta(meta);
+        inventory.addItem(item);
     }
 
     public void damage(int damage) {
         if (isDead) return;
         getPlayer().setGameMode(GameMode.SPECTATOR);
         removeBlock();
+        destroyFallingBlock();
         Firework firework = getFirework();
         firework.detonate();
         isDead = true;
