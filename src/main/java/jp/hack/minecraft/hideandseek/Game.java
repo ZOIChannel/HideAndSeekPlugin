@@ -272,8 +272,7 @@ public final class Game extends JavaPlugin {
 
     public void stop() {
         // プレイヤーをどこかへTPさせる?
-        gamePlayers.forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setGameMode(GameMode.ADVENTURE));
-        gamePlayers.clear();
+        destroyGamePlayers();
 
         currentState = GameState.LOBBY;
         seekerTeleportTimer.cancel();
@@ -293,6 +292,17 @@ public final class Game extends JavaPlugin {
         Hider hider = new Hider(player);
         gamePlayers.put(hider.getPlayerUuid(), hider);
         return hider;
+    }
+
+    public void destroyGamePlayers() {
+        gamePlayers.forEach((uuid, gamePlayer) -> {
+            gamePlayer.getPlayer().setGameMode(GameMode.ADVENTURE);
+            if (gamePlayer.isHider()) {
+                Hider hider = (Hider) gamePlayer;
+                hider.destroy();
+            }
+        });
+        gamePlayers.clear();
     }
 
     public void join(Player player) {

@@ -104,20 +104,19 @@ public class Hider extends GamePlayer {
         inventory.addItem(item);
     }
 
+    public void destroy() {
+        removeBlock();
+        destroyFallingBlock();
+    }
+
     public void damage(int damage) {
         if (isDead) return;
         getPlayer().setGameMode(GameMode.SPECTATOR);
-        removeBlock();
-        destroyFallingBlock();
+        destroy();
+        getPlayer().playSound(getLocation(), Sound.ENTITY_PLAYER_HURT, 1F, 1F);
         Firework firework = getFirework();
         firework.detonate();
         isDead = true;
-        /*
-        blockMelt();
-        setFreezeTicks(0L);
-        getPlayer().damage(damage);
-        getPlayer().playSound(getLocation(), Sound.ENTITY_PLAYER_HURT, 1F, 1F);
-        */
     }
 
     public void blockFreeze() {
@@ -175,7 +174,7 @@ public class Hider extends GamePlayer {
     }
 
     private void destroyFallingBlock() {
-        if (!isFBLived() || !this.isFrozen || this.isDead) return;
+        if (!isFBLived() || !this.isFrozen) return;
         this.fallingBlock.remove();
         this.fallingBlock = null;
     }
@@ -187,7 +186,7 @@ public class Hider extends GamePlayer {
     }
 
     private void removeBlock() {
-        if (this.block == null || this.isDead) return;
+        if (this.block == null) return;
         this.block.setType(Material.AIR);
         this.block = null;
     }
