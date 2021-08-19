@@ -27,6 +27,7 @@ public class TestCommand extends AdminCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Game game = manager.game;
+        game.destroyGamePlayers();
         List<Player> players = new ArrayList<>(game.getServer().getOnlinePlayers());
         players.forEach(game::createHider);
         int rnd = new Random().nextInt(players.size());
@@ -37,7 +38,7 @@ public class TestCommand extends AdminCommandMaster {
 
     @Override
     public boolean getExecutable(CommandSender sender, CommandMaster command){
-        return super.getExecutable(sender, this) && manager.game.getCurrentState() == GameState.PLAYING;
+        return super.getExecutable(sender, this);
     }
 
     @Override

@@ -41,10 +41,8 @@ public final class Game extends JavaPlugin {
     private BukkitTask gameOverTimer;
     private BlockGui blockGui;
 
-    private Integer attackDamage;
-    private final int DEF_ATTACK_DAMAGE = 4;
-    private Material captureType = Material.GLASS_BOTTLE;
-    private Material meltType = Material.WOODEN_PICKAXE;
+    private final Material captureType = Material.GLASS_BOTTLE;
+    private final Material meltType = Material.COMPASS;
 
     public EventWatcher getEventWatcher() {
         return eventWatcher;
@@ -119,8 +117,9 @@ public final class Game extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        eventWatcher.stop();
         super.onDisable();
+        eventWatcher.stop();
+        destroyGamePlayers();
     }
 
     private boolean setupEconomy() {
@@ -136,9 +135,6 @@ public final class Game extends JavaPlugin {
     }
 
     private void initializeConst() {
-        attackDamage = configLoader.getInt("attackDamage");
-        if (attackDamage == null) attackDamage = DEF_ATTACK_DAMAGE;
-        configLoader.setData("attackDamage", attackDamage);
         if (!(configLoader.getData("stage") instanceof List)
                 || ((List<?>) configLoader.getData("stage")).stream().noneMatch(Objects::nonNull)) {
             stageList = new ArrayList<>();
@@ -322,10 +318,10 @@ public final class Game extends JavaPlugin {
         player.setInvisible(false);
         gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> {
             if (pl.getUniqueId() == player.getUniqueId()) {
-                pl.sendMessage(Messages.message("game.youJoinGame"));
+                pl.sendMessage(Messages.greenMessage("game.youJoinGame"));
                 return;
             }
-            pl.sendMessage(Messages.message("game.otherJoinGame"));
+            pl.sendMessage(Messages.greenMessage("game.otherJoinGame"));
         });
     }
 
@@ -334,7 +330,7 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.notJoined"));
             return;
         }
-        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.message("game.youCancelGame")));
+        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.greenMessage("game.youCancelGame")));
         gamePlayers.remove(player.getUniqueId());
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
         player.setGameMode(GameMode.SURVIVAL);
@@ -342,14 +338,16 @@ public final class Game extends JavaPlugin {
     }
 
     public void damageHider(Hider hider) {
+        if (hider.isDead()) return;
+
         gamePlayers.values().forEach(gamePlayer -> {
-            if (hider == gamePlayer) {
-                gamePlayer.getPlayer().sendMessage(Messages.message("game.you.found", hider.getPlayer().getDisplayName()));
+            if (hider.getPlayerUuid() == gamePlayer.getPlayerUuid()) {
+                gamePlayer.getPlayer().sendTitle(Messages.redMessage("game.you.captured", hider.getPlayer().getDisplayName()), "", 10, 40, 10);
                 return;
             }
-            gamePlayer.getPlayer().sendMessage(Messages.message("game.other.found", hider.getPlayer().getDisplayName()));
+            gamePlayer.getPlayer().sendMessage(Messages.greenMessage("game.other.captured", hider.getPlayer().getDisplayName()));
         });
-        hider.damage(attackDamage);
+        hider.damage();
         hider.getPlayer().teleport(getCurrentStage().getLobby());
         if (gamePlayers.values().stream().noneMatch(gamePlayer -> {
             if (!gamePlayer.isHider()) return false;

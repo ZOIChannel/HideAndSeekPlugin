@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -24,9 +25,11 @@ public class Hider extends GamePlayer {
 
     public Hider(Player player) {
         super(player);
-        this.material = Material.ACACIA_LOG;
+        player.setGameMode(GameMode.ADVENTURE);
         player.setInvisible(true);
         equipItem();
+
+        this.material = Material.ACACIA_LOG;
     }
 
     public Material getMaterial() {
@@ -104,12 +107,17 @@ public class Hider extends GamePlayer {
         inventory.addItem(item);
     }
 
+    public void found() {
+        getPlayer().sendTitle(Messages.redMessage("game.you.found"), Messages.message("game.you.runaway"), 5, 10, 5);
+        getPlayer().playSound(getLocation(), Sound.ENTITY_GHAST_WARN, SoundCategory.MASTER, 1.0F, 1.0F);
+    }
+
     public void destroy() {
         removeBlock();
         destroyFallingBlock();
     }
 
-    public void damage(int damage) {
+    public void damage() {
         if (isDead) return;
         getPlayer().setGameMode(GameMode.SPECTATOR);
         destroy();
@@ -143,11 +151,6 @@ public class Hider extends GamePlayer {
         resetFBVelocity();
     }
 
-    public void reduceFBVelocity() {
-        if (!isFBLived() || this.isFrozen || this.isDead) return;
-        this.fallingBlock.setVelocity(this.getFallingBlock().getVelocity().multiply(0.8));
-    }
-
     public void resetFBVelocity() {
         if (!isFBLived() || this.isFrozen || this.isDead) return;
         this.fallingBlock.setVelocity(new Vector(0d, 0d, 0d));
@@ -174,8 +177,9 @@ public class Hider extends GamePlayer {
     }
 
     private void destroyFallingBlock() {
-        if (!isFBLived() || !this.isFrozen) return;
+        if (!isFBLived()) return;
         this.fallingBlock.remove();
+
         this.fallingBlock = null;
     }
 

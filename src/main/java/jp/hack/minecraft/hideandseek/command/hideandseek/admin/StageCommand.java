@@ -86,7 +86,7 @@ public class StageCommand extends AdminCommandMaster {
         }
         StageData stageData = stageDataOptional.get();
         manager.game.setStage(stageData);
-        player.sendMessage(Messages.message("stage.crated", name));
+        player.sendMessage(Messages.greenMessage("stage.crated", name));
     }
 
     private void deleteStage(Player player, String[] args) {
@@ -102,7 +102,7 @@ public class StageCommand extends AdminCommandMaster {
         }
         StageData stageData = stageDataOptional.get();
         manager.game.deleteStage(stageData);
-        player.sendMessage(Messages.message("stage.deleted", name));
+        player.sendMessage(Messages.greenMessage("stage.deleted", name));
     }
 
     private void createStage(Player player, String[] args) {
@@ -122,7 +122,7 @@ public class StageCommand extends AdminCommandMaster {
             return;
         }
         stageData.setLocation(StageType.STAGE, player.getLocation(), manager.game.getConfigLoader());
-        player.sendMessage(Messages.message("stage.crated", name));
+        player.sendMessage(Messages.greenMessage("stage.crated", name));
     }
 
     private void editStage(Player player, String[] args) {
@@ -145,13 +145,13 @@ public class StageCommand extends AdminCommandMaster {
                 stageType = LOBBY;
                 stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
                 manager.game.getConfigLoader().setData("location.stage", player.getLocation());
-                player.sendMessage(Messages.message("stage.edited", name, type));
+                player.sendMessage(Messages.greenMessage("stage.edited", name, type));
                 break;
             case "seekerLobby":
                 stageType = SEEKER_LOBBY;
                 stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
                 manager.game.getConfigLoader().setData("location.stage", player.getLocation());
-                player.sendMessage(Messages.message("stage.edited", name, type));
+                player.sendMessage(Messages.greenMessage("stage.edited", name, type));
                 break;
             case "stage":
                 stageType = STAGE;
@@ -165,7 +165,7 @@ public class StageCommand extends AdminCommandMaster {
         }
         stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
 //        manager.game.getConfigLoader().setData("location.stage", player.getLocation());
-        player.sendMessage(Messages.message("stage.edited", name, type));
+        player.sendMessage(Messages.greenMessage("stage.edited", name, type));
     }
 
     private void editStageRadius(Player player, String[] args) {
@@ -184,7 +184,7 @@ public class StageCommand extends AdminCommandMaster {
 //        String type = args[3];
         double radius = Double.parseDouble(args[4]);
         stageData.setRadius(radius, manager.game.getConfigLoader());
-        player.sendMessage(Messages.message("stage.edited", name, StageType.RADIUS));
+        player.sendMessage(Messages.greenMessage("stage.edited", name, StageType.RADIUS));
     }
 
     private void listStage(Player player, String[] args) {

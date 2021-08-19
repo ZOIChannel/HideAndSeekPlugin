@@ -2,6 +2,7 @@ package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.player.Seeker;
+import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -101,8 +102,15 @@ public class EventManager implements Listener {
 
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         Block block = event.getClickedBlock();
+
         Hider hider = game.findHiderByBlock(block);
-        if (hider == null) return;
+        if (hider == null) {
+            player.sendMessage(Messages.redMessage("game.its.notPlayer"));
+            return;
+        }
+        player.sendTitle(Messages.greenMessage("game.its.player"), "", 5, 10, 5);
+
+        hider.found();
         hider.blockMelt();
     }
 

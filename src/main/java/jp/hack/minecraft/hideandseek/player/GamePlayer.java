@@ -11,7 +11,7 @@ abstract public class GamePlayer {
     public GamePlayer(Player player) {
         this.playerUuid = player.getUniqueId();
         this.player = player;
-        this.player.setCollidable(true);
+        this.player.setCollidable(false);
     }
 
     public void equipItem() {}

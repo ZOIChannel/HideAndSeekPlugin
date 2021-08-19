@@ -15,9 +15,13 @@ public class Messages {
         messages.put("game.otherJoinGame", "%sがゲームに参加しました");
         messages.put("game.youCancelGame", "ゲームから退出しました");
 
+        messages.put("game.its.notPlayer", "プレイヤーではないようです...");
+        messages.put("game.its.player", "プレイヤーを見つけました！！");
+        messages.put("game.you.found", "鬼に見つかりました！！");
+        messages.put("game.you.runaway", "逃げましょう！");
         messages.put("game.you.cannotHideHere", "ここで隠れることはできません");
-        messages.put("game.you.found", "あなたは見つかってしまいました");
-        messages.put("game.other.found", "%sは見つかってしまいました");
+        messages.put("game.you.captured", "あなたは捕まりました！");
+        messages.put("game.other.captured", "%sは捕まってしまいました！");
 
         messages.put("stage.crated", "ステージ「%s」を作成しました");
         messages.put("stage.deleted", "ステージ「%s」を削除しました");
@@ -42,7 +46,17 @@ public class Messages {
     }
 
     public static String message(String code, Object... args) {
+        if (_instance.messages.containsKey(code)) return String.format(_instance.messages.get(code), args);
+        return error("error.notExistKey");
+    }
+
+    public static String greenMessage(String code, Object... args) {
         if (_instance.messages.containsKey(code)) return ChatColor.GREEN + String.format(_instance.messages.get(code), args);
+        return error("error.notExistKey");
+    }
+
+    public static String redMessage(String code, Object... args) {
+        if (_instance.messages.containsKey(code)) return ChatColor.RED + String.format(_instance.messages.get(code), args);
         return error("error.notExistKey");
     }
 
