@@ -75,10 +75,9 @@ public class EventWatcher {
 
         if (hider.getFreezeTicks() >= LIMIT) {
             if (!hider.isCalledEvent()) {
+                hider.setCalledEvent(true);
                 HiderFrozenEvent hiderFrozenEvent = new HiderFrozenEvent(hider);
                 game.getServer().getPluginManager().callEvent(hiderFrozenEvent);
-                hider.setCalledEvent(true);
-
             }
         }
     }

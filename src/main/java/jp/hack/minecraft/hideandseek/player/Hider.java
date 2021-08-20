@@ -127,6 +127,11 @@ public class Hider extends GamePlayer {
 
     public void blockFreeze() {
         if (this.isFrozen || this.isDead) return;
+        if(getPlayer().getLocation().getBlock().getType() != Material.AIR){
+            getPlayer().sendTitle(Messages.greenMessage("game.you.cannotHideHere"), "ブロックのない場所へ移動してください", 0, 5, 0);
+            setCalledEvent(false);
+            return;
+        }
         this.isFrozen = true;
         Player player = getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
