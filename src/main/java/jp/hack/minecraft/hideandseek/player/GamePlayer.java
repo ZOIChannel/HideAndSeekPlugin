@@ -34,6 +34,14 @@ abstract public class GamePlayer {
         getPlayer().sendTitle(Messages.redMessage(code), subtitle, fadeIn, stay, fadeOut);
     }
 
+    public void sendTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
+        getPlayer().sendTitle(Messages.message(code, args), "", fadeIn, stay, fadeOut);
+    }
+
+    public void sendTitle(int fadeIn, int stay, int fadeOut, String code, String subtitle) {
+        getPlayer().sendTitle(Messages.message(code), subtitle, fadeIn, stay, fadeOut);
+    }
+
     public void sendGreenMessage(String code, Object... args) {
         getPlayer().sendMessage(Messages.greenMessage(code, args));
     }

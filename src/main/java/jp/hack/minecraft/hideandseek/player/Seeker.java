@@ -49,13 +49,13 @@ public class Seeker extends GamePlayer {
     }
 
     public void knock(Location loc) {
-        sendRedMessage("game.its.notPlayer");
+        sendRedMessage("game.block.notPlayer");
         getPlayer().playSound(loc, Sound.ENTITY_ITEM_PICKUP, SoundCategory.MASTER, 1.0F, 1.0F);
     }
 
     public void discover() {
-        sendGreenMessage("game.its.player");
-        sendRedTitle(2, 20, 2, "game.its.player", "");
+        sendGreenMessage("game.block.player");
+        sendRedTitle(2, 20, 2, "game.block.player", "");
         getPlayer().playSound(getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 0.5F, 1.0F);
     }
 }

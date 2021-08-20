@@ -15,14 +15,15 @@ public class Messages {
         messages.put("game.otherJoinGame", "%sがゲームに参加しました");
         messages.put("game.youCancelGame", "ゲームから退出しました");
 
-        messages.put("game.its.notPlayer", "プレイヤーではないようです...");
-        messages.put("game.its.player", "プレイヤーを見つけました！！");
+        messages.put("game.block.notPlayer", "プレイヤーではないようです...");
+        messages.put("game.block.player", "プレイヤーを見つけました！！");
         messages.put("game.you.found", "鬼に見つかりました！！");
         messages.put("game.you.runaway", "逃げましょう！");
         messages.put("game.you.cannotHideHere", "ここで隠れることはできません");
         messages.put("game.you.captured", "あなたは捕まりました！");
         messages.put("game.other.captured", "%sは捕まってしまいました！");
 
+        messages.put("game.start", "ゲーム開始");
         messages.put("game.end", "ゲーム終了です");
         messages.put("game.win", "%sの勝利!!!");
         messages.put("game.win.border", "--- %s の勝利 ---");

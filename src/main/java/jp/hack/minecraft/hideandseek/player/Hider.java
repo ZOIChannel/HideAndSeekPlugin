@@ -37,10 +37,6 @@ public class Hider extends GamePlayer {
 
     public void setMaterial(Material material) {
         this.material = material;
-        freezeTicks = 0L;
-        blockMelt();
-        destroyFallingBlock();
-        spawnFallingBlock();
     }
 
     public Block getBlock() {
@@ -105,6 +101,13 @@ public class Hider extends GamePlayer {
             item.setItemMeta(meta);
             inventory.addItem(item);
         }
+    }
+
+    public void respawnFB() {
+        setFreezeTicks(0L);
+        blockMelt();
+        destroyFallingBlock();
+        spawnFallingBlock();
     }
 
     public void found() {

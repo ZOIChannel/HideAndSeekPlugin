@@ -188,17 +188,12 @@ public final class Game extends JavaPlugin {
                 lobbyPlayer.createHider(gamePlayers);
             }
         }
-        gamePlayers.values().forEach(gamePlayer -> {
-            Player player = gamePlayer.getPlayer();
-            player.sendTitle("ゲーム開始", "", 10, 20, 10);
-        });
+        gamePlayers.values().forEach(gamePlayer -> gamePlayer.sendTitle(10, 20, 10, "ゲーム開始", ""));
 
         stageData.createBorder();
 
         Location stage = getCurrentStage().getStage();
-        getHiders().forEach(hider -> {
-            hider.getPlayer().teleport(stage);
-        });
+        getHiders().forEach(hider -> hider.getPlayer().teleport(stage));
 
         Location seekerLobby = getCurrentStage().getSeekerLobby();
         getSeekers().forEach(seeker -> {
@@ -221,7 +216,7 @@ public final class Game extends JavaPlugin {
             @Override
             public void run() {
                 if (gameRemainTime > 0) {
-                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setLevel(gameRemainTime));
+                    getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(gameRemainTime));
                     gameRemainTime -= 1;
                 } else {
                     game.gameOver();
@@ -235,7 +230,6 @@ public final class Game extends JavaPlugin {
             @Override
             public void run() {
                 if (seekerWaitRemainTime > 0) {
-                    getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
                     getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
                     seekerWaitRemainTime -= 1;
                 } else {
@@ -342,8 +336,7 @@ public final class Game extends JavaPlugin {
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
-        player.setGameMode(GameMode.SURVIVAL);
-        player.setInvisible(false);
+        resetPlayerState(player);
         gamePlayers.values().forEach(gamePlayer -> {
             if (gamePlayer.getPlayerUuid() == player.getUniqueId()) {
                 gamePlayer.sendGreenMessage("game.youJoinGame");
@@ -359,9 +352,13 @@ public final class Game extends JavaPlugin {
             return;
         }
         player.setPlayerListName(player.getDisplayName());
-        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.greenMessage("game.youCancelGame")));
+        allSendGreenMessage("game.youCancelGame");
         gamePlayers.remove(player.getUniqueId());
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
+        resetPlayerState(player);
+    }
+
+    public void resetPlayerState(Player player) {
         player.setGameMode(GameMode.SURVIVAL);
         player.setInvisible(false);
     }
@@ -441,7 +438,7 @@ public final class Game extends JavaPlugin {
     }
 
     public void allSendGreenMessage(String code, Object... args) {
-        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendGreenMessage(code));
+        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendGreenMessage(code, args));
     }
 
     public void allSendGreenTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
@@ -462,7 +459,6 @@ public final class Game extends JavaPlugin {
         stageList.remove(stageData);
     }
 
-
     public void selectNextStage() {
         System.out.println(currentStageIndex);
         currentStageIndex++;
@@ -480,10 +476,9 @@ public final class Game extends JavaPlugin {
     }
 
     public void setHiderMaterial(UUID uuid, Material material) {
-        if (!gamePlayers.containsKey(uuid)) return;
-        GamePlayer gamePlayer = gamePlayers.get(uuid);
-        if (!gamePlayer.isHider()) return;
-        Hider hider = (Hider) gamePlayer;
+        Hider hider = findHider(uuid);
+        if (hider == null) return;
         hider.setMaterial(material);
+        hider.respawnFB();
     }
 }
