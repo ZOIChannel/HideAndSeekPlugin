@@ -118,7 +118,8 @@ public class EventManager implements Listener {
 
         Hider hider = game.findHiderByBlock(block);
         if (hider == null) {
-            seeker.knock();
+            Location blockLoc = event.getClickedBlock().getLocation();
+            seeker.knock(blockLoc);
             return;
         }
         seeker.discover();

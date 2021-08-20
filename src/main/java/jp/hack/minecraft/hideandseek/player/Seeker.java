@@ -48,9 +48,9 @@ public class Seeker extends GamePlayer {
         }
     }
 
-    public void knock() {
+    public void knock(Location loc) {
         sendRedMessage("game.its.notPlayer");
-        getPlayer().playSound(getLocation(), Sound.ENTITY_ITEM_PICKUP, SoundCategory.MASTER, 1.0F, 1.0F);
+        getPlayer().playSound(loc, Sound.ENTITY_ITEM_PICKUP, SoundCategory.MASTER, 1.0F, 1.0F);
     }
 
     public void discover() {
