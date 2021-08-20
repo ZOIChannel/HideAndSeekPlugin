@@ -41,6 +41,8 @@ public final class Game extends JavaPlugin {
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
 
+    private final List<DummyArmorStand> armorStands = new ArrayList<>();
+
     public EventWatcher getEventWatcher() {
         return eventWatcher;
     }
@@ -142,6 +144,7 @@ public final class Game extends JavaPlugin {
     }
 
     public void start() {
+        armorStands.forEach(DummyArmorStand::destroy);
         StageData stageData = getCurrentStage();
         if (stageData == null) {
             this.gamePlayers.values().forEach(gamePlayer -> {
@@ -240,6 +243,14 @@ public final class Game extends JavaPlugin {
     }
 
     public void gameOver() {
+        getGamePlayers().values().stream().filter(GamePlayer::isHider)
+                .filter(gamePlayer -> !((Hider) gamePlayer).isDead())
+                .forEach(hider -> {
+                    DummyArmorStand armorStand = new DummyArmorStand(hider);
+                    armorStand.create();
+                    armorStands.add(armorStand);
+        });
+
         getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("ゲーム終了です"));
         String wonRole = judge();
         getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendTitle(wonRole + "の勝利!!!", "", 20, 20, 20));
@@ -316,6 +327,7 @@ public final class Game extends JavaPlugin {
             gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.error("stage.none")));
             return;
         }
+        player.setPlayerListName(ChatColor.GREEN + player.getDisplayName());
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
@@ -335,6 +347,7 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.notJoined"));
             return;
         }
+        player.setPlayerListName(player.getDisplayName());
         gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.greenMessage("game.youCancelGame")));
         gamePlayers.remove(player.getUniqueId());
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
