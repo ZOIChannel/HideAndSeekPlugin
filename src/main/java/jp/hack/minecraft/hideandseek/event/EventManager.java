@@ -1,6 +1,8 @@
 package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
+import jp.hack.minecraft.hideandseek.data.GameState;
+import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Seeker;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.GameMode;
@@ -14,8 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
 import jp.hack.minecraft.hideandseek.player.Hider;
 import org.bukkit.inventory.ItemStack;
@@ -64,7 +68,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-        System.out.println(event.getEventName() +"; Entity:" + event.getRightClicked().getName());
+        System.out.println(event.getEventName() + "; Entity:" + event.getRightClicked().getName());
 
         Player player = event.getPlayer();
         Entity rightClicked = event.getRightClicked();
@@ -123,12 +127,12 @@ public class EventManager implements Listener {
         changeStage(sign);
     }
 
-    private void onPlayerClickItem(PlayerInteractEvent event){
+    private void onPlayerClickItem(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
-        if(item == null) return;
-        if(item.getItemMeta() == null) return;
-        if(!item.getItemMeta().hasDisplayName()) return;
-        if(!item.getItemMeta().getDisplayName().equals("Select Block")) return;
+        if (item == null) return;
+        if (item.getItemMeta() == null) return;
+        if (!item.getItemMeta().hasDisplayName()) return;
+        if (!item.getItemMeta().getDisplayName().equals("Select Block")) return;
         game.getBlockGui().openGui(event.getPlayer());
     }
 
@@ -176,6 +180,36 @@ public class EventManager implements Listener {
         if (game.isDistant(hider.getLocation(), hider.getFallingBlock().getLocation())) {
             hider.teleportFBToHider();
         }
+    }
+
+    @EventHandler
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        if (game.getCurrentState() != GameState.PLAYING) return;
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+        if (gamePlayer == null) return;
+        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) return; // killコマンドは多分使える
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event){
+        Player player = event.getPlayer();
+        if (game.getCurrentState() != GameState.PLAYING) return;
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+        if (gamePlayer == null) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerBreakBlock(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        if (game.getCurrentState() != GameState.PLAYING) return;
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+        if (gamePlayer == null) return;
+        if (!gamePlayer.isSeeker()) return;
+        event.setCancelled(true);
     }
 }
 

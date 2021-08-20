@@ -14,8 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -28,7 +26,6 @@ public final class Game extends JavaPlugin {
 
     //    private List<GamePlayer> playerList;
     private GameState currentState = GameState.LOBBY;
-    private GameLogic gameLogic;
     private ConfigLoader configLoader;
     private int currentStageIndex = 0;
     private List<StageData> stageList = new ArrayList<>();
@@ -192,13 +189,6 @@ public final class Game extends JavaPlugin {
         Location stage = getCurrentStage().getStage();
         getHiders().forEach(hider -> {
             hider.getPlayer().teleport(stage);
-            {
-                ItemStack item = new ItemStack(Material.CARROT_ON_A_STICK);
-                ItemMeta meta = item.getItemMeta();
-                meta.setDisplayName("Select Block");
-                item.setItemMeta(meta);
-                hider.getPlayer().getInventory().addItem(item);
-            }
         });
 
         Location seekerLobby = getCurrentStage().getSeekerLobby();
@@ -254,6 +244,20 @@ public final class Game extends JavaPlugin {
         getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("ゲーム終了です"));
         String wonRole = judge();
         getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendTitle(wonRole + "の勝利!!!", "", 20, 20, 20));
+        getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("--- " + wonRole + "の勝利 ---"));
+        if (wonRole.equals("Hider")) {
+            List<String> livingHiders = new ArrayList<>();
+            getGamePlayers().values().stream().filter(GamePlayer::isHider)
+                    .filter(hider -> !((Hider) hider).isDead())
+                    .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
+            getGamePlayers().forEach((uuid, gamePlayer) -> {
+                gamePlayer.getPlayer().sendMessage("生存者:");
+                livingHiders.forEach(name -> {
+                    gamePlayer.getPlayer().sendMessage("    " + name);
+                });
+                gamePlayer.getPlayer().sendMessage("-----------");
+            });
+        }
         stop();
     }
 
@@ -292,7 +296,9 @@ public final class Game extends JavaPlugin {
 
     public void destroyGamePlayers() {
         gamePlayers.forEach((uuid, gamePlayer) -> {
-            gamePlayer.getPlayer().setGameMode(GameMode.ADVENTURE);
+            gamePlayer.getPlayer().setGameMode(GameMode.SPECTATOR);
+            gamePlayer.getPlayer().getInventory().clear();
+            gamePlayer.getPlayer().teleport(getCurrentStage().getStage());
             if (gamePlayer.isHider()) {
                 Hider hider = (Hider) gamePlayer;
                 hider.destroy();
@@ -321,7 +327,7 @@ public final class Game extends JavaPlugin {
                 pl.sendMessage(Messages.greenMessage("game.youJoinGame"));
                 return;
             }
-            pl.sendMessage(Messages.greenMessage("game.otherJoinGame"));
+            pl.sendMessage(Messages.greenMessage("game.otherJoinGame", pl.getDisplayName()));
         });
     }
 
@@ -342,6 +348,7 @@ public final class Game extends JavaPlugin {
 
         gamePlayers.values().forEach(gamePlayer -> {
             if (hider.getPlayerUuid() == gamePlayer.getPlayerUuid()) {
+                gamePlayer.getPlayer().sendMessage(Messages.redMessage("game.you.captured", hider.getPlayer().getDisplayName()));
                 gamePlayer.getPlayer().sendTitle(Messages.redMessage("game.you.captured", hider.getPlayer().getDisplayName()), "", 10, 40, 10);
                 return;
             }

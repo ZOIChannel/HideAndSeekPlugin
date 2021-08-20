@@ -40,6 +40,8 @@ public class Hider extends GamePlayer {
         this.material = material;
         freezeTicks = 0L;
         blockMelt();
+        destroyFallingBlock();
+        spawnFallingBlock();
     }
 
     public Block getBlock() {
@@ -119,6 +121,7 @@ public class Hider extends GamePlayer {
 
     public void damage() {
         if (isDead) return;
+        getPlayer().sendMessage(Messages.redMessage("game.you.found"));
         getPlayer().setGameMode(GameMode.SPECTATOR);
         destroy();
         getPlayer().playSound(getLocation(), Sound.ENTITY_PLAYER_HURT, 1F, 1F);

@@ -14,7 +14,7 @@ import java.util.List;
 public class Seeker extends GamePlayer {
     public Seeker(Player player) {
         super(player);
-        player.setGameMode(GameMode.ADVENTURE);
+        player.setGameMode(GameMode.SURVIVAL);
         player.setInvisible(false);
         equipItem();
     }

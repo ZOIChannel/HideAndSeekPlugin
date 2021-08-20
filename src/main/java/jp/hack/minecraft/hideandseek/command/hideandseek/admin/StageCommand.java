@@ -5,6 +5,7 @@ import jp.hack.minecraft.hideandseek.command.CommandManager;
 import jp.hack.minecraft.hideandseek.data.StageData;
 import jp.hack.minecraft.hideandseek.data.StageType;
 import jp.hack.minecraft.hideandseek.system.Messages;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -62,11 +63,11 @@ public class StageCommand extends AdminCommandMaster {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length < 2) return new ArrayList<>();
         if (args.length == 2) {
-            return new ArrayList<>(Arrays.asList("create", "list", "edit")).stream()
+            return new ArrayList<>(Arrays.asList("set", "delete", "create", "edit", "list")).stream()
                     .filter(s -> s.startsWith(args[1])).collect(Collectors.toList());
         }
-        if (args[1].equals("create") && args.length == 3) return new ArrayList<>(Arrays.asList("name"));
-        if (args[1].equals("edit") && args.length == 3)
+        if (args[1].equals("create") && args.length == 3) return new ArrayList<>(Arrays.asList("(name)"));
+        if ((args[1].equals("set") || args[1].equals("delete") || args[1].equals("edit")) && args.length == 3)
             return manager.game.getStageList().stream().map(StageData::getName).collect(Collectors.toList());
         if (args[1].equals("edit") && args.length == 4)
             return new ArrayList<>(Arrays.asList("lobby", "seekerLobby", "stage", "radius"));
@@ -86,7 +87,7 @@ public class StageCommand extends AdminCommandMaster {
         }
         StageData stageData = stageDataOptional.get();
         manager.game.setStage(stageData);
-        player.sendMessage(Messages.greenMessage("stage.crated", name));
+        player.sendMessage(Messages.greenMessage("stage.set", name));
     }
 
     private void deleteStage(Player player, String[] args) {
@@ -121,7 +122,6 @@ public class StageCommand extends AdminCommandMaster {
             player.sendMessage(Messages.error("stage.alreadyExist", name));
             return;
         }
-        stageData.setLocation(StageType.STAGE, player.getLocation(), manager.game.getConfigLoader());
         player.sendMessage(Messages.greenMessage("stage.crated", name));
     }
 
@@ -145,13 +145,11 @@ public class StageCommand extends AdminCommandMaster {
                 stageType = LOBBY;
                 stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
                 manager.game.getConfigLoader().setData("location.stage", player.getLocation());
-                player.sendMessage(Messages.greenMessage("stage.edited", name, type));
                 break;
             case "seekerLobby":
                 stageType = SEEKER_LOBBY;
                 stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
                 manager.game.getConfigLoader().setData("location.stage", player.getLocation());
-                player.sendMessage(Messages.greenMessage("stage.edited", name, type));
                 break;
             case "stage":
                 stageType = STAGE;
@@ -164,7 +162,6 @@ public class StageCommand extends AdminCommandMaster {
                 break;
         }
         stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
-//        manager.game.getConfigLoader().setData("location.stage", player.getLocation());
         player.sendMessage(Messages.greenMessage("stage.edited", name, type));
     }
 
@@ -188,18 +185,21 @@ public class StageCommand extends AdminCommandMaster {
     }
 
     private void listStage(Player player, String[] args) {
-        List<String> sendTexts = new ArrayList<>(Arrays.asList("|--- name ---|-- lobby --|-- seekerLobby --|-- stage --|-- radius --|"));
+        List<String> sendTexts = new ArrayList<>();
         manager.game.getStageList().forEach(stageData -> {
             StringBuilder builder = new StringBuilder();
-            builder.append("| ").append(String.format("%-14s", stageData.getName()));
-            builder.append("| ").append(String.format("%-12s", (stageData.getLobby() != null)));
-            builder.append("| ").append(String.format("%-22s", (stageData.getSeekerLobby() != null)));
-            builder.append("| ").append(String.format("%-12s", (stageData.getStage() != null)));
-            builder.append("| ").append(String.format("%-14s", (stageData.getRadius() != 0)));
-            builder.append("|");
+            builder.append("| [" + stageData.getName() + "] :").append("\n")
+                    .append("|     lobby: ").append(getMessageFromBoolean(stageData.getLobby() != null)).append("\n")
+                    .append("|     seekerLobby: ").append(getMessageFromBoolean(stageData.getSeekerLobby() != null)).append("\n")
+                    .append("|     stage: ").append(getMessageFromBoolean(stageData.getStage() != null)).append("\n")
+                    .append("|     radius: ").append(getMessageFromBoolean(stageData.getRadius() != 0)).append("\n");
             sendTexts.add(builder.toString());
         });
-        sendTexts.add("|-----------|----------|----------------|----------|");
         player.sendMessage(sendTexts.toArray(new String[0]));
+    }
+
+    private String getMessageFromBoolean(boolean value) {
+        if (value) return ChatColor.GREEN + "true" + ChatColor.RESET;
+        else return ChatColor.RED + "false" + ChatColor.RESET;
     }
 }

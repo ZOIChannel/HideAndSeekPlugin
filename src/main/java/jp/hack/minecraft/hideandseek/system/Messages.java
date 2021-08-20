@@ -24,6 +24,7 @@ public class Messages {
         messages.put("game.other.captured", "%sは捕まってしまいました！");
 
         messages.put("stage.crated", "ステージ「%s」を作成しました");
+        messages.put("stage.set", "「%s」をステージとして設定しました");
         messages.put("stage.deleted", "ステージ「%s」を削除しました");
         messages.put("stage.edited", "ステージ「%s」の「%s」の設定を変更しました");
 
