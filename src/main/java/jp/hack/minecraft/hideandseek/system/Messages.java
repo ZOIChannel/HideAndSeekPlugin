@@ -26,7 +26,7 @@ public class Messages {
         messages.put("game.end", "ゲーム終了です");
         messages.put("game.win", "%sの勝利!!!");
         messages.put("game.win.border", "--- %s の勝利 ---");
-        messages.put("game.gotMoney", "$%sゲットしました");
+        messages.put("game.gotMoney", "$%s 獲得しました");
 
         messages.put("stage.crated", "ステージ「%s」を作成しました");
         messages.put("stage.set", "「%s」をステージとして設定しました");

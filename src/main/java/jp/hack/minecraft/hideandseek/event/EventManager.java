@@ -98,7 +98,6 @@ public class EventManager implements Listener {
             hider = game.findHider(rightClicked.getUniqueId());
         }
         if (hider == null) return;
-        game.giveReward(Role.SEEKER);
         game.damageHider(hider);
     }
 
