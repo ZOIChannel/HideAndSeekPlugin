@@ -97,11 +97,14 @@ public class Hider extends GamePlayer {
         Inventory inventory = getPlayer().getInventory();
         inventory.clear();
 
-        ItemStack item = new ItemStack(Material.CARROT_ON_A_STICK);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName("Select Block");
-        item.setItemMeta(meta);
-        inventory.addItem(item);
+        {
+            ItemStack item = new ItemStack(Material.CARROT_ON_A_STICK);
+            ItemMeta meta = item.getItemMeta();
+            assert meta != null;
+            meta.setDisplayName("ブロックを選択");
+            item.setItemMeta(meta);
+            inventory.addItem(item);
+        }
     }
 
     public void found() {

@@ -23,6 +23,11 @@ public class Messages {
         messages.put("game.you.captured", "あなたは捕まりました！");
         messages.put("game.other.captured", "%sは捕まってしまいました！");
 
+        messages.put("game.end", "ゲーム終了です");
+        messages.put("game.win", "%sの勝利!!!");
+        messages.put("game.win.border", "--- %s の勝利 ---");
+        messages.put("game.gotMoney", "$%sゲットしました");
+
         messages.put("stage.crated", "ステージ「%s」を作成しました");
         messages.put("stage.set", "「%s」をステージとして設定しました");
         messages.put("stage.deleted", "ステージ「%s」を削除しました");

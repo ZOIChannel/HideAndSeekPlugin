@@ -3,6 +3,7 @@ package jp.hack.minecraft.hideandseek.event;
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
+import jp.hack.minecraft.hideandseek.player.Role;
 import jp.hack.minecraft.hideandseek.player.Seeker;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
@@ -97,6 +98,7 @@ public class EventManager implements Listener {
             hider = game.findHider(rightClicked.getUniqueId());
         }
         if (hider == null) return;
+        game.giveReward(Role.SEEKER);
         game.damageHider(hider);
     }
 

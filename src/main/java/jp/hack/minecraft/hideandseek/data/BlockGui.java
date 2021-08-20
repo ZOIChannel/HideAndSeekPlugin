@@ -27,7 +27,7 @@ public class BlockGui {
 
         itemList.forEach(item -> {
             pane.addItem(new GuiItem(item, event -> {
-                game.setBlock(event.getWhoClicked().getUniqueId(), item.getType());
+                game.setHiderMaterial(event.getWhoClicked().getUniqueId(), item.getType());
                 event.setCancelled(true);
             }));
         });

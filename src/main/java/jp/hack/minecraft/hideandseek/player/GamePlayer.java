@@ -62,4 +62,10 @@ abstract public class GamePlayer {
     public Boolean isSeeker() {
         return this instanceof Seeker;
     }
+
+    public Boolean isSameRole(Role role) {
+        if (isHider() && role == Role.HIDER) {
+            return true;
+        } else return isSeeker() && role == Role.SEEKER;
+    }
 }

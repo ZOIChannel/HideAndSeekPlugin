@@ -40,6 +40,8 @@ public final class Game extends JavaPlugin {
 
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
+    private final Integer DEFAULT_REWARD = 60;
+    private Integer reward;
 
     private final List<DummyArmorStand> armorStands = new ArrayList<>();
 
@@ -141,6 +143,11 @@ public final class Game extends JavaPlugin {
             stageList = (ArrayList<StageData>) configLoader.getData("stage");
         }
         blockGui = new BlockGui(this);
+        reward = configLoader.getInt("reward");
+        if (reward == null) {
+            reward = DEFAULT_REWARD;
+            configLoader.setData("reward", reward);
+        }
     }
 
     public void start() {
@@ -251,11 +258,14 @@ public final class Game extends JavaPlugin {
                     armorStands.add(armorStand);
         });
 
-        getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("ゲーム終了です"));
-        String wonRole = judge();
-        getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendTitle(wonRole + "の勝利!!!", "", 20, 20, 20));
-        getGamePlayers().forEach((uuid, gamePlayer) -> gamePlayer.getPlayer().sendMessage("--- " + wonRole + "の勝利 ---"));
-        if (wonRole.equals("Hider")) {
+        allSendGreenMessage("game.end");
+        Role wonRole = judge();
+        allSendGreenTitle(20, 40, 20, "game.win", wonRole.toString());
+        allSendGreenMessage("game.win.border", wonRole.toString());
+
+        giveReward(wonRole);
+
+        if (wonRole.equals(Role.HIDER)) {
             List<String> livingHiders = new ArrayList<>();
             getGamePlayers().values().stream().filter(GamePlayer::isHider)
                     .filter(hider -> !((Hider) hider).isDead())
@@ -271,13 +281,13 @@ public final class Game extends JavaPlugin {
         stop();
     }
 
-    private String judge() {
+    private Role judge() {
         if (gamePlayers.values().stream().anyMatch(gamePlayer -> {
             if (!gamePlayer.isHider()) return false;
             Hider hider = (Hider) gamePlayer;
             return !hider.isDead();
-        })) return "Hider";
-        else return "Seeker";
+        })) return Role.HIDER;
+        else return Role.SEEKER;
     }
 
     public void stop() {
@@ -305,10 +315,11 @@ public final class Game extends JavaPlugin {
     }
 
     public void destroyGamePlayers() {
-        gamePlayers.forEach((uuid, gamePlayer) -> {
-            gamePlayer.getPlayer().setGameMode(GameMode.SPECTATOR);
-            gamePlayer.getPlayer().getInventory().clear();
-            gamePlayer.getPlayer().teleport(getCurrentStage().getStage());
+        gamePlayers.values().forEach(gamePlayer -> {
+            Player player = gamePlayer.getPlayer();
+            player.setGameMode(GameMode.SPECTATOR);
+            player.getInventory().clear();
+            player.teleport(getCurrentStage().getStage());
             if (gamePlayer.isHider()) {
                 Hider hider = (Hider) gamePlayer;
                 hider.destroy();
@@ -324,7 +335,7 @@ public final class Game extends JavaPlugin {
         }
         Location lobby = getCurrentStage().getLobby();
         if (lobby == null) {
-            gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> pl.sendMessage(Messages.error("stage.none")));
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
             return;
         }
         player.setPlayerListName(ChatColor.GREEN + player.getDisplayName());
@@ -333,12 +344,12 @@ public final class Game extends JavaPlugin {
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
         player.setGameMode(GameMode.SURVIVAL);
         player.setInvisible(false);
-        gamePlayers.values().stream().map(GamePlayer::getPlayer).forEach(pl -> {
-            if (pl.getUniqueId() == player.getUniqueId()) {
-                pl.sendMessage(Messages.greenMessage("game.youJoinGame"));
+        gamePlayers.values().forEach(gamePlayer -> {
+            if (gamePlayer.getPlayerUuid() == player.getUniqueId()) {
+                gamePlayer.sendGreenMessage("game.youJoinGame");
                 return;
             }
-            pl.sendMessage(Messages.greenMessage("game.otherJoinGame", pl.getDisplayName()));
+            gamePlayer.sendGreenMessage("game.otherJoinGame", gamePlayer.getPlayer().getDisplayName());
         });
     }
 
@@ -375,6 +386,21 @@ public final class Game extends JavaPlugin {
         })) {
             gameOver();
         }
+    }
+
+    public void giveReward(Role wonRole) {
+        System.out.println("giveReward");
+        if (econ == null) return;
+        System.out.println("econ: notNull");
+        gamePlayers.values().forEach(gamePlayer -> {
+            if (gamePlayer.isSameRole(wonRole)) {
+                econ.depositPlayer(gamePlayer.getPlayer(), reward);
+                gamePlayer.sendGreenMessage("game.gotMoney", reward);
+            } else {
+                econ.depositPlayer(gamePlayer.getPlayer(), reward/3);
+                gamePlayer.sendGreenMessage("game.gotMoney", reward/3);
+            }
+        });
     }
 
     public Seeker findSeeker(UUID uuid) {
@@ -414,6 +440,14 @@ public final class Game extends JavaPlugin {
         return stageList.get(currentStageIndex);
     }
 
+    public void allSendGreenMessage(String code, Object... args) {
+        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendGreenMessage(code));
+    }
+
+    public void allSendGreenTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
+        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendGreenTitle(fadeIn, stay, fadeOut, code, args));
+    }
+
     public void setStage(StageData stageData) {
         int index = stageList.indexOf(stageData);
         if (index < 0) return;
@@ -445,7 +479,7 @@ public final class Game extends JavaPlugin {
         return stageData;
     }
 
-    public void setBlock(UUID uuid, Material material) {
+    public void setHiderMaterial(UUID uuid, Material material) {
         if (!gamePlayers.containsKey(uuid)) return;
         GamePlayer gamePlayer = gamePlayers.get(uuid);
         if (!gamePlayer.isHider()) return;
