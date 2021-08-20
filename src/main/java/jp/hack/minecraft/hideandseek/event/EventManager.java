@@ -5,9 +5,7 @@ import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Seeker;
 import jp.hack.minecraft.hideandseek.system.Messages;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -17,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -42,17 +41,27 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
+        if (game.getGamePlayer(player.getUniqueId()) == null) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Player player = event.getPlayer();
+        if (game.getGamePlayer(player.getUniqueId()) == null) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         event.setCancelled(true);
     }
 
     @EventHandler
-    public void onPlayerItemDamage(PlayerItemDamageEvent event) {
-        event.setCancelled(true);
-    }
-
-    @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        System.out.println(event.getEventName());
         if (event.getEntity() instanceof Player) event.setCancelled(true);
     }
 
@@ -93,9 +102,9 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        System.out.println(event.getEventName());
         onPlayerClickSign(event);
         onPlayerClickItem(event);
-        System.out.println(event.getEventName());
 
         Player player = event.getPlayer();
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
@@ -109,10 +118,10 @@ public class EventManager implements Listener {
 
         Hider hider = game.findHiderByBlock(block);
         if (hider == null) {
-            player.sendMessage(Messages.redMessage("game.its.notPlayer"));
+            seeker.knock();
             return;
         }
-        player.sendTitle(Messages.greenMessage("game.its.player"), "", 5, 10, 5);
+        seeker.discover();
 
         hider.found();
         hider.blockMelt();
@@ -147,8 +156,6 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        System.out.println(event.getEventName());
-
         Player player = event.getPlayer();
         Hider hider = game.findHider(player.getUniqueId());
         if (hider == null) return;

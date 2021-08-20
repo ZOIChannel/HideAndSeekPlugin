@@ -107,7 +107,6 @@ public final class Game extends JavaPlugin {
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
 
         configLoader = new ConfigLoader(this);
-        eventWatcher.start();
         initializeConst();
     }
 
@@ -348,11 +347,11 @@ public final class Game extends JavaPlugin {
 
         gamePlayers.values().forEach(gamePlayer -> {
             if (hider.getPlayerUuid() == gamePlayer.getPlayerUuid()) {
-                gamePlayer.getPlayer().sendMessage(Messages.redMessage("game.you.captured", hider.getPlayer().getDisplayName()));
-                gamePlayer.getPlayer().sendTitle(Messages.redMessage("game.you.captured", hider.getPlayer().getDisplayName()), "", 10, 40, 10);
+                gamePlayer.sendRedMessage("game.you.captured", hider.getPlayer().getDisplayName());
+                gamePlayer.sendRedTitle(10, 40, 10, "game.you.captured", hider.getPlayer().getDisplayName());
                 return;
             }
-            gamePlayer.getPlayer().sendMessage(Messages.greenMessage("game.other.captured", hider.getPlayer().getDisplayName()));
+            gamePlayer.sendGreenMessage("game.other.captured", hider.getPlayer().getDisplayName());
         });
         hider.damage();
         hider.getPlayer().teleport(getCurrentStage().getLobby());
@@ -367,22 +366,22 @@ public final class Game extends JavaPlugin {
 
     public Seeker findSeeker(UUID uuid) {
         if (uuid == null) return null;
-        return (getSeekers().stream().filter(s -> s.getPlayerUuid().equals(uuid)).findAny().orElse(null));
+        return (getSeekers().stream().filter(s -> s.getPlayerUuid().equals(uuid)).findFirst().orElse(null));
     }
 
     public Hider findHider(UUID uuid) {
         if (uuid == null) return null;
-        return (getHiders().stream().filter(h -> h.getPlayerUuid().equals(uuid)).findAny().orElse(null));
+        return (getHiders().stream().filter(h -> h.getPlayerUuid().equals(uuid)).findFirst().orElse(null));
     }
 
     public Hider findHiderByBlock(Block block) {
         if (block == null) return null;
-        return getHiders().stream().filter(h -> h.getBlock().equals(block)).findAny().orElse(null);
+        return getHiders().stream().filter(h -> h.getBlock().equals(block)).findFirst().orElse(null);
     }
 
     public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
         if (fallingBlock == null) return null;
-        return getHiders().stream().filter(h -> h.getFallingBlock().equals(fallingBlock)).findAny().orElse(null);
+        return getHiders().stream().filter(h -> h.getFallingBlock().equals(fallingBlock)).findFirst().orElse(null);
     }
 
     public Boolean isSameLocation(Location loc1, Location loc2) {

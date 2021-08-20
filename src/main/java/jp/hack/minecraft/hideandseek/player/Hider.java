@@ -25,7 +25,6 @@ public class Hider extends GamePlayer {
 
     public Hider(Player player) {
         super(player);
-        player.setGameMode(GameMode.ADVENTURE);
         player.setInvisible(true);
         equipItem();
 
@@ -85,10 +84,6 @@ public class Hider extends GamePlayer {
         this.freezeTicks += increase;
     }
 
-    public Location getLocation() {
-        return getPlayer().getLocation();
-    }
-
     public Location getPrevLoc() {
         return prevLoc;
     }
@@ -110,7 +105,7 @@ public class Hider extends GamePlayer {
     }
 
     public void found() {
-        getPlayer().sendTitle(Messages.redMessage("game.you.found"), Messages.message("game.you.runaway"), 5, 10, 5);
+        sendRedTitle(5, 10, 5,"game.you.found", Messages.message("game.you.runaway"));
         getPlayer().playSound(getLocation(), Sound.ENTITY_GHAST_WARN, SoundCategory.MASTER, 1.0F, 1.0F);
     }
 

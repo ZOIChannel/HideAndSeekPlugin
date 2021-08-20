@@ -1,8 +1,6 @@
 package jp.hack.minecraft.hideandseek.player;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +12,6 @@ import java.util.List;
 public class Seeker extends GamePlayer {
     public Seeker(Player player) {
         super(player);
-        player.setGameMode(GameMode.SURVIVAL);
         player.setInvisible(false);
         equipItem();
     }
@@ -49,5 +46,16 @@ public class Seeker extends GamePlayer {
             item.setItemMeta(meta);
             inventory.addItem(item);
         }
+    }
+
+    public void knock() {
+        sendRedMessage("game.its.notPlayer");
+        getPlayer().playSound(getLocation(), Sound.ENTITY_ITEM_PICKUP, SoundCategory.MASTER, 1.0F, 1.0F);
+    }
+
+    public void discover() {
+        sendGreenMessage("game.its.player");
+        sendRedTitle(2, 20, 2, "game.its.player", "");
+        getPlayer().playSound(getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 0.5F, 1.0F);
     }
 }

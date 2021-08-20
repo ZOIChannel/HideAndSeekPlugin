@@ -1,5 +1,8 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.system.Messages;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -11,7 +14,32 @@ abstract public class GamePlayer {
     public GamePlayer(Player player) {
         this.playerUuid = player.getUniqueId();
         this.player = player;
+        this.player.setGameMode(GameMode.SURVIVAL);
         this.player.setCollidable(false);
+    }
+
+    public void sendGreenTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
+        getPlayer().sendTitle(Messages.greenMessage(code, args), "", fadeIn, stay, fadeOut);
+    }
+
+    public void sendGreenTitle(int fadeIn, int stay, int fadeOut, String code, String subtitle) {
+        getPlayer().sendTitle(Messages.greenMessage(code), subtitle, fadeIn, stay, fadeOut);
+    }
+
+    public void sendRedTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
+        getPlayer().sendTitle(Messages.redMessage(code, args), "", fadeIn, stay, fadeOut);
+    }
+
+    public void sendRedTitle(int fadeIn, int stay, int fadeOut, String code, String subtitle) {
+        getPlayer().sendTitle(Messages.redMessage(code), subtitle, fadeIn, stay, fadeOut);
+    }
+
+    public void sendGreenMessage(String code, Object... args) {
+        getPlayer().sendMessage(Messages.greenMessage(code, args));
+    }
+
+    public void sendRedMessage(String code, Object... args) {
+        getPlayer().sendMessage(Messages.redMessage(code, args));
     }
 
     public void equipItem() {}
@@ -22,6 +50,10 @@ abstract public class GamePlayer {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Location getLocation() {
+        return getPlayer().getLocation();
     }
 
     public Boolean isHider() {
