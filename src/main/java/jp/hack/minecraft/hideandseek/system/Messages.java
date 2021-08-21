@@ -24,6 +24,8 @@ public class Messages {
         messages.put("game.other.captured", "%sは捕まってしまいました！");
         messages.put("game.you.upSpeed", "スピードアップ！");
         messages.put("game.you.coolTime", "クールタイムが明けていません");
+        messages.put("game.you.hiLight", "プレイヤーの大まかな位置を表示しました");
+        messages.put("game.other.hiLight", "鬼がハイライトを使用しました！");
 
         messages.put("game.start", "ゲーム開始");
         messages.put("game.end", "ゲーム終了");

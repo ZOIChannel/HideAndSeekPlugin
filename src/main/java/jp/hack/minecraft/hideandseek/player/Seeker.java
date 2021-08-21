@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.data.EffectType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -10,11 +11,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Seeker extends GamePlayer {
+    private int countHiLight = 0;
+
+    public int getCountHiLight() {
+        return countHiLight;
+    }
+
+    public void addCountHiLight() {
+        countHiLight++;
+    }
+
     public Seeker(Player player) {
         super(player);
         getPlayer().setPlayerListName(ChatColor.RED + getPlayer().getName() + ChatColor.RESET);
         player.setInvisible(false);
-        equipItem();
     }
 
     @Override
@@ -47,6 +57,24 @@ public class Seeker extends GamePlayer {
             item.setItemMeta(meta);
             inventory.addItem(item);
         }
+        {
+            ItemStack item = new ItemStack(Material.CLOCK);
+            ItemMeta meta = item.getItemMeta();
+            assert meta != null;
+
+            final String NAME = ChatColor.GREEN.toString() + "プレイヤーをハイライト";
+            meta.setDisplayName(NAME);
+            final List<String> LORE = Arrays.asList(
+                    ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
+                    ChatColor.WHITE.toString() + "１ゲームで" + ChatColor.BOLD.toString() + "２回のみ" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "使用可能",
+                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
+                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
+            );
+            meta.setLore(LORE);
+
+            item.setItemMeta(meta);
+            inventory.addItem(item);
+        }
     }
 
     public void knock(Location loc) {
@@ -59,4 +87,14 @@ public class Seeker extends GamePlayer {
         sendRedTitle(2, 20, 2, "game.block.player", "");
         getPlayer().playSound(getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 0.5F, 1.0F);
     }
+
+    public void hiLight(Boolean boo) {
+        if (boo) {
+            sendGreenMessage("game.you.hiLight");
+            getPlayer().playSound(getLocation(), Sound.AMBIENT_CAVE, 1.1F, 1.0F);
+            addCountHiLight();
+        } else {
+            sendRedMessage("game.you.coolTime");
+        }
+    };
 }

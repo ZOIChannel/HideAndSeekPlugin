@@ -135,6 +135,13 @@ public class EventManager implements Listener {
             if (hider == null) return;
             hider.upSpeed(game.givePlayerEffect(hider, EffectType.UP_SPEED));
 
+        } else if (havingItemType == game.getHiLightType()) {
+
+            if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+            Seeker seeker = game.findSeeker(player.getUniqueId());
+            if (seeker == null) return;
+            seeker.hiLight(game.playerHiLight(seeker, EffectType.HI_LIGHT));
+
         }
     }
 
@@ -150,10 +157,9 @@ public class EventManager implements Listener {
 
     private void onPlayerClickItem(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!game.getGamePlayers().containsKey(player.getUniqueId())) return;
-        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-        if (!gamePlayer.isHider()) return;
-        Hider hider = (Hider) gamePlayer;
+        Hider hider = game.findHider(player.getUniqueId());
+        if (hider == null) return;
+
         ItemStack item = event.getItem();
         if (item == null) return;
         if (item.getItemMeta() == null) return;

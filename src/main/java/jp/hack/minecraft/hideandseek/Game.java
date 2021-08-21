@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -36,11 +37,17 @@ public final class Game extends JavaPlugin {
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private BukkitTask seekerTeleportTimer;
     private BukkitTask gameOverTimer;
+    private boolean bStop = false;
 
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
     private final Material speedType = Material.FEATHER;
+    private final Material hiLightType = Material.CLOCK;
 
+    private final int DEFAULT_GAME_TIME = 60;
+    private int gameTime;
+    private final int DEFAULT_SEEKER_WAIT_TIME = 10;
+    private int seekerWaitTime;
     private final Double DEFAULT_REWARD = 60d;
     private Double reward;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
@@ -52,7 +59,7 @@ public final class Game extends JavaPlugin {
     );
     private List<UsableBlock> usableBlocks;
 
-    private final List<DummyArmorStand> armorStands = new ArrayList<>();
+    private final Map<UUID, DummyArmorStand> armorStands = new HashMap<>();
 
     public EventWatcher getEventWatcher() {
         return eventWatcher;
@@ -106,6 +113,10 @@ public final class Game extends JavaPlugin {
         return speedType;
     }
 
+    public Material getHiLightType() {
+        return hiLightType;
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -126,6 +137,7 @@ public final class Game extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         super.onDisable();
+        bStop = true;
         eventWatcher.stop();
         destroyGamePlayers();
     }
@@ -150,22 +162,40 @@ public final class Game extends JavaPlugin {
         } else {
             stageList = (ArrayList<StageData>) configLoader.getData("stage");
         }
+
+        if (configLoader.contains("gameTime")) {
+            gameTime = configLoader.getInt("gameTime");
+        } else {
+            gameTime = DEFAULT_GAME_TIME;
+            configLoader.setData("gameTime", gameTime);
+        }
+
+        if (configLoader.contains("seekerWaitTime")) {
+            seekerWaitTime = configLoader.getInt("seekerWaitTime");
+        } else {
+            seekerWaitTime = DEFAULT_SEEKER_WAIT_TIME;
+            configLoader.setData("seekerWaitTime", seekerWaitTime);
+        }
+
         if (configLoader.contains("reward")) {
             reward = configLoader.getDouble("reward");
         } else {
             reward = DEFAULT_REWARD;
             configLoader.setData("reward", reward);
         }
+
         if (configLoader.contains("usableBlocks")) {
             usableBlocks = configLoader.getUsableBlocks();
         } else {
             usableBlocks = DEFAULT_USABLE_BLOCKS;
             configLoader.setData("usableBlocks", usableBlocks);
         }
+
     }
 
     public void start() {
-        armorStands.forEach(DummyArmorStand::destroy);
+        bStop = false;
+        destroyAllDummy();
         StageData stageData = getCurrentStage();
         if (stageData == null) {
             this.gamePlayers.values().forEach(gamePlayer -> {
@@ -225,50 +255,74 @@ public final class Game extends JavaPlugin {
 //            }
         });
 
-        int gameTime = configLoader.getInt("gameTime");
-        int seekerWaitTime = configLoader.getInt("seekerWaitTime");
-        Game game = this;
-        BukkitRunnable gameOverRunnable = new BukkitRunnable() {
-            int gameRemainTime = gameTime;
-
-            @Override
-            public void run() {
-                if (gameRemainTime > 0) {
-                    getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(gameRemainTime));
-                    gameRemainTime -= 1;
-                } else {
-                    game.gameOver();
-                    this.cancel();
-                }
-            }
-        };
-        seekerTeleportTimer = new BukkitRunnable() {
+        new Thread(new BukkitRunnable() {
             int seekerWaitRemainTime = seekerWaitTime;
 
             @Override
             public void run() {
-                if (seekerWaitRemainTime > 0) {
-                    getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
-                    seekerWaitRemainTime -= 1;
-                } else {
-                    Objects.requireNonNull(stage.getWorld()).playSound(stage, Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.AMBIENT, 1, 1);
-                    getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
-                    getHiders().forEach(hider -> hider.getPlayer().sendTitle("鬼が放出された", "", 20, 40, 20));
-                    gameOverTimer = gameOverRunnable.runTaskTimer(game, 20, 20);
-                    this.cancel();
+                System.out.println("run1");
+                long t = System.currentTimeMillis();
+                while(!bStop && seekerWaitRemainTime > 0) {
+                    System.out.println("loop:" + seekerWaitRemainTime);
+                    long d = System.currentTimeMillis() - t;
+                    if (d > 1000) {
+                        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
+                        seekerWaitRemainTime -= 1;
+                        t = System.currentTimeMillis();
+                    }
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (!bStop) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            Objects.requireNonNull(stage.getWorld()).playSound(stage, Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.AMBIENT, 1, 1);
+                            getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
+                            getHiders().forEach(hider -> hider.getPlayer().sendTitle("鬼が放出された", "", 20, 40, 20));
+                            equipItems();
+                        }
+                    }.runTask(Game.this);
+                    new Thread(new BukkitRunnable() {
+                        int gameRemainTime = gameTime;
+
+                        @Override
+                        public void run() {
+                            System.out.println("run2");
+                            long t = System.currentTimeMillis();
+                            while(!bStop && gameRemainTime > 0) {
+                                System.out.println("loop2:" + gameRemainTime);
+                                long d = System.currentTimeMillis() - t;
+                                if (d > 1000) {
+                                    getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(gameRemainTime));
+                                    gameRemainTime -= 1;
+                                    t = System.currentTimeMillis();
+                                }
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            if (!bStop) new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    Game.this.gameOver();
+                                }
+                            }.runTask(Game.this);
+                        }
+                    }).start();
                 }
             }
-        }.runTaskTimer(this, 20, 20);
+        }).start();
     }
 
     public void gameOver() {
-        getGamePlayers().values().stream().filter(GamePlayer::isHider)
-                .filter(gamePlayer -> !((Hider) gamePlayer).isDead())
-                .forEach(hider -> {
-                    DummyArmorStand armorStand = new DummyArmorStand(hider);
-                    armorStand.create();
-                    armorStands.add(armorStand);
-                });
+        makeAliveHiderDummy();
 
         allSendGreenMessage("game.end");
         Role wonRole = judge();
@@ -306,11 +360,10 @@ public final class Game extends JavaPlugin {
     public void stop() {
         // プレイヤーをどこかへTPさせる?
         destroyGamePlayers();
-
         currentState = GameState.LOBBY;
-        seekerTeleportTimer.cancel();
-        gameOverTimer.cancel();
         getCurrentStage().deleteBorder();
+        eventWatcher.stop();
+        bStop = true;
     }
 
 //    // gamePlayersへのSeekerのputはLobbyPlayerから行う
@@ -337,6 +390,9 @@ public final class Game extends JavaPlugin {
             if (gamePlayer.isHider()) {
                 Hider hider = (Hider) gamePlayer;
                 hider.destroy();
+            } else {
+                Seeker seeker = (Seeker) gamePlayer;
+                clearHiLightTask(seeker);
             }
         });
         gamePlayers.clear();
@@ -395,6 +451,9 @@ public final class Game extends JavaPlugin {
             gamePlayer.sendGreenMessage("game.other.captured", hider.getPlayer().getDisplayName());
         });
         clearPlayerEffect(hider);
+        if (armorStands.containsKey(hider.getPlayerUuid())) {
+            armorStands.get(hider.getPlayerUuid()).destroy();
+        }
         hider.damage();
         hider.getPlayer().teleport(getCurrentStage().getLobby());
         reloadScoreboard();
@@ -428,8 +487,36 @@ public final class Game extends JavaPlugin {
         });
     }
 
+    private Boolean isHiLight = false;
+    public Boolean playerHiLight(Seeker seeker, EffectType type) {
+        Map<EffectType, MyRunnable> map = seeker.getEffectMap();
+        if (isHiLight) return false;
+        if (seeker.getCountHiLight() >= 2) return false;
+        if (map.containsKey(type)) return false;
+        makeAliveHiderDummy();
+        allSendRedTitle(5, 20, 5, "game.other.hiLight");
+
+        final MyRunnable myRunnable = new MyRunnable() {
+            @Override
+            public void run() {
+                destroyAllDummy();
+                isHiLight = false;
+                setRunnable(new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        map.remove(type);
+                    }
+                });
+                getRunnable().runTaskLater(Game.this, type.getCoolTime() * 20L);
+            }
+        };
+        isHiLight = true;
+        map.put(type, myRunnable);
+        myRunnable.runTaskLater(Game.this, type.getDuration() * 20L);
+        return true;
+    }
+
     public Boolean givePlayerEffect(GamePlayer gamePlayer, EffectType type) {
-        Game game = this;
         Map<EffectType, MyRunnable> map = gamePlayer.getEffectMap();
         if (map.containsKey(type)) return false;
         gamePlayer.giveEffect(type);
@@ -444,17 +531,17 @@ public final class Game extends JavaPlugin {
                         map.remove(type);
                     }
                 });
-                getRunnable().runTaskLater(game, type.getCoolTime() * 20L);
+                getRunnable().runTaskLater(Game.this, type.getCoolTime() * 20L);
             }
 
             ;
         };
         map.put(type, myRunnable);
-        myRunnable.runTaskLater(game, type.getDuration() * 20L);
+        myRunnable.runTaskLater(Game.this, type.getDuration() * 20L);
         return true;
     }
 
-    public abstract class MyRunnable extends BukkitRunnable {
+    public abstract static class MyRunnable extends BukkitRunnable {
         private BukkitRunnable runnable;
 
         public BukkitRunnable getRunnable() {
@@ -466,8 +553,23 @@ public final class Game extends JavaPlugin {
         }
     }
 
+    public void clearHiLightTask(Seeker seeker) {
+        Map<EffectType, MyRunnable> map = seeker.getEffectMap();
+        map.forEach((k, v) -> {
+            if (v != null) {
+                if (!v.isCancelled()) v.cancel();
+                if (v.getRunnable() != null) {
+                    if (!v.getRunnable().isCancelled()) v.getRunnable().cancel();
+                }
+            }
+        });
+        destroyAllDummy();
+    }
+
     public void clearPlayerEffect(GamePlayer gamePlayer) {
         Map<EffectType, MyRunnable> map = gamePlayer.getEffectMap();
+        if (map == null) return;
+        if (map.isEmpty()) return;
         map.forEach((k, v) -> {
             if (v != null) {
                 if (!v.isCancelled()) v.cancel();
@@ -477,6 +579,11 @@ public final class Game extends JavaPlugin {
             }
             gamePlayer.clearEffect(k);
         });
+    }
+
+    public void equipItems() {
+        getSeekers().forEach(Seeker::equipItem);
+        getHiders().forEach(Hider::equipItem);
     }
 
     public Seeker findSeeker(UUID uuid) {
@@ -516,12 +623,30 @@ public final class Game extends JavaPlugin {
         return stageList.get(currentStageIndex);
     }
 
+    public void makeAliveHiderDummy() {
+        getGamePlayers().values().stream().filter(GamePlayer::isHider)
+                .filter(gamePlayer -> !((Hider) gamePlayer).isDead())
+                .forEach(hider -> {
+                    DummyArmorStand armorStand = new DummyArmorStand(hider);
+                    armorStand.create();
+                    armorStands.put(hider.getPlayerUuid(), armorStand);
+                });
+    }
+
+    public void destroyAllDummy() {
+        armorStands.values().forEach(DummyArmorStand::destroy);
+    }
+
     public void allSendGreenMessage(String code, Object... args) {
         getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendGreenMessage(code, args));
     }
 
     public void allSendGreenTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
         getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendGreenTitle(fadeIn, stay, fadeOut, code, args));
+    }
+
+    public void allSendRedTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
+        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.sendRedTitle(fadeIn, stay, fadeOut, code, args));
     }
 
     public void setStage(StageData stageData) {

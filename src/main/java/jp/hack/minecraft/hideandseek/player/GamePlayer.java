@@ -61,10 +61,12 @@ abstract public class GamePlayer {
     }
 
     public void giveEffect(EffectType type) {
+        if (type.getPotionType() == null) return;
         getPlayer().addPotionEffect(new PotionEffect(type.getPotionType(), type.getDuration()*20, type.getLevel()));
     }
 
     public void clearEffect(EffectType type) {
+        if (!getPlayer().hasPotionEffect(type.getPotionType())) return;
         getPlayer().removePotionEffect(type.getPotionType());
     }
 

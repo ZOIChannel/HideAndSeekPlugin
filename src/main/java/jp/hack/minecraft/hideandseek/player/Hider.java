@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class Hider extends GamePlayer {
         super(player);
         player.setInvisible(true);
         player.setPlayerListName(ChatColor.BLUE + player.getName() + ChatColor.RESET);
-        equipItem();
+        equipBlockList();
 
         this.material = Material.ACACIA_LOG;
         blockGui = new BlockGui(game, player);
@@ -102,8 +103,7 @@ public class Hider extends GamePlayer {
         this.prevLoc = prevLoc;
     }
 
-    @Override
-    public void equipItem() {
+    public void equipBlockList() {
         Inventory inventory = getPlayer().getInventory();
         inventory.clear();
 
@@ -120,6 +120,12 @@ public class Hider extends GamePlayer {
             item.setItemMeta(meta);
             inventory.addItem(item);
         }
+    }
+
+    @Override
+    public void equipItem() {
+        Inventory inventory = getPlayer().getInventory();
+
         {
             ItemStack item = new ItemStack(Material.FEATHER);
             ItemMeta meta = item.getItemMeta();
