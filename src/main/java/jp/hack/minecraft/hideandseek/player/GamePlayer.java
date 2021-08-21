@@ -23,6 +23,7 @@ abstract public class GamePlayer {
         this.playerUuid = player.getUniqueId();
         this.player = player;
         this.player.setGameMode(GameMode.SURVIVAL);
+        this.player.setFoodLevel(20);
         this.player.setCollidable(false);
         gameBoard = new GameBoard(this, "Hide And Seek");
     }

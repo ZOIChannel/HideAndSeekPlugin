@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 import jp.hack.minecraft.hideandseek.player.Hider;
 import org.bukkit.inventory.ItemStack;
@@ -169,6 +170,12 @@ public class EventManager implements Listener {
         if (game.getCurrentStage() == null) sign.setLine(2, ">> Stage not set <<");
         sign.setLine(2, ">> " + game.getCurrentStage().getName() + " <<");
         sign.update();
+    }
+
+    @EventHandler
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        event.setCancelled(true);
     }
 
     @EventHandler

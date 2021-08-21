@@ -42,7 +42,7 @@ public final class Game extends JavaPlugin {
     private final Material meltType = Material.COMPASS;
     private final Material speedType = Material.FEATHER;
 
-    private final Double DEFAULT_REWARD = 60D;
+    private final Double DEFAULT_REWARD = 60d;
     private Double reward = null;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
             new UsableBlock(Material.FLOWER_POT, 0),
