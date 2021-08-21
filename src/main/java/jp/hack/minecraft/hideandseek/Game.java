@@ -41,7 +41,15 @@ public final class Game extends JavaPlugin {
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
     private final Integer DEFAULT_REWARD = 60;
-    private Integer reward;
+    private Integer reward = null;
+    private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
+            new UsableBlock(Material.FLOWER_POT, 0),
+            new UsableBlock(Material.CRAFTING_TABLE, 0),
+            new UsableBlock(Material.ANVIL, 60),
+            new UsableBlock(Material.CHEST, 120),
+            new UsableBlock(Material.BOOKSHELF, 120)
+    );
+    private List<UsableBlock> usableBlocks = null;
 
     private final List<DummyArmorStand> armorStands = new ArrayList<>();
 
@@ -143,10 +151,17 @@ public final class Game extends JavaPlugin {
             stageList = (ArrayList<StageData>) configLoader.getData("stage");
         }
         blockGui = new BlockGui(this);
-        reward = configLoader.getInt("reward");
-        if (reward == null) {
+        if (configLoader.contains("reward")) {
+            reward = configLoader.getInt("reward");
+        } else {
             reward = DEFAULT_REWARD;
             configLoader.setData("reward", reward);
+        }
+        if (configLoader.contains("usableBlocks")) {
+            usableBlocks = configLoader.getUsableBlocks();
+        } else {
+            usableBlocks = DEFAULT_USABLE_BLOCKS;
+            configLoader.setData("usableBlocks", usableBlocks);
         }
     }
 

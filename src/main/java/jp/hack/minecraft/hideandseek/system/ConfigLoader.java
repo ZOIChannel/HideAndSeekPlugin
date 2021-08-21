@@ -1,9 +1,14 @@
 package jp.hack.minecraft.hideandseek.system;
 
 import jp.hack.minecraft.hideandseek.data.StageData;
+import jp.hack.minecraft.hideandseek.data.UsableBlock;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConfigLoader {
     private JavaPlugin plugin;
@@ -32,5 +37,16 @@ public class ConfigLoader {
 
     public Integer getInt(String path) {
         return config.getInt(path);
+    }
+
+    public Boolean contains(String path) {
+        return config.contains(path);
+    }
+
+    public List<UsableBlock> getUsableBlocks() {
+        return config.getMapList("usableBlocks").stream().map(map -> {
+            Map<String, Object> usaMap = map.entrySet().stream().collect(Collectors.toMap(String::valueOf, v -> (Object) v));
+            return UsableBlock.deserialize(usaMap);
+        }).collect(Collectors.toList());
     }
 }
