@@ -400,10 +400,10 @@ public final class Game extends JavaPlugin {
         }
     }
 
-    private List<Material> getPlayerUsableBlocks(Player player) {
-        if (econ == null) return usableBlocks.stream().map(UsableBlock::getMaterial).collect(Collectors.toList());
+    private List<UsableBlock> getPlayerUsableBlocks(Player player) {
+        if (econ == null) return usableBlocks;
         double balance = econ.getBalance(player);
-        return usableBlocks.stream().filter(v -> v.getPrice() <= balance).map(UsableBlock::getMaterial).collect(Collectors.toList());
+        return usableBlocks.stream().filter(v -> v.getPrice() <= balance).collect(Collectors.toList());
     }
 
     public void giveReward(Role wonRole) {
