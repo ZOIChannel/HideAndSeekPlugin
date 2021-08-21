@@ -113,8 +113,13 @@ public final class Game extends JavaPlugin {
         return speedType;
     }
 
+<<<<<<< HEAD
     public Material getHiLightType() {
         return hiLightType;
+=======
+    public List<UsableBlock> getUsableBlocks() {
+        return usableBlocks;
+>>>>>>> f12d28fb50d3faacafbbc71bb28cfc85123c6ec1
     }
 
     @Override
@@ -186,6 +191,10 @@ public final class Game extends JavaPlugin {
 
         if (configLoader.contains("usableBlocks")) {
             usableBlocks = configLoader.getUsableBlocks();
+            if (usableBlocks.size() == 0) {
+                usableBlocks = DEFAULT_USABLE_BLOCKS;
+                configLoader.setData("usableBlocks", usableBlocks);
+            }
         } else {
             usableBlocks = DEFAULT_USABLE_BLOCKS;
             configLoader.setData("usableBlocks", usableBlocks);
@@ -338,11 +347,11 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !((Hider) hider).isDead())
                     .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
             getGamePlayers().forEach((uuid, gamePlayer) -> {
-                gamePlayer.getPlayer().sendMessage("生存者:");
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "生存者:" + ChatColor.RESET);
                 livingHiders.forEach(name -> {
-                    gamePlayer.getPlayer().sendMessage("    " + name);
+                    gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET);
                 });
-                gamePlayer.getPlayer().sendMessage("-----------");
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "-----------" + ChatColor.RESET);
             });
         }
         stop();
@@ -468,6 +477,7 @@ public final class Game extends JavaPlugin {
 
     public List<UsableBlock> getPlayerUsableBlocks(Player player) {
         if (econ == null) return usableBlocks;
+        System.out.println(usableBlocks);
         double balance = econ.getBalance(player);
         return usableBlocks.stream().filter(v -> v.getPrice() <= balance).collect(Collectors.toList());
     }
@@ -686,11 +696,11 @@ public final class Game extends JavaPlugin {
         hider.respawnFB();
     }
 
-    private void reloadScoreboard() {
+    public void reloadScoreboard() {
         gamePlayers.values().forEach(gamePlayer -> {
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
-            if(getCurrentState() != GameState.PLAYING) return;
+            if (getCurrentState() != GameState.PLAYING) return;
             gamePlayer.getGameBoard().setText(1, "");
             gamePlayer.getGameBoard().setText(2, "-----");
             List<Hider> livingPlayerList = getGamePlayers().values().stream()

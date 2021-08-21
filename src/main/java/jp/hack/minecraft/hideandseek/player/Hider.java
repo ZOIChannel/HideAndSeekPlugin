@@ -112,7 +112,7 @@ public class Hider extends GamePlayer {
             ItemMeta meta = item.getItemMeta();
             assert meta != null;
 
-            final String NAME = ChatColor.YELLOW.toString() + "ブロックを選択";
+            final String NAME = ChatColor.YELLOW + "ブロックを選択";
             meta.setDisplayName(NAME);
             final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを選択");
             meta.setLore(LORE);
@@ -135,8 +135,8 @@ public class Hider extends GamePlayer {
             meta.setDisplayName(NAME);
             final List<String> LORE = Arrays.asList(
                     ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックで" + ChatColor.AQUA.toString() + "スピードアップ",
-                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
-                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
+                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "秒",
+                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "秒"
             );
             meta.setLore(LORE);
 

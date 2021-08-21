@@ -27,6 +27,8 @@ public class Messages {
         messages.put("game.you.hiLight", "プレイヤーの大まかな位置を表示しました");
         messages.put("game.other.hiLight", "鬼がハイライトを使用しました！");
 
+        messages.put("buy.noMoney", "お金が足りません");
+
         messages.put("game.start", "ゲーム開始");
         messages.put("game.end", "ゲーム終了");
         messages.put("game.win", "%sの勝利!!!");

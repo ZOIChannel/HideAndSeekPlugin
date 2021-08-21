@@ -164,7 +164,8 @@ public class EventManager implements Listener {
         if (item == null) return;
         if (item.getItemMeta() == null) return;
         if (!item.getItemMeta().hasDisplayName()) return;
-        if (!item.getItemMeta().getDisplayName().equals("ブロックを選択")) return;
+        final String NAME = ChatColor.YELLOW + "ブロックを選択";
+        if (!item.getItemMeta().getDisplayName().equals(NAME)) return;
         hider.getBlockGui().openGui(event.getPlayer());
     }
 
