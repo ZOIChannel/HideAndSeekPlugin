@@ -113,13 +113,12 @@ public final class Game extends JavaPlugin {
         return speedType;
     }
 
-<<<<<<< HEAD
     public Material getHiLightType() {
         return hiLightType;
-=======
+    }
+
     public List<UsableBlock> getUsableBlocks() {
         return usableBlocks;
->>>>>>> f12d28fb50d3faacafbbc71bb28cfc85123c6ec1
     }
 
     @Override
