@@ -53,12 +53,16 @@ public final class Game extends JavaPlugin {
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
             new UsableBlock(Material.CRAFTING_TABLE, 0),
             new UsableBlock(Material.FURNACE, 0),
-            new UsableBlock(Material.OAK_LOG, 10),
-            new UsableBlock(Material.COBBLESTONE, 10),
-            new UsableBlock(Material.STONE, 10),
-            new UsableBlock(Material.DIRT, 30),
-            new UsableBlock(Material.OAK_PLANKS, 30),
-            new UsableBlock(Material.FLOWER_POT, 30)
+            new UsableBlock(Material.BOOKSHELF, 0),
+            new UsableBlock(Material.CHEST, 0),
+            new UsableBlock(Material.JUKEBOX, 0),
+            new UsableBlock(Material.STONE_BRICKS, 20),
+            new UsableBlock(Material.DIRT, 20),
+            new UsableBlock(Material.FLOWER_POT, 20),
+            new UsableBlock(Material.OAK_SIGN, 20),
+            new UsableBlock(Material.OAK_PLANKS, 60),
+            new UsableBlock(Material.STONE, 60),
+            new UsableBlock(Material.GRASS_BLOCK, 120)
     );
     private List<UsableBlock> usableBlocks;
 
@@ -484,25 +488,35 @@ public final class Game extends JavaPlugin {
         return usableBlocks.stream().filter(v -> v.getPrice() <= balance).collect(Collectors.toList());
     }
 
+    public void giveBounty(GamePlayer gamePlayer) {
+        System.out.println("giveBounty");
+        if (econ == null) return;
+        System.out.println("econ: notNull");
+        giveMoney(gamePlayer, reward/10);
+    }
+
     public void giveReward(Role wonRole) {
         System.out.println("giveReward");
         if (econ == null) return;
         System.out.println("econ: notNull");
         gamePlayers.values().forEach(gamePlayer -> {
             if (gamePlayer.isSameRole(wonRole)) {
-                econ.depositPlayer(gamePlayer.getPlayer(), reward);
-                gamePlayer.sendGreenMessage("game.gotMoney", reward);
+                giveMoney(gamePlayer, reward);
             } else {
-                econ.depositPlayer(gamePlayer.getPlayer(), reward / 3);
-                gamePlayer.sendGreenMessage("game.gotMoney", reward / 3);
+                giveMoney(gamePlayer, reward/3);
             }
         });
     }
 
+    public void giveMoney(GamePlayer gamePlayer, double amount) {
+        econ.depositPlayer(gamePlayer.getPlayer(), amount);
+        gamePlayer.sendGreenMessage("game.gotMoney", amount);
+    }
+
+
     private Boolean isHiLight = false;
-    public Boolean playerHiLight(Seeker seeker, EffectType type) {
+    public Boolean playerHiLight(EffectType type) {
         if (isHiLight) return false;
-        if (seeker.getCountHiLight() >= 2) return false;
         makeAliveHiderDummy();
         allSendRedTitle(5, 20, 5, "game.other.hiLight");
 

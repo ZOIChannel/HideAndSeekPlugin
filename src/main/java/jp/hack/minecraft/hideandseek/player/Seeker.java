@@ -68,9 +68,8 @@ public class Seeker extends GamePlayer {
             meta.setDisplayName(NAME);
             final List<String> LORE = Arrays.asList(
                     ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
-                    ChatColor.WHITE.toString() + "１ゲームで" + ChatColor.BOLD.toString() + "２回のみ" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "使用可能",
-                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
-                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
+                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
+                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
             );
             meta.setLore(LORE);
 

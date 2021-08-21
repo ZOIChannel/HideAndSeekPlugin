@@ -4,7 +4,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public enum EffectType {
     UP_SPEED(PotionEffectType.SPEED, 30, 5, 1),
-    HI_LIGHT(null, 20, 10);
+    HI_LIGHT(null, 15, 45);
 
     private PotionEffectType potionType;
     private int coolTime;
@@ -27,11 +27,11 @@ public enum EffectType {
         return level;
     }
 
-    private EffectType(PotionEffectType type, int coolTime, int duration) {
+    EffectType(PotionEffectType type, int coolTime, int duration) {
         this(type, coolTime, duration, 1);
     }
 
-    private EffectType(PotionEffectType type, int coolTime, int duration, int level) {
+    EffectType(PotionEffectType type, int coolTime, int duration, int level) {
         this.potionType = type;
         this.coolTime = coolTime;
         this.duration = duration;

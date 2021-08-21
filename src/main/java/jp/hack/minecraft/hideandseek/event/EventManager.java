@@ -99,6 +99,7 @@ public class EventManager implements Listener {
         }
         if (hider == null) return;
         game.damageHider(hider);
+        game.giveBounty(seeker);
     }
 
     @EventHandler
@@ -140,7 +141,7 @@ public class EventManager implements Listener {
             if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
             Seeker seeker = game.findSeeker(player.getUniqueId());
             if (seeker == null) return;
-            seeker.hiLight(game.playerHiLight(seeker, EffectType.HI_LIGHT));
+            seeker.hiLight(game.playerHiLight(EffectType.HI_LIGHT));
 
         }
     }
