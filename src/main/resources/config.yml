@@ -4,3 +4,4 @@ seekerWaitTime: 5
 gameTime: 10
 borderRadius: 50
 stage: []
+usableBlocks:

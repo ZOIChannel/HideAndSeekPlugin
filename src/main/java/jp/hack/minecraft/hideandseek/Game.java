@@ -203,7 +203,7 @@ public final class Game extends JavaPlugin {
                 lobbyPlayer.createHider(gamePlayers);
             }
         }
-        gamePlayers.values().forEach(gamePlayer -> gamePlayer.sendTitle(10, 20, 10, "ゲーム開始", ""));
+        gamePlayers.values().forEach(gamePlayer -> gamePlayer.sendTitle(10, 20, 10, "game.start", ""));
 
         stageData.createBorder();
 
