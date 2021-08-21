@@ -35,6 +35,7 @@ public class DummyArmorStand {
     }
 
     public void destroy(){
+        armorStand.getEquipment().clear();
         armorStand.remove();
     }
 }
