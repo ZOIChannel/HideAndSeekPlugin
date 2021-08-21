@@ -151,9 +151,9 @@ public class EventManager implements Listener {
 
     private void onPlayerClickItem(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if(!game.getGamePlayers().containsKey(player.getUniqueId())) return;
+        if (!game.getGamePlayers().containsKey(player.getUniqueId())) return;
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-        if(!gamePlayer.isHider()) return;
+        if (!gamePlayer.isHider()) return;
         Hider hider = (Hider) gamePlayer;
         ItemStack item = event.getItem();
         if (item == null) return;
@@ -225,7 +225,7 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerDropItem(PlayerDropItemEvent event){
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
         if (game.getCurrentState() != GameState.PLAYING) return;
         GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
@@ -241,6 +241,16 @@ public class EventManager implements Listener {
         if (gamePlayer == null) return;
         if (!gamePlayer.isSeeker()) return;
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        String message = ChatColor.AQUA +
+                "Hide And Seek\n" +
+                "制作: ZOI, Ryokno\n" +
+                "ブロックになってかくれんぼをするミニゲームです。\n" +
+                ChatColor.RESET;
+        event.getPlayer().sendMessage(message);
     }
 }
 
