@@ -4,7 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import jp.hack.minecraft.hideandseek.Game;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -36,11 +36,13 @@ public class BlockGui {
 
         itemList.forEach(item -> {
             pane.addItem(new GuiItem(item, event -> {
-                game.setHiderMaterial(event.getWhoClicked().getUniqueId(), item.getType());
+                Player clickedPlayer = (Player) event.getWhoClicked();
+                game.setHiderMaterial(clickedPlayer.getUniqueId(), item.getType());
                 Optional<UsableBlock> usableBlockOptional = game.getUsableBlocks().stream().filter(uBlock -> uBlock.getMaterial() == item.getType()).findFirst();
                 if (!usableBlockOptional.isPresent()) return;
                 UsableBlock usableBlock = usableBlockOptional.get();
-                Game.getEconomy().depositPlayer((OfflinePlayer) event.getWhoClicked(), -1 * usableBlock.getPrice());
+                Game.getEconomy().depositPlayer(clickedPlayer, -1 * usableBlock.getPrice());
+                clickedPlayer.getWorld().playSound(clickedPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, 1F, 1F);
                 game.reloadScoreboard();
                 event.setCancelled(true);
             }));
