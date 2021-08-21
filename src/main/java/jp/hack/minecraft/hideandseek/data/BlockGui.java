@@ -4,7 +4,6 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import jp.hack.minecraft.hideandseek.Game;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,14 +15,14 @@ public class BlockGui {
     private final ChestGui gui;
     private final List<ItemStack> itemList = new ArrayList<>();
 
-    public BlockGui(Game game) {
+    public BlockGui(Game game, Player player) {
         this.game = game;
-        gui = new ChestGui(5, "Select Block");
+        gui = new ChestGui(5, "ブロックを選択");
         OutlinePane pane = new OutlinePane(0, 0, 9, 5);
 
-        itemList.add(new ItemStack(Material.ICE));
-        itemList.add(new ItemStack(Material.FLOWER_POT));
-        itemList.add(new ItemStack(Material.OAK_WOOD));
+        game.getPlayerUsableBlocks(player).forEach(usableBlock -> {
+            itemList.add(new ItemStack(usableBlock.getMaterial()));
+        });
 
         itemList.forEach(item -> {
             pane.addItem(new GuiItem(item, event -> {

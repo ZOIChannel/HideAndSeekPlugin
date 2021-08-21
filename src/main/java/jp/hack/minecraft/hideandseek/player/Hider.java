@@ -1,5 +1,7 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.Game;
+import jp.hack.minecraft.hideandseek.data.BlockGui;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -15,6 +17,7 @@ public class Hider extends GamePlayer {
     private Material material;
     private Block block;
     private FallingBlock fallingBlock;
+    private final BlockGui blockGui;
 
     private Long freezeTicks = 0L;
     private Location prevLoc;
@@ -23,12 +26,13 @@ public class Hider extends GamePlayer {
     private Boolean isFrozen = false;
     private Boolean isCalledEvent = false;
 
-    public Hider(Player player) {
+    public Hider(Game game, Player player) {
         super(player);
         player.setInvisible(true);
         equipItem();
 
         this.material = Material.ACACIA_LOG;
+        blockGui = new BlockGui(game, player);
     }
 
     public Material getMaterial() {
@@ -45,6 +49,10 @@ public class Hider extends GamePlayer {
 
     public org.bukkit.entity.FallingBlock getFallingBlock() {
         return fallingBlock;
+    }
+
+    public BlockGui getBlockGui() {
+        return blockGui;
     }
 
     public Boolean isDead() {
@@ -94,7 +102,7 @@ public class Hider extends GamePlayer {
         inventory.clear();
 
         {
-            ItemStack item = new ItemStack(Material.CARROT_ON_A_STICK);
+            ItemStack item = new ItemStack(Material.BOOK);
             ItemMeta meta = item.getItemMeta();
             assert meta != null;
             meta.setDisplayName("ブロックを選択");
@@ -111,7 +119,7 @@ public class Hider extends GamePlayer {
     }
 
     public void found() {
-        sendRedTitle(5, 10, 5,"game.you.found", Messages.message("game.you.runaway"));
+        sendRedTitle(5, 10, 5, "game.you.found", Messages.message("game.you.runaway"));
         getPlayer().playSound(getLocation(), Sound.ENTITY_GHAST_WARN, SoundCategory.MASTER, 1.0F, 1.0F);
     }
 
@@ -133,7 +141,7 @@ public class Hider extends GamePlayer {
 
     public void blockFreeze() {
         if (this.isFrozen || this.isDead) return;
-        if(getPlayer().getLocation().getBlock().getType() != Material.AIR){
+        if (getPlayer().getLocation().getBlock().getType() != Material.AIR) {
             sendRedMessage("game.you.cannotHideHere");
             return;
         }

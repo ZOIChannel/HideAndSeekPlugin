@@ -1,18 +1,16 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.Game;
 import org.bukkit.entity.Player;
-
-import java.util.Map;
-import java.util.UUID;
 
 public class LobbyPlayer extends GamePlayer{
     public LobbyPlayer(Player player) {
         super(player);
     }
-    public void createHider(Map<UUID, GamePlayer> gamePlayers){
-        gamePlayers.put(this.getPlayerUuid(), new Hider(this.getPlayer()));
+    public void createHider(Game game){
+        game.getGamePlayers().put(this.getPlayerUuid(), new Hider(game, this.getPlayer()));
     }
-    public void createSeeker(Map<UUID, GamePlayer> gamePlayers){
-        gamePlayers.put(this.getPlayerUuid(), new Seeker(this.getPlayer()));
+    public void createSeeker(Game game){
+        game.getGamePlayers().put(this.getPlayerUuid(), new Seeker(this.getPlayer()));
     }
 }

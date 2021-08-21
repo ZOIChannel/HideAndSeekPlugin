@@ -58,17 +58,17 @@ public class Messages {
     }
 
     public static String greenMessage(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return ChatColor.GREEN + String.format(_instance.messages.get(code), args);
+        if (_instance.messages.containsKey(code)) return ChatColor.GREEN + String.format(_instance.messages.get(code), args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String redMessage(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return ChatColor.RED + String.format(_instance.messages.get(code), args);
+        if (_instance.messages.containsKey(code)) return ChatColor.RED + String.format(_instance.messages.get(code), args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String error(String code, Object... args) {
-        if (_instance.errors.containsKey(code)) return ChatColor.RED + String.format(_instance.errors.get(code), args);
+        if (_instance.errors.containsKey(code)) return ChatColor.RED + String.format(_instance.errors.get(code), args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 }

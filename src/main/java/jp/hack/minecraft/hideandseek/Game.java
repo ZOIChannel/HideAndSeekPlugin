@@ -36,7 +36,6 @@ public final class Game extends JavaPlugin {
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private BukkitTask seekerTeleportTimer;
     private BukkitTask gameOverTimer;
-    private BlockGui blockGui;
 
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
@@ -101,10 +100,6 @@ public final class Game extends JavaPlugin {
         return meltType;
     }
 
-    public BlockGui getBlockGui() {
-        return blockGui;
-    }
-
 
     @Override
     public void onEnable() {
@@ -150,7 +145,6 @@ public final class Game extends JavaPlugin {
         } else {
             stageList = (ArrayList<StageData>) configLoader.getData("stage");
         }
-        blockGui = new BlockGui(this);
         if (configLoader.contains("reward")) {
             reward = configLoader.getDouble("reward");
         } else {
@@ -183,6 +177,7 @@ public final class Game extends JavaPlugin {
             return;
         }
 
+        eventWatcher.start();
         currentState = GameState.PLAYING;
         int seekerRate = configLoader.getInt("seekerRate");
         int seekerCount = (int) Math.ceil(gamePlayers.size() / (float) seekerRate);
@@ -198,9 +193,9 @@ public final class Game extends JavaPlugin {
         for (int i = 0; i < lobbyPlayers.size(); i++) {
             LobbyPlayer lobbyPlayer = lobbyPlayers.get(i);
             if (seekerIndex.contains(i)) {
-                lobbyPlayer.createSeeker(gamePlayers);
+                lobbyPlayer.createSeeker(this);
             } else {
-                lobbyPlayer.createHider(gamePlayers);
+                lobbyPlayer.createHider(this);
             }
         }
         gamePlayers.values().forEach(gamePlayer -> gamePlayer.sendTitle(10, 20, 10, "game.start", ""));
@@ -309,19 +304,19 @@ public final class Game extends JavaPlugin {
         getCurrentStage().deleteBorder();
     }
 
-    // gamePlayersへのSeekerのputはLobbyPlayerから行う
-    public Seeker createSeeker(Player player) {
-        Seeker seeker = new Seeker(player);
-        gamePlayers.put(seeker.getPlayerUuid(), seeker);
-        return seeker;
-    }
-
-    // 仮コード・削除予定。gamePlayersへのHiderのputはLobbyPlayerから行う
-    public Hider createHider(Player player) {
-        Hider hider = new Hider(player);
-        gamePlayers.put(hider.getPlayerUuid(), hider);
-        return hider;
-    }
+//    // gamePlayersへのSeekerのputはLobbyPlayerから行う
+//    public Seeker createSeeker(Player player) {
+//        Seeker seeker = new Seeker(player);
+//        gamePlayers.put(seeker.getPlayerUuid(), seeker);
+//        return seeker;
+//    }
+//
+//    // 仮コード・削除予定。gamePlayersへのHiderのputはLobbyPlayerから行う
+//    public Hider createHider(Player player) {
+//        Hider hider = new Hider(player);
+//        gamePlayers.put(hider.getPlayerUuid(), hider);
+//        return hider;
+//    }
 
     public void destroyGamePlayers() {
         gamePlayers.values().forEach(gamePlayer -> {
@@ -400,7 +395,7 @@ public final class Game extends JavaPlugin {
         }
     }
 
-    private List<UsableBlock> getPlayerUsableBlocks(Player player) {
+    public List<UsableBlock> getPlayerUsableBlocks(Player player) {
         if (econ == null) return usableBlocks;
         double balance = econ.getBalance(player);
         return usableBlocks.stream().filter(v -> v.getPrice() <= balance).collect(Collectors.toList());

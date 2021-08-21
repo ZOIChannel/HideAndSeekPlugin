@@ -139,12 +139,17 @@ public class EventManager implements Listener {
     }
 
     private void onPlayerClickItem(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if(!game.getGamePlayers().containsKey(player.getUniqueId())) return;
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+        if(!gamePlayer.isHider()) return;
+        Hider hider = (Hider) gamePlayer;
         ItemStack item = event.getItem();
         if (item == null) return;
         if (item.getItemMeta() == null) return;
         if (!item.getItemMeta().hasDisplayName()) return;
-        if (!item.getItemMeta().getDisplayName().equals("Select Block")) return;
-        game.getBlockGui().openGui(event.getPlayer());
+        if (!item.getItemMeta().getDisplayName().equals("ブロックを選択")) return;
+        hider.getBlockGui().openGui(event.getPlayer());
     }
 
     private void changeStage(Sign sign) {
