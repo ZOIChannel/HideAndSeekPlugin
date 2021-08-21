@@ -22,6 +22,8 @@ public class Messages {
         messages.put("game.you.cannotHideHere", "ここで隠れることはできません");
         messages.put("game.you.captured", "あなたは捕まりました！");
         messages.put("game.other.captured", "%sは捕まってしまいました！");
+        messages.put("game.you.upSpeed", "スピードアップ！");
+        messages.put("game.you.coolTime", "クールタイムが明けていません");
 
         messages.put("game.start", "ゲーム開始");
         messages.put("game.end", "ゲーム終了です");

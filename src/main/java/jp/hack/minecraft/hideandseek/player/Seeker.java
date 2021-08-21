@@ -27,7 +27,7 @@ public class Seeker extends GamePlayer {
 
             final String NAME = ChatColor.YELLOW.toString() + "ブロックを鑑定";
             meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + "クリックでブロックを鑑定");
+            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを鑑定");
             meta.setLore(LORE);
 
             item.setItemMeta(meta);
@@ -40,7 +40,7 @@ public class Seeker extends GamePlayer {
 
             final String NAME = ChatColor.RED.toString() + "プレイヤーを確保";
             meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + "クリックでプレイヤーを確保");
+            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーを確保");
             meta.setLore(LORE);
 
             item.setItemMeta(meta);

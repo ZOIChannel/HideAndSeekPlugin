@@ -16,6 +16,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -39,6 +40,8 @@ public final class Game extends JavaPlugin {
 
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
+    private final Material speedType = Material.FEATHER;
+
     private final Double DEFAULT_REWARD = 60D;
     private Double reward = null;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
@@ -100,6 +103,9 @@ public final class Game extends JavaPlugin {
         return meltType;
     }
 
+    public Material getSpeedType() {
+        return speedType;
+    }
 
     @Override
     public void onEnable() {
@@ -320,6 +326,7 @@ public final class Game extends JavaPlugin {
 
     public void destroyGamePlayers() {
         gamePlayers.values().forEach(gamePlayer -> {
+            clearPlayerEffect(gamePlayer);
             Player player = gamePlayer.getPlayer();
             player.setGameMode(GameMode.SPECTATOR);
             player.getInventory().clear();
@@ -384,6 +391,7 @@ public final class Game extends JavaPlugin {
             }
             gamePlayer.sendGreenMessage("game.other.captured", hider.getPlayer().getDisplayName());
         });
+        clearPlayerEffect(hider);
         hider.damage();
         hider.getPlayer().teleport(getCurrentStage().getLobby());
         if (gamePlayers.values().stream().noneMatch(gamePlayer -> {
@@ -416,14 +424,63 @@ public final class Game extends JavaPlugin {
         });
     }
 
+    public Boolean givePlayerEffect(GamePlayer gamePlayer, EffectType type) {
+        Game game = this;
+        Map<EffectType, MyRunnable> map = gamePlayer.getEffectMap();
+        if (map.containsKey(type)) return false;
+        gamePlayer.giveEffect(type);
+
+        final MyRunnable myRunnable = new MyRunnable() {
+            @Override
+            public void run() {
+                gamePlayer.clearEffect(type);
+                setRunnable(new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        map.remove(type);
+                    }
+                });
+                getRunnable().runTaskLater(game, type.getCoolTime()* 20L);
+            };
+        };
+        map.put(type, myRunnable);
+        myRunnable.runTaskLater(game, type.getDuration()* 20L);
+        return true;
+    }
+
+    public abstract class MyRunnable extends BukkitRunnable {
+        private BukkitRunnable runnable;
+
+        public BukkitRunnable getRunnable() {
+            return runnable;
+        }
+
+        public void setRunnable(BukkitRunnable runnable) {
+            this.runnable = runnable;
+        }
+    }
+
+    public void clearPlayerEffect(GamePlayer gamePlayer) {
+        Map<EffectType, MyRunnable> map = gamePlayer.getEffectMap();
+        map.forEach((k, v) -> {
+            if (v != null) {
+                if (!v.isCancelled()) v.cancel();
+                if (v.getRunnable() != null) {
+                    if (!v.getRunnable().isCancelled()) v.getRunnable().cancel();
+                }
+            }
+            gamePlayer.clearEffect(k);
+        });
+    }
+
     public Seeker findSeeker(UUID uuid) {
         if (uuid == null) return null;
-        return (getSeekers().stream().filter(s -> s.getPlayerUuid().equals(uuid)).findFirst().orElse(null));
+        return getSeekers().stream().filter(s -> s.getPlayerUuid().equals(uuid)).findFirst().orElse(null);
     }
 
     public Hider findHider(UUID uuid) {
         if (uuid == null) return null;
-        return (getHiders().stream().filter(h -> h.getPlayerUuid().equals(uuid)).findFirst().orElse(null));
+        return getHiders().stream().filter(h -> h.getPlayerUuid().equals(uuid)).findFirst().orElse(null);
     }
 
     public Hider findHiderByBlock(Block block) {

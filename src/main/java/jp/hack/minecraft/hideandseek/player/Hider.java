@@ -2,6 +2,7 @@ package jp.hack.minecraft.hideandseek.player;
 
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.BlockGui;
+import jp.hack.minecraft.hideandseek.data.EffectType;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -11,7 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Hider extends GamePlayer {
     private Material material;
@@ -105,7 +110,29 @@ public class Hider extends GamePlayer {
             ItemStack item = new ItemStack(Material.BOOK);
             ItemMeta meta = item.getItemMeta();
             assert meta != null;
-            meta.setDisplayName("ブロックを選択");
+
+            final String NAME = ChatColor.YELLOW.toString() + "ブロックを選択";
+            meta.setDisplayName(NAME);
+            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを選択");
+            meta.setLore(LORE);
+
+            item.setItemMeta(meta);
+            inventory.addItem(item);
+        }
+        {
+            ItemStack item = new ItemStack(Material.FEATHER);
+            ItemMeta meta = item.getItemMeta();
+            assert meta != null;
+
+            final String NAME = ChatColor.AQUA.toString() + "スピードアップ";
+            meta.setDisplayName(NAME);
+            final List<String> LORE = Arrays.asList(
+                    ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックで" + ChatColor.AQUA.toString() + "スピードアップ",
+                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
+                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
+            );
+            meta.setLore(LORE);
+
             item.setItemMeta(meta);
             inventory.addItem(item);
         }
@@ -116,6 +143,15 @@ public class Hider extends GamePlayer {
         blockMelt();
         destroyFallingBlock();
         spawnFallingBlock();
+    }
+
+    public void upSpeed(Boolean boo) {
+        if (boo) {
+            sendGreenMessage("game.you.upSpeed");
+            getPlayer().playSound(getLocation(), Sound.ENTITY_HORSE_STEP, 1.0F, 1.0F);
+        } else {
+            sendRedMessage("game.you.coolTime");
+        }
     }
 
     public void found() {

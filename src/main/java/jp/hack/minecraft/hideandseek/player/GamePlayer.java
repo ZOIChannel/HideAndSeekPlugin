@@ -1,15 +1,21 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.Game;
+import jp.hack.minecraft.hideandseek.data.EffectType;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 abstract public class GamePlayer {
     private final UUID playerUuid;
     private final Player player;
+    private final Map<EffectType, Game.MyRunnable> effectMap = new HashMap<>();
 
     public GamePlayer(Player player) {
         this.playerUuid = player.getUniqueId();
@@ -50,6 +56,14 @@ abstract public class GamePlayer {
         getPlayer().sendMessage(Messages.redMessage(code, args));
     }
 
+    public void giveEffect(EffectType type) {
+        getPlayer().addPotionEffect(new PotionEffect(type.getPotionType(), type.getDuration()*20, type.getLevel()));
+    }
+
+    public void clearEffect(EffectType type) {
+        getPlayer().removePotionEffect(type.getPotionType());
+    }
+
     public void equipItem() {}
 
     public UUID getPlayerUuid() {
@@ -58,6 +72,10 @@ abstract public class GamePlayer {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public Map<EffectType, Game.MyRunnable> getEffectMap() {
+        return effectMap;
     }
 
     public Location getLocation() {

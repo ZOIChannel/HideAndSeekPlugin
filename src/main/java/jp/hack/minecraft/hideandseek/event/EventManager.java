@@ -1,6 +1,7 @@
 package jp.hack.minecraft.hideandseek.event;
 
 import jp.hack.minecraft.hideandseek.Game;
+import jp.hack.minecraft.hideandseek.data.EffectType;
 import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Role;
@@ -109,24 +110,33 @@ public class EventManager implements Listener {
 
         Player player = event.getPlayer();
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
-        if (!game.getMeltType().equals(havingItemType)) return;
+        if (havingItemType == game.getMeltType()) {
 
-        Seeker seeker = game.findSeeker(player.getUniqueId());
-        if (seeker == null) return;
+            Seeker seeker = game.findSeeker(player.getUniqueId());
+            if (seeker == null) return;
 
-        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
-        Block block = event.getClickedBlock();
+            if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+            Block block = event.getClickedBlock();
 
-        Hider hider = game.findHiderByBlock(block);
-        if (hider == null) {
-            Location blockLoc = event.getClickedBlock().getLocation();
-            seeker.knock(blockLoc);
-            return;
+            Hider hider = game.findHiderByBlock(block);
+            if (hider == null) {
+                Location blockLoc = event.getClickedBlock().getLocation();
+                seeker.knock(blockLoc);
+                return;
+            }
+            seeker.discover();
+
+            hider.found();
+            hider.blockMelt();
+
+        } else if (havingItemType == game.getSpeedType()) {
+
+            if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+            Hider hider = game.findHider(player.getUniqueId());
+            if (hider == null) return;
+            hider.upSpeed(game.givePlayerEffect(hider, EffectType.UP_SPEED));
+
         }
-        seeker.discover();
-
-        hider.found();
-        hider.blockMelt();
     }
 
 
