@@ -3,7 +3,8 @@ package jp.hack.minecraft.hideandseek.data;
 import org.bukkit.potion.PotionEffectType;
 
 public enum EffectType {
-    UP_SPEED(PotionEffectType.SPEED, 30, 5, 1),
+    SEEKER_UP_SPEED(PotionEffectType.SPEED, 0, 10000, 1),
+    UP_SPEED(PotionEffectType.SPEED, 30, 5, 2),
     HI_LIGHT(null, 45, 15);
 
     private PotionEffectType potionType;

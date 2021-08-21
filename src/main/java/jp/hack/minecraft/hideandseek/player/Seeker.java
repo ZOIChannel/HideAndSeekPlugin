@@ -25,6 +25,7 @@ public class Seeker extends GamePlayer {
         super(player);
         getPlayer().setPlayerListName(ChatColor.RED + getPlayer().getName() + ChatColor.RESET);
         player.setInvisible(false);
+        giveEffect(EffectType.SEEKER_UP_SPEED);
 
         Inventory inventory = getPlayer().getInventory();
         inventory.clear();

@@ -601,16 +601,15 @@ public final class Game extends JavaPlugin {
 
     public void clearPlayerEffect(GamePlayer gamePlayer) {
         Map<EffectType, MyRunnable> map = gamePlayer.getEffectMap();
+        gamePlayer.allClearEffect();
         if (map == null) return;
-        if (map.isEmpty()) return;
-        map.forEach((k, v) -> {
+        map.values().forEach(v -> {
             if (v != null) {
                 if (!v.isCancelled()) v.cancel();
                 if (v.getRunnable() != null) {
                     if (!v.getRunnable().isCancelled()) v.getRunnable().cancel();
                 }
             }
-            gamePlayer.clearEffect(k);
         });
     }
 

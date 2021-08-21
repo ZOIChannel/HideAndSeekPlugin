@@ -65,6 +65,12 @@ abstract public class GamePlayer {
         getPlayer().addPotionEffect(new PotionEffect(type.getPotionType(), type.getDuration()*20, type.getLevel()));
     }
 
+    public void allClearEffect() {
+        getPlayer().getActivePotionEffects().forEach(effect -> {
+            getPlayer().removePotionEffect(effect.getType());
+        });
+    }
+
     public void clearEffect(EffectType type) {
         if (!getPlayer().hasPotionEffect(type.getPotionType())) return;
         getPlayer().removePotionEffect(type.getPotionType());
