@@ -361,7 +361,7 @@ public final class Game extends JavaPlugin {
                 gamePlayer.sendGreenMessage("game.youJoinGame");
                 return;
             }
-            gamePlayer.sendGreenMessage("game.otherJoinGame", gamePlayer.getPlayer().getDisplayName());
+            gamePlayer.sendGreenMessage("game.otherJoinGame", player.getDisplayName());
         });
     }
 
