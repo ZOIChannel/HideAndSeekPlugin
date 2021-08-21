@@ -2,6 +2,7 @@ package jp.hack.minecraft.hideandseek.player;
 
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.EffectType;
+import jp.hack.minecraft.hideandseek.data.GameBoard;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -16,12 +17,14 @@ abstract public class GamePlayer {
     private final UUID playerUuid;
     private final Player player;
     private final Map<EffectType, Game.MyRunnable> effectMap = new HashMap<>();
+    private final GameBoard gameBoard;
 
     public GamePlayer(Player player) {
         this.playerUuid = player.getUniqueId();
         this.player = player;
         this.player.setGameMode(GameMode.SURVIVAL);
         this.player.setCollidable(false);
+        gameBoard = new GameBoard(this, "Hide And Seek");
     }
 
     public void sendGreenTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
@@ -93,5 +96,9 @@ abstract public class GamePlayer {
         if (isHider() && role == Role.HIDER) {
             return true;
         } else return isSeeker() && role == Role.SEEKER;
+    }
+
+    public GameBoard getGameBoard() {
+        return gameBoard;
     }
 }

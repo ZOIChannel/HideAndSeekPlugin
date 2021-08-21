@@ -204,7 +204,10 @@ public final class Game extends JavaPlugin {
                 lobbyPlayer.createHider(this);
             }
         }
-        gamePlayers.values().forEach(gamePlayer -> gamePlayer.sendTitle(10, 20, 10, "game.start", ""));
+        gamePlayers.values().forEach(gamePlayer -> {
+            gamePlayer.sendTitle(10, 20, 10, "game.start", "");
+        });
+        reloadScoreboard();
 
         stageData.createBorder();
 
@@ -266,7 +269,7 @@ public final class Game extends JavaPlugin {
                     DummyArmorStand armorStand = new DummyArmorStand(hider);
                     armorStand.create();
                     armorStands.add(armorStand);
-        });
+                });
 
         allSendGreenMessage("game.end");
         Role wonRole = judge();
@@ -394,6 +397,7 @@ public final class Game extends JavaPlugin {
         clearPlayerEffect(hider);
         hider.damage();
         hider.getPlayer().teleport(getCurrentStage().getLobby());
+        reloadScoreboard();
         if (gamePlayers.values().stream().noneMatch(gamePlayer -> {
             if (!gamePlayer.isHider()) return false;
             Hider h = (Hider) gamePlayer;
@@ -418,8 +422,8 @@ public final class Game extends JavaPlugin {
                 econ.depositPlayer(gamePlayer.getPlayer(), reward);
                 gamePlayer.sendGreenMessage("game.gotMoney", reward);
             } else {
-                econ.depositPlayer(gamePlayer.getPlayer(), reward/3);
-                gamePlayer.sendGreenMessage("game.gotMoney", reward/3);
+                econ.depositPlayer(gamePlayer.getPlayer(), reward / 3);
+                gamePlayer.sendGreenMessage("game.gotMoney", reward / 3);
             }
         });
     }
@@ -440,11 +444,13 @@ public final class Game extends JavaPlugin {
                         map.remove(type);
                     }
                 });
-                getRunnable().runTaskLater(game, type.getCoolTime()* 20L);
-            };
+                getRunnable().runTaskLater(game, type.getCoolTime() * 20L);
+            }
+
+            ;
         };
         map.put(type, myRunnable);
-        myRunnable.runTaskLater(game, type.getDuration()* 20L);
+        myRunnable.runTaskLater(game, type.getDuration() * 20L);
         return true;
     }
 
@@ -553,5 +559,24 @@ public final class Game extends JavaPlugin {
         if (hider == null) return;
         hider.setMaterial(material);
         hider.respawnFB();
+    }
+
+    private void reloadScoreboard() {
+        gamePlayers.values().forEach(gamePlayer -> {
+            gamePlayer.sendTitle(10, 20, 10, "game.start", "");
+//            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + 183);
+            gamePlayer.getGameBoard().setText(1, "-----");
+            gamePlayer.getGameBoard().setText(2, "生存プレイヤー");
+            List<Hider> livingPlayerList = getGamePlayers().values().stream()
+                    .filter(GamePlayer::isHider)
+                    .map(gp -> (Hider) gp)
+                    .filter(hider -> !hider.isDead())
+                    .collect(Collectors.toList());
+            for (int i = 0; i < livingPlayerList.size(); i++) {
+                Hider livingPlayer = livingPlayerList.get(i);
+                gamePlayer.getGameBoard().setText(i + 3, "    " + livingPlayer.getPlayer().getDisplayName());
+            }
+        });
     }
 }
