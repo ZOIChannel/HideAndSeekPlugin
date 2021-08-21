@@ -39,6 +39,10 @@ public class ConfigLoader {
         return config.getInt(path);
     }
 
+    public Double getDouble(String path) {
+        return config.getDouble(path);
+    }
+
     public Boolean contains(String path) {
         return config.contains(path);
     }

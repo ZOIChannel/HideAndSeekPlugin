@@ -40,8 +40,8 @@ public final class Game extends JavaPlugin {
 
     private final Material captureType = Material.GLASS_BOTTLE;
     private final Material meltType = Material.COMPASS;
-    private final Integer DEFAULT_REWARD = 60;
-    private Integer reward = null;
+    private final Double DEFAULT_REWARD = 60D;
+    private Double reward = null;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
             new UsableBlock(Material.FLOWER_POT, 0),
             new UsableBlock(Material.CRAFTING_TABLE, 0),
@@ -152,7 +152,7 @@ public final class Game extends JavaPlugin {
         }
         blockGui = new BlockGui(this);
         if (configLoader.contains("reward")) {
-            reward = configLoader.getInt("reward");
+            reward = configLoader.getDouble("reward");
         } else {
             reward = DEFAULT_REWARD;
             configLoader.setData("reward", reward);
@@ -398,6 +398,12 @@ public final class Game extends JavaPlugin {
         })) {
             gameOver();
         }
+    }
+
+    private List<Material> getPlayerUsableBlocks(Player player) {
+        if (econ == null) return usableBlocks.stream().map(UsableBlock::getMaterial).collect(Collectors.toList());
+        double balance = econ.getBalance(player);
+        return usableBlocks.stream().filter(v -> v.getPrice() <= balance).map(UsableBlock::getMaterial).collect(Collectors.toList());
     }
 
     public void giveReward(Role wonRole) {
