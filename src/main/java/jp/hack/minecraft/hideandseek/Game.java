@@ -51,11 +51,14 @@ public final class Game extends JavaPlugin {
     private final Double DEFAULT_REWARD = 60d;
     private Double reward;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
-            new UsableBlock(Material.FLOWER_POT, 0),
             new UsableBlock(Material.CRAFTING_TABLE, 0),
-            new UsableBlock(Material.ANVIL, 60),
-            new UsableBlock(Material.CHEST, 120),
-            new UsableBlock(Material.BOOKSHELF, 120)
+            new UsableBlock(Material.FURNACE, 0),
+            new UsableBlock(Material.OAK_LOG, 10),
+            new UsableBlock(Material.COBBLESTONE, 10),
+            new UsableBlock(Material.STONE, 10),
+            new UsableBlock(Material.DIRT, 30),
+            new UsableBlock(Material.OAK_PLANKS, 30),
+            new UsableBlock(Material.FLOWER_POT, 30)
     );
     private List<UsableBlock> usableBlocks;
 
