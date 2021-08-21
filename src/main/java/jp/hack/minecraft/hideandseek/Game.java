@@ -16,7 +16,6 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -566,6 +565,7 @@ public final class Game extends JavaPlugin {
         gamePlayers.values().forEach(gamePlayer -> {
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+            if(getCurrentState() != GameState.PLAYING) return;
             gamePlayer.getGameBoard().setText(1, "");
             gamePlayer.getGameBoard().setText(2, "-----");
             List<Hider> livingPlayerList = getGamePlayers().values().stream()

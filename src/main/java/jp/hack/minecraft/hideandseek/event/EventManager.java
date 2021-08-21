@@ -4,9 +4,7 @@ import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.EffectType;
 import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
-import jp.hack.minecraft.hideandseek.player.Role;
 import jp.hack.minecraft.hideandseek.player.Seeker;
-import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -146,7 +144,8 @@ public class EventManager implements Listener {
         if (!event.hasBlock()) return;
         if (!(event.getClickedBlock().getState() instanceof Sign)) return;
         Sign sign = (Sign) event.getClickedBlock().getState();
-        changeStage(sign);
+        onClickForStage(sign);
+        onClickForJoin(sign, event.getPlayer());
     }
 
     private void onPlayerClickItem(PlayerInteractEvent event) {
@@ -163,13 +162,16 @@ public class EventManager implements Listener {
         hider.getBlockGui().openGui(event.getPlayer());
     }
 
-    private void changeStage(Sign sign) {
+    private void onClickForStage(Sign sign) {
         if (!sign.getLines()[0].equals("[StageSelector]")) return;
         game.selectNextStage();
-        System.out.println("event.getEventName()");
         if (game.getCurrentStage() == null) sign.setLine(2, ">> Stage not set <<");
         sign.setLine(2, ">> " + game.getCurrentStage().getName() + " <<");
         sign.update();
+    }
+    private void onClickForJoin(Sign sign, Player player) {
+        if (!sign.getLines()[0].equals("[Join]")) return;
+        player.performCommand("hs join");
     }
 
     @EventHandler

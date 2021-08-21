@@ -1,7 +1,7 @@
 attackDamage: 4
 seekerRate: 5
-seekerWaitTime: 5
-gameTime: 10
+seekerWaitTime: 30
+gameTime: 300
 borderRadius: 50
 stage: []
 usableBlocks:
