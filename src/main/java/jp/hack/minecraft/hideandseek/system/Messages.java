@@ -25,6 +25,8 @@ public class Messages {
         messages.put("game.you.upSpeed", "スピードアップ！");
         messages.put("game.you.coolTime", "クールタイムが明けていません");
 
+        messages.put("buy.noMoney", "お金が足りません");
+
         messages.put("game.start", "ゲーム開始");
         messages.put("game.end", "ゲーム終了");
         messages.put("game.win", "%sの勝利!!!");

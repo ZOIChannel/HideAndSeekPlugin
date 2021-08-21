@@ -162,7 +162,7 @@ public final class Game extends JavaPlugin {
         }
         if (configLoader.contains("usableBlocks")) {
             usableBlocks = configLoader.getUsableBlocks();
-            if(usableBlocks.size() == 0) {
+            if (usableBlocks.size() == 0) {
                 usableBlocks = DEFAULT_USABLE_BLOCKS;
                 configLoader.setData("usableBlocks", usableBlocks);
             }
@@ -292,11 +292,11 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !((Hider) hider).isDead())
                     .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
             getGamePlayers().forEach((uuid, gamePlayer) -> {
-                gamePlayer.getPlayer().sendMessage("生存者:");
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "生存者:" + ChatColor.RESET);
                 livingHiders.forEach(name -> {
-                    gamePlayer.getPlayer().sendMessage("    " + name);
+                    gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET);
                 });
-                gamePlayer.getPlayer().sendMessage("-----------");
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "-----------" + ChatColor.RESET);
             });
         }
         stop();
@@ -574,7 +574,7 @@ public final class Game extends JavaPlugin {
         gamePlayers.values().forEach(gamePlayer -> {
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
-            if(getCurrentState() != GameState.PLAYING) return;
+            if (getCurrentState() != GameState.PLAYING) return;
             gamePlayer.getGameBoard().setText(1, "");
             gamePlayer.getGameBoard().setText(2, "-----");
             List<Hider> livingPlayerList = getGamePlayers().values().stream()
