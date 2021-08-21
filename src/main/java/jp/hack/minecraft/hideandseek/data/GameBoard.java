@@ -16,7 +16,7 @@ public class GameBoard {
     private final GamePlayer gamePlayer;
     private final Scoreboard scoreboard;
     private final Objective objective;
-    private final List<String> keyList = new ArrayList<>(Arrays.asList(new String[16]));
+    private final List<String> keyList = new ArrayList<>(Arrays.asList("", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));
 
     public GameBoard(GamePlayer gamePlayer, String name) {
         this.gamePlayer = gamePlayer;
@@ -25,18 +25,19 @@ public class GameBoard {
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         objective.setRenderType(RenderType.INTEGER);
         gamePlayer.getPlayer().setScoreboard(scoreboard);
-        initScoreboard();
+        reloadScoreboard();
     }
 
-    private void initScoreboard() {
-        for (int i = 0; i < 15; i++) {
-            keyList.set(i, "");
-            objective.getScore(keyList.get(i)).setScore(15 - i);
-        }
-    }
+//    private void initScoreboard() {
+//        for (int i = 0; i < 15; i++) {
+//            scoreboard.resetScores(keyList.get(i));
+//            objective.getScore(keyList.get(i)).setScore(15 - i);
+//        }
+//    }
 
     private void reloadScoreboard() {
         for (int i = 0; i < 15; i++) {
+            scoreboard.resetScores(keyList.get(i));
             objective.getScore(keyList.get(i)).setScore(15 - i);
         }
     }
@@ -46,6 +47,7 @@ public class GameBoard {
     }
 
     public void setText(int index, String text) {
+        if (index > 14) return;
         scoreboard.resetScores(keyList.get(index));
         keyList.set(index, text);
         objective.getScore(text).setScore(index);

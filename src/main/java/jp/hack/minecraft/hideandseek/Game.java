@@ -277,6 +277,7 @@ public final class Game extends JavaPlugin {
         allSendGreenMessage("game.win.border", wonRole.toString());
 
         giveReward(wonRole);
+        reloadScoreboard();
 
         if (wonRole.equals(Role.HIDER)) {
             List<String> livingHiders = new ArrayList<>();
@@ -354,6 +355,7 @@ public final class Game extends JavaPlugin {
         }
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
+        reloadScoreboard();
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
         resetPlayerState(player);
         gamePlayers.values().forEach(gamePlayer -> {
@@ -564,17 +566,28 @@ public final class Game extends JavaPlugin {
         gamePlayers.values().forEach(gamePlayer -> {
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
-            gamePlayer.getGameBoard().setText(1, "-----");
-            gamePlayer.getGameBoard().setText(2, "生存プレイヤー");
+            gamePlayer.getGameBoard().setText(1, "");
+            gamePlayer.getGameBoard().setText(2, "-----");
             List<Hider> livingPlayerList = getGamePlayers().values().stream()
                     .filter(GamePlayer::isHider)
                     .map(gp -> (Hider) gp)
                     .filter(hider -> !hider.isDead())
                     .collect(Collectors.toList());
-            for (int i = 0; i < livingPlayerList.size(); i++) {
-                Hider livingPlayer = livingPlayerList.get(i);
-                gamePlayer.getGameBoard().setText(i + 3, "    " + livingPlayer.getPlayer().getDisplayName());
+            gamePlayer.getGameBoard().setText(3, "");
+            gamePlayer.getGameBoard().setText(4, "生存プレイヤー : " + getGamePlayers().values().stream()
+                    .filter(GamePlayer::isHider)
+                    .filter(gp -> !((Hider) gp).isDead()).count() + "人");
+            List<String> seekers = new ArrayList<>();
+            getGamePlayers().values().stream().filter(GamePlayer::isSeeker)
+                    .forEach(gp -> seekers.add(gp.getPlayer().getDisplayName()));
+            gamePlayer.getGameBoard().setText(5, "鬼 :");
+            for (int i = 0; i < seekers.size(); i++) {
+                gamePlayer.getGameBoard().setText(6 + i, "    " + seekers.get(i));
             }
+//            for (int i = 0; i < livingPlayerList.size(); i++) {
+//                Hider livingPlayer = livingPlayerList.get(i);
+//                gamePlayer.getGameBoard().setText(i + 3, "    " + livingPlayer.getPlayer().getDisplayName());
+//            }
         });
     }
 }
