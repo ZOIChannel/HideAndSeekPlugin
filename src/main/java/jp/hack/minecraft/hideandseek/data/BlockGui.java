@@ -57,7 +57,7 @@ public class BlockGui {
                     clickedPlayer.sendMessage(Messages.redMessage("buy.noMoney"));
                     return;
                 }
-                Game.getEconomy().depositPlayer(clickedPlayer, -1 * usableBlock.getPrice());
+                Game.getEconomy().withdrawPlayer(clickedPlayer, usableBlock.getPrice());
                 clickedPlayer.getWorld().playSound(clickedPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, 1F, 1F);
                 game.setHiderMaterial(clickedPlayer.getUniqueId(), item.getType());
                 game.reloadScoreboard();

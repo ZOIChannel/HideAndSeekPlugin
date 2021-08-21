@@ -153,10 +153,7 @@ public final class Game extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         super.onDisable();
-        timeBar.setVisible(false);
-        bStop = true;
-        eventWatcher.stop();
-        destroyGamePlayers();
+        stop();
     }
 
     private boolean setupEconomy() {
@@ -384,6 +381,7 @@ public final class Game extends JavaPlugin {
         destroyGamePlayers();
         clearHiLightTask();
         currentState = GameState.LOBBY;
+        if (getCurrentStage() != null)
         getCurrentStage().deleteBorder();
         eventWatcher.stop();
         bStop = true;
