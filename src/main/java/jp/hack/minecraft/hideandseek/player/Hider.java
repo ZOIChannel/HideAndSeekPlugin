@@ -38,7 +38,7 @@ public class Hider extends GamePlayer {
         player.setPlayerListName(ChatColor.BLUE + player.getName() + ChatColor.RESET);
         equipBlockList();
 
-        this.material = Material.ACACIA_LOG;
+        this.material = Material.MELON;
         blockGui = new BlockGui(game, player);
     }
 

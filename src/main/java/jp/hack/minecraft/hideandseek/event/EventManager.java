@@ -17,10 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import jp.hack.minecraft.hideandseek.player.Hider;
 import org.bukkit.inventory.ItemStack;
@@ -81,6 +78,18 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
+    public void onEntityPickupItem(EntityPickupItemEvent event) {
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void on(PlayerArmorStandManipulateEvent event) {
+        Player player = event.getPlayer();
+        if (game.getGamePlayer(player.getUniqueId()) == null) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
         System.out.println(event.getEventName() + "; Entity:" + event.getRightClicked().getName());
 
@@ -92,7 +101,6 @@ public class EventManager implements Listener {
         Seeker seeker = game.findSeeker(player.getUniqueId());
         if (seeker == null) return;
 
-        if (rightClicked instanceof ArmorStand) event.setCancelled(true);
         if (!(rightClicked instanceof FallingBlock || rightClicked instanceof Player)) return;
 
         Hider hider;

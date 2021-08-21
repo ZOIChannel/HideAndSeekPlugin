@@ -25,7 +25,8 @@ public class Messages {
         messages.put("game.you.upSpeed", "スピードアップ！");
         messages.put("game.you.coolTime", "クールタイムが明けていません");
         messages.put("game.you.hiLight", "プレイヤーの大まかな位置を表示しました");
-        messages.put("game.other.hiLight", "鬼がハイライトを使用しました！");
+        messages.put("game.other.hiLight", "ハイライト");
+        messages.put("game.seeker.release", "鬼が放出された");
 
         messages.put("buy.noMoney", "お金が足りません");
 

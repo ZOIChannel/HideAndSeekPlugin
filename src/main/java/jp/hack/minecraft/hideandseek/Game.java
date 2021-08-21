@@ -153,6 +153,7 @@ public final class Game extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         super.onDisable();
+        timeBar.setVisible(false);
         bStop = true;
         eventWatcher.stop();
         destroyGamePlayers();
@@ -304,7 +305,7 @@ public final class Game extends JavaPlugin {
                         public void run() {
                             Objects.requireNonNull(stage.getWorld()).playSound(stage, Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.AMBIENT, 1, 1);
                             getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
-                            getHiders().forEach(hider -> hider.getPlayer().sendTitle("鬼が放出された", "", 20, 40, 20));
+                            allSendRedTitle(20, 40, 20, "game.seeker.release", "");
                             equipItems();
                         }
                     }.runTask(Game.this);
@@ -528,7 +529,6 @@ public final class Game extends JavaPlugin {
         gamePlayer.sendGreenMessage("game.gotMoney", amount);
     }
 
-
     private Boolean isHiLight = false;
     private MyRunnable myRunnable;
     public Boolean playerHiLight(EffectType type) {
@@ -597,6 +597,7 @@ public final class Game extends JavaPlugin {
             if (myRunnable.getRunnable() != null)
                 if (!myRunnable.getRunnable().isCancelled()) myRunnable.getRunnable().cancel();
         }
+        isHiLight = false;
         destroyAllDummy();
     }
 
