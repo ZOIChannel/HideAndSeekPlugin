@@ -498,10 +498,8 @@ public final class Game extends JavaPlugin {
 
     private Boolean isHiLight = false;
     public Boolean playerHiLight(Seeker seeker, EffectType type) {
-        Map<EffectType, MyRunnable> map = seeker.getEffectMap();
         if (isHiLight) return false;
         if (seeker.getCountHiLight() >= 2) return false;
-        if (map.containsKey(type)) return false;
         makeAliveHiderDummy();
         allSendRedTitle(5, 20, 5, "game.other.hiLight");
 
@@ -509,18 +507,16 @@ public final class Game extends JavaPlugin {
             @Override
             public void run() {
                 destroyAllDummy();
-                isHiLight = false;
                 setRunnable(new BukkitRunnable() {
                     @Override
                     public void run() {
-                        map.remove(type);
+                        isHiLight = false;
                     }
                 });
                 getRunnable().runTaskLater(Game.this, type.getCoolTime() * 20L);
             }
         };
         isHiLight = true;
-        map.put(type, myRunnable);
         myRunnable.runTaskLater(Game.this, type.getDuration() * 20L);
         return true;
     }

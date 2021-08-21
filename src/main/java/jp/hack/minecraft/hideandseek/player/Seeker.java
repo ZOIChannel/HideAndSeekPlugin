@@ -25,12 +25,14 @@ public class Seeker extends GamePlayer {
         super(player);
         getPlayer().setPlayerListName(ChatColor.RED + getPlayer().getName() + ChatColor.RESET);
         player.setInvisible(false);
+
+        Inventory inventory = getPlayer().getInventory();
+        inventory.clear();
     }
 
     @Override
     public void equipItem() {
         Inventory inventory = getPlayer().getInventory();
-        inventory.clear();
         {
             ItemStack item = new ItemStack(Material.COMPASS);
             ItemMeta meta = item.getItemMeta();
