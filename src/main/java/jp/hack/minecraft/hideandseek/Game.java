@@ -43,7 +43,7 @@ public final class Game extends JavaPlugin {
     private final Material speedType = Material.FEATHER;
 
     private final Double DEFAULT_REWARD = 60d;
-    private Double reward = null;
+    private Double reward;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
             new UsableBlock(Material.FLOWER_POT, 0),
             new UsableBlock(Material.CRAFTING_TABLE, 0),
@@ -51,7 +51,7 @@ public final class Game extends JavaPlugin {
             new UsableBlock(Material.CHEST, 120),
             new UsableBlock(Material.BOOKSHELF, 120)
     );
-    private List<UsableBlock> usableBlocks = null;
+    private List<UsableBlock> usableBlocks;
 
     private final List<DummyArmorStand> armorStands = new ArrayList<>();
 
