@@ -563,7 +563,6 @@ public final class Game extends JavaPlugin {
 
     private void reloadScoreboard() {
         gamePlayers.values().forEach(gamePlayer -> {
-            gamePlayer.sendTitle(10, 20, 10, "game.start", "");
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gamePlayer.getGameBoard().setText(0, "所持ポイント: " + 183);
             gamePlayer.getGameBoard().setText(1, "-----");

@@ -26,7 +26,7 @@ public class Messages {
         messages.put("game.you.coolTime", "クールタイムが明けていません");
 
         messages.put("game.start", "ゲーム開始");
-        messages.put("game.end", "ゲーム終了です");
+        messages.put("game.end", "ゲーム終了");
         messages.put("game.win", "%sの勝利!!!");
         messages.put("game.win.border", "--- %s の勝利 ---");
         messages.put("game.gotMoney", "$%s 獲得しました");
