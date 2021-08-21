@@ -5,6 +5,7 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.system.Messages;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +40,8 @@ public class BlockGui {
         game.getPlayerUsableBlocks(player).forEach(usableBlock -> {
             ItemStack item = new ItemStack(usableBlock.getMaterial());
             ItemMeta meta = item.getItemMeta();
-            meta.setLore(Collections.singletonList("価格: " + usableBlock.getPrice() + "円"));
+            assert meta != null;
+            meta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + "価格: " + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "$" + usableBlock.getPrice()));
             item.setItemMeta(meta);
             itemList.add(item);
         });

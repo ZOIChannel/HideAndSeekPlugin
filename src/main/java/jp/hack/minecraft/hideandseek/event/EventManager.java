@@ -8,6 +8,7 @@ import jp.hack.minecraft.hideandseek.player.Seeker;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
@@ -23,6 +24,8 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.*;
 import jp.hack.minecraft.hideandseek.player.Hider;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 public class EventManager implements Listener {
     private final Game game;
@@ -64,6 +67,7 @@ public class EventManager implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         System.out.println(event.getEventName());
         if (event.getEntity() instanceof Player) event.setCancelled(true);
+        if (event.getEntity() instanceof ArmorStand) event.setCancelled(true);
     }
 
     @EventHandler
@@ -88,6 +92,7 @@ public class EventManager implements Listener {
         Seeker seeker = game.findSeeker(player.getUniqueId());
         if (seeker == null) return;
 
+        if (rightClicked instanceof ArmorStand) event.setCancelled(true);
         if (!(rightClicked instanceof FallingBlock || rightClicked instanceof Player)) return;
 
         Hider hider;
@@ -98,8 +103,8 @@ public class EventManager implements Listener {
             hider = game.findHider(rightClicked.getUniqueId());
         }
         if (hider == null) return;
-        game.damageHider(hider);
         game.giveBounty(seeker);
+        game.damageHider(hider);
     }
 
     @EventHandler
@@ -109,6 +114,7 @@ public class EventManager implements Listener {
         onPlayerClickItem(event);
 
         Player player = event.getPlayer();
+        if (player.getGameMode() == GameMode.SPECTATOR) event.setCancelled(true);
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
         if (havingItemType == game.getMeltType()) {
 
@@ -261,6 +267,16 @@ public class EventManager implements Listener {
                 "ブロックになってかくれんぼをするミニゲームです。\n" +
                 ChatColor.RESET;
         event.getPlayer().sendMessage(message);
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (!game.getGamePlayers().containsKey(uuid)) return;
+        GamePlayer gamePlayer = game.getGamePlayer(uuid);
+        game.destroyGamePlayer(gamePlayer);
+        game.getGamePlayers().remove(uuid);
+        game.confirmGame();
     }
 }
 

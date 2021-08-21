@@ -4,7 +4,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public enum EffectType {
     UP_SPEED(PotionEffectType.SPEED, 30, 5, 1),
-    HI_LIGHT(null, 15, 45);
+    HI_LIGHT(null, 45, 15);
 
     private PotionEffectType potionType;
     private int coolTime;

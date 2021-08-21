@@ -71,7 +71,6 @@ public class EventWatcher {
 
     private void callEvent(Hider hider) {
         hider.addFreezeTick(DELAY);
-        System.out.println(hider.getFreezeTicks());
 
         if (hider.getFreezeTicks() >= LIMIT) {
             if (!hider.isCalledEvent()) {

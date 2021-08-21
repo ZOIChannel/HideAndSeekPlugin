@@ -35,6 +35,7 @@ public final class Game extends JavaPlugin {
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
+    private final TimeBar timeBar = new TimeBar();
     private BukkitTask seekerTeleportTimer;
     private BukkitTask gameOverTimer;
     private boolean bStop = false;
@@ -54,14 +55,18 @@ public final class Game extends JavaPlugin {
             new UsableBlock(Material.CRAFTING_TABLE, 0),
             new UsableBlock(Material.FURNACE, 0),
             new UsableBlock(Material.BOOKSHELF, 0),
-            new UsableBlock(Material.CHEST, 0),
-            new UsableBlock(Material.JUKEBOX, 0),
-            new UsableBlock(Material.STONE_BRICKS, 20),
-            new UsableBlock(Material.DIRT, 20),
+            new UsableBlock(Material.MELON, 0),
+
             new UsableBlock(Material.FLOWER_POT, 20),
-            new UsableBlock(Material.OAK_SIGN, 20),
+            new UsableBlock(Material.ANVIL, 20),
+            new UsableBlock(Material.JUKEBOX, 20),
+
+            new UsableBlock(Material.STONE_BRICKS, 40),
+            new UsableBlock(Material.DIRT, 40),
+
             new UsableBlock(Material.OAK_PLANKS, 60),
             new UsableBlock(Material.STONE, 60),
+
             new UsableBlock(Material.GRASS_BLOCK, 120)
     );
     private List<UsableBlock> usableBlocks;
@@ -250,6 +255,8 @@ public final class Game extends JavaPlugin {
         }
         gamePlayers.values().forEach(gamePlayer -> {
             gamePlayer.sendTitle(10, 20, 10, "game.start", "");
+            timeBar.addPlayer(gamePlayer.getPlayer());
+            timeBar.setVisible(true);
         });
         reloadScoreboard();
 
@@ -275,14 +282,13 @@ public final class Game extends JavaPlugin {
 
             @Override
             public void run() {
-                System.out.println("run1");
                 long t = System.currentTimeMillis();
                 while(!bStop && seekerWaitRemainTime > 0) {
-                    System.out.println("loop:" + seekerWaitRemainTime);
                     long d = System.currentTimeMillis() - t;
                     if (d > 1000) {
-                        getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
+                        //getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
                         seekerWaitRemainTime -= 1;
+                        timeBar.setProgress((float)seekerWaitRemainTime / (float)seekerWaitTime);
                         t = System.currentTimeMillis();
                     }
 
@@ -307,14 +313,13 @@ public final class Game extends JavaPlugin {
 
                         @Override
                         public void run() {
-                            System.out.println("run2");
                             long t = System.currentTimeMillis();
                             while(!bStop && gameRemainTime > 0) {
-                                System.out.println("loop2:" + gameRemainTime);
                                 long d = System.currentTimeMillis() - t;
                                 if (d > 1000) {
-                                    getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(gameRemainTime));
+                                    //getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(gameRemainTime));
                                     gameRemainTime -= 1;
+                                    timeBar.setProgress((float)gameRemainTime / (float)gameTime);
                                     t = System.currentTimeMillis();
                                 }
                                 try {
@@ -344,6 +349,7 @@ public final class Game extends JavaPlugin {
         allSendGreenTitle(20, 40, 20, "game.win", wonRole.toString());
         allSendGreenMessage("game.win.border", wonRole.toString());
 
+        timeBar.setVisible(false);
         giveReward(wonRole);
         reloadScoreboard();
 
@@ -375,6 +381,7 @@ public final class Game extends JavaPlugin {
     public void stop() {
         // プレイヤーをどこかへTPさせる?
         destroyGamePlayers();
+        clearHiLightTask();
         currentState = GameState.LOBBY;
         getCurrentStage().deleteBorder();
         eventWatcher.stop();
@@ -395,21 +402,21 @@ public final class Game extends JavaPlugin {
 //        return hider;
 //    }
 
+    public void destroyGamePlayer(GamePlayer gamePlayer) {
+        clearPlayerEffect(gamePlayer);
+        Player player = gamePlayer.getPlayer();
+        player.setGameMode(GameMode.SPECTATOR);
+        player.getInventory().clear();
+        player.teleport(getCurrentStage().getStage());
+        if (gamePlayer.isHider()) {
+            Hider hider = (Hider) gamePlayer;
+            hider.destroy();
+        }
+    }
+
     public void destroyGamePlayers() {
-        gamePlayers.values().forEach(gamePlayer -> {
-            clearPlayerEffect(gamePlayer);
-            Player player = gamePlayer.getPlayer();
-            player.setGameMode(GameMode.SPECTATOR);
-            player.getInventory().clear();
-            player.teleport(getCurrentStage().getStage());
-            if (gamePlayer.isHider()) {
-                Hider hider = (Hider) gamePlayer;
-                hider.destroy();
-            } else {
-                Seeker seeker = (Seeker) gamePlayer;
-                clearHiLightTask(seeker);
-            }
-        });
+        if (gamePlayers.isEmpty()) return;
+        gamePlayers.values().forEach(this::destroyGamePlayer);
         gamePlayers.clear();
     }
 
@@ -472,13 +479,21 @@ public final class Game extends JavaPlugin {
         hider.damage();
         hider.getPlayer().teleport(getCurrentStage().getLobby());
         reloadScoreboard();
-        if (gamePlayers.values().stream().noneMatch(gamePlayer -> {
-            if (!gamePlayer.isHider()) return false;
-            Hider h = (Hider) gamePlayer;
-            return !h.isDead();
-        })) {
+        confirmGame();
+    }
+
+    public void confirmGame() {
+        if (isHidersDied()) {
+            gameOver();
+            return;
+        }
+        if (getSeekers().isEmpty()) {
             gameOver();
         }
+    }
+
+    public boolean isHidersDied() {
+        return getHiders().stream().allMatch(Hider::isDead);
     }
 
     public List<UsableBlock> getPlayerUsableBlocks(Player player) {
@@ -515,12 +530,13 @@ public final class Game extends JavaPlugin {
 
 
     private Boolean isHiLight = false;
+    private MyRunnable myRunnable;
     public Boolean playerHiLight(EffectType type) {
         if (isHiLight) return false;
         makeAliveHiderDummy();
         allSendRedTitle(5, 20, 5, "game.other.hiLight");
 
-        final MyRunnable myRunnable = new MyRunnable() {
+        myRunnable = new MyRunnable() {
             @Override
             public void run() {
                 destroyAllDummy();
@@ -575,16 +591,12 @@ public final class Game extends JavaPlugin {
         }
     }
 
-    public void clearHiLightTask(Seeker seeker) {
-        Map<EffectType, MyRunnable> map = seeker.getEffectMap();
-        map.forEach((k, v) -> {
-            if (v != null) {
-                if (!v.isCancelled()) v.cancel();
-                if (v.getRunnable() != null) {
-                    if (!v.getRunnable().isCancelled()) v.getRunnable().cancel();
-                }
-            }
-        });
+    public void clearHiLightTask() {
+        if (myRunnable != null) {
+            if (!myRunnable.isCancelled()) myRunnable.cancel();
+            if (myRunnable.getRunnable() != null)
+                if (!myRunnable.getRunnable().isCancelled()) myRunnable.getRunnable().cancel();
+        }
         destroyAllDummy();
     }
 
