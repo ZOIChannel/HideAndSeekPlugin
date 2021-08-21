@@ -352,7 +352,6 @@ public final class Game extends JavaPlugin {
             gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
             return;
         }
-        player.setPlayerListName(ChatColor.GREEN + player.getDisplayName());
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
@@ -564,7 +563,7 @@ public final class Game extends JavaPlugin {
     private void reloadScoreboard() {
         gamePlayers.values().forEach(gamePlayer -> {
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
-            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + 183);
+            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gamePlayer.getGameBoard().setText(1, "-----");
             gamePlayer.getGameBoard().setText(2, "生存プレイヤー");
             List<Hider> livingPlayerList = getGamePlayers().values().stream()

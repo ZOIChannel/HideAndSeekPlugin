@@ -34,6 +34,7 @@ public class Hider extends GamePlayer {
     public Hider(Game game, Player player) {
         super(player);
         player.setInvisible(true);
+        player.setPlayerListName(ChatColor.BLUE + player.getName() + ChatColor.RESET);
         equipItem();
 
         this.material = Material.ACACIA_LOG;
@@ -166,6 +167,7 @@ public class Hider extends GamePlayer {
 
     public void damage() {
         if (isDead) return;
+        getPlayer().setPlayerListName(ChatColor.BLACK + getPlayer().getName() + ChatColor.RESET);
         getPlayer().sendMessage(Messages.redMessage("game.you.found"));
         getPlayer().setGameMode(GameMode.SPECTATOR);
         destroy();
