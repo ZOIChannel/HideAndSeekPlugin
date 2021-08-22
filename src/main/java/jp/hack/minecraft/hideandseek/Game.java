@@ -385,6 +385,7 @@ public final class Game extends JavaPlugin {
         getCurrentStage().deleteBorder();
         eventWatcher.stop();
         bStop = true;
+        reloadScoreboard();
     }
 
 //    // gamePlayersへのSeekerのputはLobbyPlayerから行う
@@ -728,6 +729,7 @@ public final class Game extends JavaPlugin {
     public void reloadScoreboard() {
         gamePlayers.values().forEach(gamePlayer -> {
 //            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+            gamePlayer.getGameBoard().resetText();
             gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             if (getCurrentState() != GameState.PLAYING) return;
             gamePlayer.getGameBoard().setText(1, "");

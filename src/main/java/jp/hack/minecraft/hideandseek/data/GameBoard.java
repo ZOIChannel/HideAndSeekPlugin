@@ -47,10 +47,17 @@ public class GameBoard {
     }
 
     public void setText(int index, String text) {
-        if (index > 14) return;
+        if (index >= 14) return;
         scoreboard.resetScores(keyList.get(index));
         keyList.set(index, text);
         objective.getScore(text).setScore(index);
+        reloadScoreboard();
+    }
+
+    public void resetText() {
+        for (int i = 0; i < 15; i++){
+            setText(i, "");
+        }
         reloadScoreboard();
     }
 }
