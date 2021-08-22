@@ -162,6 +162,7 @@ public class Hider extends GamePlayer {
     }
 
     public void found() {
+        System.out.println("----- event:003 -----");
         sendRedTitle(5, 10, 5, "game.you.found", Messages.message("game.you.runaway"));
         getPlayer().playSound(getLocation(), Sound.ENTITY_GHAST_WARN, SoundCategory.MASTER, 1.0F, 1.0F);
     }
@@ -197,6 +198,7 @@ public class Hider extends GamePlayer {
     }
 
     public void blockMelt() {
+        System.out.println("----- event:004 -----");
         if (!this.isFrozen || this.isDead) return;
         this.isFrozen = false;
         Player player = getPlayer();

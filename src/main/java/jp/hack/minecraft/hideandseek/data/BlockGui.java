@@ -48,15 +48,19 @@ public class BlockGui {
         pane.clear();
         itemList.forEach(item -> {
             pane.addItem(new GuiItem(item, event -> {
+                System.out.println("-- event2 001");
                 Player clickedPlayer = (Player) event.getWhoClicked();
                 Optional<UsableBlock> usableBlockOptional = game.getUsableBlocks().stream().filter(uBlock -> uBlock.getMaterial() == item.getType()).findFirst();
                 if (!usableBlockOptional.isPresent()) return;
+                System.out.println("-- event2 002");
                 UsableBlock usableBlock = usableBlockOptional.get();
 //                Game.getEconomy().depositPlayer(clickedPlayer, -1 * Game.getEconomy().getBalance(clickedPlayer));
                 if (Game.getEconomy().getBalance(clickedPlayer) < usableBlock.getPrice()) {
                     clickedPlayer.sendMessage(Messages.redMessage("buy.noMoney"));
+                    System.out.println("-- event2 003");
                     return;
                 }
+                System.out.println("-- event2 004");
                 Game.getEconomy().withdrawPlayer(clickedPlayer, usableBlock.getPrice());
                 clickedPlayer.getWorld().playSound(clickedPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, 1F, 1F);
                 game.setHiderMaterial(clickedPlayer.getUniqueId(), item.getType());

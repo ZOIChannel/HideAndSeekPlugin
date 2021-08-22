@@ -125,6 +125,7 @@ public class EventManager implements Listener {
         if (player.getGameMode() == GameMode.SPECTATOR) event.setCancelled(true);
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
         if (havingItemType == game.getMeltType()) {
+            System.out.println("----- event:007 : -----");
 
             Seeker seeker = game.findSeeker(player.getUniqueId());
             if (seeker == null) return;
@@ -133,7 +134,9 @@ public class EventManager implements Listener {
             Block block = event.getClickedBlock();
 
             Hider hider = game.findHiderByBlock(block);
+            System.out.println("----- event:006 : " + hider + " -----");
             if (hider == null) {
+                System.out.println("----- event:001 -----");
                 Location blockLoc = event.getClickedBlock().getLocation();
                 seeker.knock(blockLoc);
                 return;

@@ -639,15 +639,28 @@ public final class Game extends JavaPlugin {
 
     public Hider findHiderByBlock(Block block) {
         if (block == null) return null;
-        return getHiders().stream().filter(h -> {
-            if(h.getBlock() == null) return false;
-            return h.getBlock().equals(block);
-        }).findFirst().orElse(null);
+        for (Hider h : getHiders()) {
+            if (h.getBlock() == null) continue;
+            if (h.getBlock().equals(block)) return h;
+        }
+        return null;
+//        return getHiders().stream().filter(h -> {
+//            if (h.getBlock() == null) return false;
+//            return h.getBlock().equals(block);
+//        }).findFirst().orElse(null);
     }
 
     public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
         if (fallingBlock == null) return null;
-        return getHiders().stream().filter(h -> h.getFallingBlock().equals(fallingBlock)).findFirst().orElse(null);
+        for (Hider h : getHiders()) {
+            if (h.getFallingBlock() == null) continue;
+            if (h.getFallingBlock().equals(fallingBlock)) return h;
+        }
+        return null;
+//        return getHiders().stream().filter(h -> {
+//            if (h.getFallingBlock() == null) return false;
+//            return h.getFallingBlock().equals(fallingBlock);
+//        }).findFirst().orElse(null);
     }
 
     public Boolean isSameLocation(Location loc1, Location loc2) {
