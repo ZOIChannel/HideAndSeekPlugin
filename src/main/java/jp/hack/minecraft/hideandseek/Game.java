@@ -484,7 +484,7 @@ public final class Game extends JavaPlugin {
             armorStands.get(hider.getPlayerUuid()).destroy();
         }
         hider.damage();
-        hider.getPlayer().teleport(getCurrentStage().getLobby());
+        hider.getPlayer().teleport(getCurrentStage().getStage());
         reloadScoreboard();
         confirmGame();
     }
