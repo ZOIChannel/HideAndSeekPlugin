@@ -108,6 +108,10 @@ public class StageData implements ConfigurationSerializable {
         return radius;
     }
 
+    public WorldBorder getWorldBorder() {
+        return stageBorder;
+    }
+
     @Override
     public Map<String, Object> serialize() {
         Map<String, Object> serialized = new HashMap<>();

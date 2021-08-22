@@ -221,6 +221,11 @@ public class EventManager implements Listener {
                 return;
             }
 
+        if(!game.getCurrentStage().getWorldBorder().isInside(to)) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (game.isSameLocation(from, to)) return;
         hider.spawnFallingBlock();
         hider.setFBVelocity(from, to);
