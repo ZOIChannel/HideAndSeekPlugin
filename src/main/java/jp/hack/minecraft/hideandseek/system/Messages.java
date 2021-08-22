@@ -14,6 +14,7 @@ public class Messages {
         messages.put("game.youJoinGame", "ゲームに参加しました");
         messages.put("game.otherJoinGame", "%sがゲームに参加しました");
         messages.put("game.youCancelGame", "ゲームから退出しました");
+        messages.put("game.otherCancelGame", "%sがゲームから退出しました");
 
         messages.put("game.block.notPlayer", "プレイヤーではないようです...");
         messages.put("game.block.player", "プレイヤーを見つけました！！");

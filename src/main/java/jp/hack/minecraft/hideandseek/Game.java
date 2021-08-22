@@ -413,7 +413,7 @@ public final class Game extends JavaPlugin {
         }
     }
 
-    public void destroyGamePlayers() {
+    private void destroyGamePlayers() {
         if (gamePlayers.isEmpty()) return;
         gamePlayers.values().forEach(this::destroyGamePlayer);
         gamePlayers.clear();
@@ -449,7 +449,14 @@ public final class Game extends JavaPlugin {
             return;
         }
         player.setPlayerListName(player.getDisplayName());
-        allSendGreenMessage("game.youCancelGame");
+//        allSendGreenMessage("game.youCancelGame");
+        gamePlayers.values().forEach(gamePlayer -> {
+            if (gamePlayer.getPlayerUuid() == player.getUniqueId()) {
+                gamePlayer.sendGreenMessage("game.youCancelGame");
+                return;
+            }
+            gamePlayer.sendGreenMessage("game.otherCancelGame", player.getDisplayName());
+        });
         gamePlayers.remove(player.getUniqueId());
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
         resetPlayerState(player);
