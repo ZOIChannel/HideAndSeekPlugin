@@ -281,12 +281,12 @@ public final class Game extends JavaPlugin {
             @Override
             public void run() {
                 long t = System.currentTimeMillis();
-                while(!bStop && seekerWaitRemainTime > 0) {
+                while (!bStop && seekerWaitRemainTime > 0) {
                     long d = System.currentTimeMillis() - t;
                     if (d > 1000) {
                         //getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(seekerWaitRemainTime));
                         seekerWaitRemainTime -= 1;
-                        timeBar.setProgress((float)seekerWaitRemainTime / (float)seekerWaitTime);
+                        timeBar.setProgress((float) seekerWaitRemainTime / (float) seekerWaitTime);
                         t = System.currentTimeMillis();
                     }
 
@@ -312,12 +312,12 @@ public final class Game extends JavaPlugin {
                         @Override
                         public void run() {
                             long t = System.currentTimeMillis();
-                            while(!bStop && gameRemainTime > 0) {
+                            while (!bStop && gameRemainTime > 0) {
                                 long d = System.currentTimeMillis() - t;
                                 if (d > 1000) {
                                     //getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().setLevel(gameRemainTime));
                                     gameRemainTime -= 1;
-                                    timeBar.setProgress((float)gameRemainTime / (float)gameTime);
+                                    timeBar.setProgress((float) gameRemainTime / (float) gameTime);
                                     t = System.currentTimeMillis();
                                 }
                                 try {
@@ -382,7 +382,7 @@ public final class Game extends JavaPlugin {
         clearHiLightTask();
         currentState = GameState.LOBBY;
         if (getCurrentStage() != null)
-        getCurrentStage().deleteBorder();
+            getCurrentStage().deleteBorder();
         eventWatcher.stop();
         bStop = true;
         reloadScoreboard();
@@ -514,7 +514,7 @@ public final class Game extends JavaPlugin {
         System.out.println("giveBounty");
         if (econ == null) return;
         System.out.println("econ: notNull");
-        giveMoney(gamePlayer, reward/10);
+        giveMoney(gamePlayer, reward / 10);
     }
 
     public void giveReward(Role wonRole) {
@@ -525,7 +525,7 @@ public final class Game extends JavaPlugin {
             if (gamePlayer.isSameRole(wonRole)) {
                 giveMoney(gamePlayer, reward);
             } else {
-                giveMoney(gamePlayer, reward/3);
+                giveMoney(gamePlayer, reward / 3);
             }
         });
     }
@@ -537,6 +537,7 @@ public final class Game extends JavaPlugin {
 
     private Boolean isHiLight = false;
     private MyRunnable myRunnable;
+
     public Boolean playerHiLight(EffectType type) {
         if (isHiLight) return false;
         makeAliveHiderDummy();
@@ -638,7 +639,10 @@ public final class Game extends JavaPlugin {
 
     public Hider findHiderByBlock(Block block) {
         if (block == null) return null;
-        return getHiders().stream().filter(h -> h.getBlock().equals(block)).findFirst().orElse(null);
+        return getHiders().stream().filter(h -> {
+            if(h.getBlock() == null) return false;
+            return h.getBlock().equals(block);
+        }).findFirst().orElse(null);
     }
 
     public Hider findHiderByFallingBlock(FallingBlock fallingBlock) {
