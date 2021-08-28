@@ -5,6 +5,7 @@ import jp.hack.minecraft.hideandseek.data.EffectType;
 import jp.hack.minecraft.hideandseek.data.GameState;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Seeker;
+import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -185,7 +186,7 @@ public class EventManager implements Listener {
     }
 
     private void onPlayerClickItem(PlayerInteractEvent event) {
-        if(event.hasBlock()) return;
+        if (event.hasBlock()) return;
         Player player = event.getPlayer();
         Hider hider = game.findHider(player.getUniqueId());
         if (hider == null) return;
@@ -202,10 +203,11 @@ public class EventManager implements Listener {
     private void onClickForStage(Sign sign) {
         if (!sign.getLines()[0].equals("[StageSelector]")) return;
         game.selectNextStage();
-        if (game.getCurrentStage() == null) sign.setLine(2, ">> Stage not set <<");
-        sign.setLine(2, ">> " + game.getCurrentStage().getName() + " <<");
+        if (!game.getCurrentStage().isPresent()) sign.setLine(2, ">> Stage not set <<");
+        else sign.setLine(2, ">> " + game.getCurrentStage().get().getName() + " <<");
         sign.update();
     }
+
     private void onClickForJoin(Sign sign, Player player) {
         if (!sign.getLines()[0].equals("[Join]")) return;
         player.performCommand("hs join");
@@ -219,6 +221,10 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (!game.getCurrentStage().isPresent()) {
+            game.getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            return;
+        }
         Player player = event.getPlayer();
         Hider hider = game.findHider(player.getUniqueId());
         if (hider == null) return;
@@ -236,7 +242,7 @@ public class EventManager implements Listener {
                 return;
             }
 
-        if(!game.getCurrentStage().getWorldBorder().isInside(to)) {
+        if (!game.getCurrentStage().get().getWorldBorder().isInside(to)) {
             event.setCancelled(true);
             return;
         }
