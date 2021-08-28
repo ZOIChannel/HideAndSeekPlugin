@@ -40,8 +40,7 @@ public final class Game extends JavaPlugin {
     private BukkitTask gameOverTimer;
     private boolean bStop = false;
 
-    private final Material captureType = Material.GLASS_BOTTLE;
-    private final Material meltType = Material.COMPASS;
+    private final Material captureType = Material.IRON_AXE;
     private final Material speedType = Material.FEATHER;
     private final Material hiLightType = Material.CLOCK;
 
@@ -115,10 +114,6 @@ public final class Game extends JavaPlugin {
 
     public Material getCaptureType() {
         return captureType;
-    }
-
-    public Material getMeltType() {
-        return meltType;
     }
 
     public Material getSpeedType() {

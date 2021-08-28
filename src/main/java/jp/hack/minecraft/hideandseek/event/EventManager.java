@@ -56,6 +56,17 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
+    public void on(EntityTeleportEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        Hider hider = game.findHider(player.getUniqueId());
+        if (hider == null) return;
+
+        if (player.getGameMode() != GameMode.SPECTATOR) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
         event.setCancelled(true);
     }
@@ -83,7 +94,7 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void on(PlayerArmorStandManipulateEvent event) {
+    public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
         Player player = event.getPlayer();
         if (game.getGamePlayer(player.getUniqueId()) == null) return;
         event.setCancelled(true);
@@ -124,7 +135,7 @@ public class EventManager implements Listener {
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.SPECTATOR) event.setCancelled(true);
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
-        if (havingItemType == game.getMeltType()) {
+        if (havingItemType == game.getCaptureType()) {
             System.out.println("----- event:007 : -----");
 
             Seeker seeker = game.findSeeker(player.getUniqueId());
