@@ -301,8 +301,7 @@ public class EventManager implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
         if (!game.getGamePlayers().containsKey(uuid)) return;
         GamePlayer gamePlayer = game.getGamePlayer(uuid);
-        game.destroyGamePlayer(gamePlayer);
-        game.getGamePlayers().remove(uuid);
+        game.destroyOneGamePlayer(gamePlayer);
         game.confirmGame();
     }
 }

@@ -34,6 +34,7 @@ public final class Game extends JavaPlugin {
     private static Economy econ = null;
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
+    private final Map<UUID, BlockGui> blockGuiList = new HashMap<>();
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private final TimeBar timeBar = new TimeBar();
     private BukkitTask seekerTeleportTimer;
@@ -397,7 +398,7 @@ public final class Game extends JavaPlugin {
 //        return hider;
 //    }
 
-    public void destroyGamePlayer(GamePlayer gamePlayer) {
+    private void destroyGamePlayer(GamePlayer gamePlayer) {
         clearPlayerEffect(gamePlayer);
         Player player = gamePlayer.getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
@@ -407,6 +408,13 @@ public final class Game extends JavaPlugin {
             Hider hider = (Hider) gamePlayer;
             hider.destroy();
         }
+        blockGuiList.remove(player.getUniqueId());
+    }
+
+    public void destroyOneGamePlayer(GamePlayer gamePlayer) {
+        if (gamePlayer == null) return;
+        destroyGamePlayer(gamePlayer);
+        getGamePlayers().remove(gamePlayer.getPlayerUuid());
     }
 
     private void destroyGamePlayers() {

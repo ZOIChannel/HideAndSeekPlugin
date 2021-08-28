@@ -35,26 +35,16 @@ public class Seeker extends GamePlayer {
     public void equipItem() {
         Inventory inventory = getPlayer().getInventory();
         {
-            ItemStack item = new ItemStack(Material.COMPASS);
+            ItemStack item = new ItemStack(Material.IRON_AXE);
             ItemMeta meta = item.getItemMeta();
             assert meta != null;
 
-            final String NAME = ChatColor.YELLOW.toString() + "ブロックを鑑定";
+            final String NAME = ChatColor.YELLOW.toString() + "プレイヤーを確保";
             meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを鑑定");
-            meta.setLore(LORE);
-
-            item.setItemMeta(meta);
-            inventory.addItem(item);
-        }
-        {
-            ItemStack item = new ItemStack(Material.GLASS_BOTTLE);
-            ItemMeta meta = item.getItemMeta();
-            assert meta != null;
-
-            final String NAME = ChatColor.RED.toString() + "プレイヤーを確保";
-            meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーを確保");
+            final List<String> LORE = Arrays.asList(
+                    ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを鑑定",
+                    ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーを確保"
+            );
             meta.setLore(LORE);
 
             item.setItemMeta(meta);
@@ -68,7 +58,7 @@ public class Seeker extends GamePlayer {
             final String NAME = ChatColor.GREEN.toString() + "プレイヤーをハイライト";
             meta.setDisplayName(NAME);
             final List<String> LORE = Arrays.asList(
-                    ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
+                    ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
                     ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
                     ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
             );
