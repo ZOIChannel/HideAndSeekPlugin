@@ -7,6 +7,8 @@ import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.HashMap;
@@ -26,6 +28,9 @@ abstract public class GamePlayer {
         this.player.setFoodLevel(20);
         this.player.setCollidable(false);
         gameBoard = new GameBoard(this, "Hide And Seek");
+
+        Inventory inventory = getPlayer().getInventory();
+        inventory.clear();
     }
 
     public void sendGreenTitle(int fadeIn, int stay, int fadeOut, String code, Object... args) {
@@ -76,7 +81,10 @@ abstract public class GamePlayer {
         getPlayer().removePotionEffect(type.getPotionType());
     }
 
-    public void equipItem() {}
+    public void equipItem(ItemStack itemStack) {
+        Inventory inventory = getPlayer().getInventory();
+        inventory.addItem(itemStack);
+    }
 
     public UUID getPlayerUuid() {
         return playerUuid;

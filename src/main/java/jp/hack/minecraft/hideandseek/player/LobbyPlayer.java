@@ -9,10 +9,4 @@ public class LobbyPlayer extends GamePlayer{
         super(player);
         getPlayer().setPlayerListName(ChatColor.GREEN + getPlayer().getName() + ChatColor.RESET);
     }
-    public void createHider(Game game){
-        game.getGamePlayers().put(this.getPlayerUuid(), new Hider(game, this.getPlayer()));
-    }
-    public void createSeeker(Game game){
-        game.getGamePlayers().put(this.getPlayerUuid(), new Seeker(this.getPlayer()));
-    }
 }

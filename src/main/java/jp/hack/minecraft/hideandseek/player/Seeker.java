@@ -26,47 +26,6 @@ public class Seeker extends GamePlayer {
         getPlayer().setPlayerListName(ChatColor.RED + getPlayer().getName() + ChatColor.RESET);
         player.setInvisible(false);
         giveEffect(EffectType.SEEKER_UP_SPEED);
-
-        Inventory inventory = getPlayer().getInventory();
-        inventory.clear();
-    }
-
-    @Override
-    public void equipItem() {
-        Inventory inventory = getPlayer().getInventory();
-        {
-            ItemStack item = new ItemStack(Material.IRON_AXE);
-            ItemMeta meta = item.getItemMeta();
-            assert meta != null;
-
-            final String NAME = ChatColor.YELLOW.toString() + "プレイヤーを確保";
-            meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(
-                    ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを鑑定",
-                    ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーを確保"
-            );
-            meta.setLore(LORE);
-
-            item.setItemMeta(meta);
-            inventory.addItem(item);
-        }
-        {
-            ItemStack item = new ItemStack(Material.CLOCK);
-            ItemMeta meta = item.getItemMeta();
-            assert meta != null;
-
-            final String NAME = ChatColor.GREEN.toString() + "プレイヤーをハイライト";
-            meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(
-                    ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
-                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
-                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
-            );
-            meta.setLore(LORE);
-
-            item.setItemMeta(meta);
-            inventory.addItem(item);
-        }
     }
 
     public void knock(Location loc) {

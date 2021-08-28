@@ -23,7 +23,6 @@ public class Hider extends GamePlayer {
     private Material material;
     private Block block;
     private FallingBlock fallingBlock;
-    private final BlockGui blockGui;
 
     private Long freezeTicks = 0L;
     private Location prevLoc;
@@ -32,14 +31,13 @@ public class Hider extends GamePlayer {
     private Boolean isFrozen = false;
     private Boolean isCalledEvent = false;
 
-    public Hider(Game game, Player player) {
+    public Hider(Player player) {
         super(player);
         player.setInvisible(true);
         player.setPlayerListName(ChatColor.BLUE + player.getName() + ChatColor.RESET);
         equipBlockList();
 
         this.material = Material.MELON;
-        blockGui = new BlockGui(game, player);
     }
 
     public Material getMaterial() {
@@ -56,10 +54,6 @@ public class Hider extends GamePlayer {
 
     public org.bukkit.entity.FallingBlock getFallingBlock() {
         return fallingBlock;
-    }
-
-    public BlockGui getBlockGui() {
-        return blockGui;
     }
 
     public Boolean isDead() {
@@ -115,29 +109,6 @@ public class Hider extends GamePlayer {
             final String NAME = ChatColor.YELLOW + "ブロックを選択";
             meta.setDisplayName(NAME);
             final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを選択");
-            meta.setLore(LORE);
-
-            item.setItemMeta(meta);
-            inventory.addItem(item);
-        }
-    }
-
-    @Override
-    public void equipItem() {
-        Inventory inventory = getPlayer().getInventory();
-
-        {
-            ItemStack item = new ItemStack(Material.FEATHER);
-            ItemMeta meta = item.getItemMeta();
-            assert meta != null;
-
-            final String NAME = ChatColor.AQUA.toString() + "スピードアップ";
-            meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(
-                    ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックで" + ChatColor.AQUA.toString() + "スピードアップ",
-                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "秒",
-                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.UP_SPEED.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "秒"
-            );
             meta.setLore(LORE);
 
             item.setItemMeta(meta);

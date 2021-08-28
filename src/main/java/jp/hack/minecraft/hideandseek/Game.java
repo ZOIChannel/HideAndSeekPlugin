@@ -14,10 +14,11 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -34,16 +35,38 @@ public final class Game extends JavaPlugin {
     private static Economy econ = null;
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
-    private final Map<UUID, BlockGui> blockGuiList = new HashMap<>();
+    private final Map<UUID, BlockGui> blockGuiMap = new HashMap<>();
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private final TimeBar timeBar = new TimeBar();
     private BukkitTask seekerTeleportTimer;
     private BukkitTask gameOverTimer;
     private boolean bStop = false;
 
-    private final Material captureType = Material.IRON_AXE;
-    private final Material speedType = Material.FEATHER;
-    private final Material hiLightType = Material.CLOCK;
+    private final ItemStack DEFAULT_CAPTURE_ITEM = createItemStack(
+            Material.IRON_AXE,
+            ChatColor.YELLOW.toString() + "プレイヤーを確保",
+            Arrays.asList(
+                ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを鑑定",
+                ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーを確保"
+            )
+    );
+    private final ItemStack DEFAULT_SPEED_ITEM = createItemStack(
+            Material.FEATHER,
+            ChatColor.YELLOW + "スピードアップ",
+            Arrays.asList(ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでスピードアップ")
+    );
+    private final ItemStack DEFAULT_HI_LIGHT_ITEM = createItemStack(
+            Material.CLOCK,
+            ChatColor.GREEN.toString() + "プレイヤーをハイライト",
+            Arrays.asList(
+                    ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
+                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
+                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
+            )
+    );
+    private ItemStack captureItem;
+    private ItemStack speedItem;
+    private ItemStack hiLightItem;
 
     private final int DEFAULT_GAME_TIME = 60;
     private int gameTime;
@@ -81,6 +104,10 @@ public final class Game extends JavaPlugin {
         return eventManager;
     }
 
+    public Map<UUID, BlockGui> getBlockGuiMap() {
+        return blockGuiMap;
+    }
+
     public GameState getCurrentState() {
         return currentState;
     }
@@ -113,16 +140,16 @@ public final class Game extends JavaPlugin {
         return gamePlayers.values().stream().filter(GamePlayer::isSeeker).map(p -> (Seeker) p).collect(Collectors.toList());
     }
 
-    public Material getCaptureType() {
-        return captureType;
+    public ItemStack getCaptureItem() {
+        return captureItem;
     }
 
-    public Material getSpeedType() {
-        return speedType;
+    public ItemStack getSpeedItem() {
+        return speedItem;
     }
 
-    public Material getHiLightType() {
-        return hiLightType;
+    public ItemStack getHiLightItem() {
+        return hiLightItem;
     }
 
     public List<UsableBlock> getUsableBlocks() {
@@ -138,6 +165,7 @@ public final class Game extends JavaPlugin {
         if (!setupEconomy()) {
             getServer().getLogger().info("Vault plugin is not found.");
         }
+
         commandManager = new CommandManager(this);
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
 
@@ -205,6 +233,27 @@ public final class Game extends JavaPlugin {
             configLoader.setData("usableBlocks", usableBlocks);
         }
 
+        if (configLoader.contains("captureItem")) {
+            captureItem = configLoader.getItemStack("captureItem");
+        } else {
+            captureItem = DEFAULT_CAPTURE_ITEM;
+            configLoader.setData("captureItem", captureItem);
+        }
+
+        if (configLoader.contains("speedItem")) {
+            speedItem = configLoader.getItemStack("speedItem");
+        } else {
+            speedItem = DEFAULT_SPEED_ITEM;
+            configLoader.setData("speedItem", speedItem);
+        }
+
+        if (configLoader.contains("hiLightItem")) {
+            hiLightItem = configLoader.getItemStack("hiLightItem");
+        } else {
+            hiLightItem = DEFAULT_HI_LIGHT_ITEM;
+            configLoader.setData("hiLightItem", hiLightItem);
+        }
+
     }
 
     public void start() {
@@ -242,9 +291,9 @@ public final class Game extends JavaPlugin {
         for (int i = 0; i < lobbyPlayers.size(); i++) {
             LobbyPlayer lobbyPlayer = lobbyPlayers.get(i);
             if (seekerIndex.contains(i)) {
-                lobbyPlayer.createSeeker(this);
+                createSeeker(lobbyPlayer.getPlayer());
             } else {
-                lobbyPlayer.createHider(this);
+                createHider(lobbyPlayer.getPlayer());
             }
         }
         gamePlayers.values().forEach(gamePlayer -> {
@@ -398,6 +447,18 @@ public final class Game extends JavaPlugin {
 //        return hider;
 //    }
 
+    public Hider createHider(Player player){
+        Hider hider = new Hider(player);
+        getGamePlayers().put(hider.getPlayerUuid(), hider);
+        getBlockGuiMap().put(hider.getPlayerUuid(), new BlockGui(this, player));
+        return hider;
+    }
+    public Seeker createSeeker(Player player){
+        Seeker seeker = new Seeker(player);
+        getGamePlayers().put(seeker.getPlayerUuid(), seeker);
+        return seeker;
+    }
+
     private void destroyGamePlayer(GamePlayer gamePlayer) {
         clearPlayerEffect(gamePlayer);
         Player player = gamePlayer.getPlayer();
@@ -407,8 +468,8 @@ public final class Game extends JavaPlugin {
         if (gamePlayer.isHider()) {
             Hider hider = (Hider) gamePlayer;
             hider.destroy();
+            blockGuiMap.remove(hider.getPlayerUuid());
         }
-        blockGuiList.remove(player.getUniqueId());
     }
 
     public void destroyOneGamePlayer(GamePlayer gamePlayer) {
@@ -471,6 +532,11 @@ public final class Game extends JavaPlugin {
         player.setInvisible(false);
     }
 
+    public void openGui(Hider hider) {
+        BlockGui gui = getBlockGuiMap().get(hider.getPlayerUuid());
+        gui.openGui(hider.getPlayer());
+    }
+
     public void damageHider(Hider hider) {
         if (hider.isDead()) return;
 
@@ -511,6 +577,16 @@ public final class Game extends JavaPlugin {
         System.out.println(usableBlocks);
         double balance = econ.getBalance(player);
         return usableBlocks.stream().filter(v -> v.getPrice() <= balance).collect(Collectors.toList());
+    }
+
+    private ItemStack createItemStack(final Material material, final String name, final List<String> lore) {
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        assert itemMeta != null;
+        itemMeta.setDisplayName(name);
+        itemMeta.setLore(lore);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
     }
 
     public void giveBounty(GamePlayer gamePlayer) {
@@ -626,8 +702,11 @@ public final class Game extends JavaPlugin {
     }
 
     public void equipItems() {
-        getSeekers().forEach(Seeker::equipItem);
-        getHiders().forEach(Hider::equipItem);
+        getSeekers().forEach(seeker -> {
+            seeker.equipItem(captureItem);
+            seeker.equipItem(hiLightItem);
+        });
+        getHiders().forEach(hider -> hider.equipItem(speedItem));
     }
 
     public Seeker findSeeker(UUID uuid) {
@@ -748,27 +827,28 @@ public final class Game extends JavaPlugin {
 
     public void reloadScoreboard() {
         gamePlayers.values().forEach(gamePlayer -> {
-//            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
-            gamePlayer.getGameBoard().resetText();
-            gamePlayer.getGameBoard().setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+            GameBoard gameBoard = gamePlayer.getGameBoard();
+//            gameBoard.setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+            gameBoard.resetText();
+            gameBoard.setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             if (getCurrentState() != GameState.PLAYING) return;
-            gamePlayer.getGameBoard().setText(1, "");
-            gamePlayer.getGameBoard().setText(2, "-----");
+            gameBoard.setText(1, "");
+            gameBoard.setText(2, "-----");
             List<Hider> livingPlayerList = getGamePlayers().values().stream()
                     .filter(GamePlayer::isHider)
                     .map(gp -> (Hider) gp)
                     .filter(hider -> !hider.isDead())
                     .collect(Collectors.toList());
-            gamePlayer.getGameBoard().setText(3, "");
-            gamePlayer.getGameBoard().setText(4, "生存プレイヤー : " + getGamePlayers().values().stream()
+            gameBoard.setText(3, "");
+            gameBoard.setText(4, "生存プレイヤー : " + getGamePlayers().values().stream()
                     .filter(GamePlayer::isHider)
                     .filter(gp -> !((Hider) gp).isDead()).count() + "人");
             List<String> seekers = new ArrayList<>();
             getGamePlayers().values().stream().filter(GamePlayer::isSeeker)
                     .forEach(gp -> seekers.add(gp.getPlayer().getDisplayName()));
-            gamePlayer.getGameBoard().setText(5, "鬼 :");
+            gameBoard.setText(5, "鬼 :");
             for (int i = 0; i < seekers.size(); i++) {
-                gamePlayer.getGameBoard().setText(6 + i, "    " + seekers.get(i));
+                gameBoard.setText(6 + i, "    " + seekers.get(i));
             }
 //            for (int i = 0; i < livingPlayerList.size(); i++) {
 //                Hider livingPlayer = livingPlayerList.get(i);

@@ -107,7 +107,7 @@ public class EventManager implements Listener {
         Player player = event.getPlayer();
         Entity rightClicked = event.getRightClicked();
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
-        if (!game.getCaptureType().equals(havingItemType)) return;
+        if (havingItemType != game.getCaptureItem().getType()) return;
 
         Seeker seeker = game.findSeeker(player.getUniqueId());
         if (seeker == null) return;
@@ -135,7 +135,7 @@ public class EventManager implements Listener {
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.SPECTATOR) event.setCancelled(true);
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
-        if (havingItemType == game.getCaptureType()) {
+        if (havingItemType == game.getCaptureItem().getType()) {
             System.out.println("----- event:007 : -----");
 
             Seeker seeker = game.findSeeker(player.getUniqueId());
@@ -157,14 +157,14 @@ public class EventManager implements Listener {
             hider.found();
             hider.blockMelt();
 
-        } else if (havingItemType == game.getSpeedType()) {
+        } else if (havingItemType == game.getSpeedItem().getType()) {
 
             if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
             Hider hider = game.findHider(player.getUniqueId());
             if (hider == null) return;
             hider.upSpeed(game.givePlayerEffect(hider, EffectType.UP_SPEED));
 
-        } else if (havingItemType == game.getHiLightType()) {
+        } else if (havingItemType == game.getHiLightItem().getType()) {
 
             if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
             Seeker seeker = game.findSeeker(player.getUniqueId());
@@ -196,7 +196,7 @@ public class EventManager implements Listener {
         if (!item.getItemMeta().hasDisplayName()) return;
         final String NAME = ChatColor.YELLOW + "ブロックを選択";
         if (!item.getItemMeta().getDisplayName().equals(NAME)) return;
-        hider.getBlockGui().openGui(event.getPlayer());
+        game.openGui(hider);
     }
 
     private void onClickForStage(Sign sign) {

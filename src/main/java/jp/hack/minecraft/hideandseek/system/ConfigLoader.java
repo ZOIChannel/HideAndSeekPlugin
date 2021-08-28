@@ -5,6 +5,7 @@ import jp.hack.minecraft.hideandseek.data.UsableBlock;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -33,6 +34,10 @@ public class ConfigLoader {
 
     public Object getData(String path) {
         return config.get(path);
+    }
+
+    public ItemStack getItemStack(String path) {
+        return config.getSerializable(path, ItemStack.class);
     }
 
     public Integer getInt(String path) {
