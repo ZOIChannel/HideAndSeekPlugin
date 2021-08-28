@@ -278,7 +278,7 @@ public final class Game extends JavaPlugin {
         eventWatcher.start();
         currentState = GameState.PLAYING;
         int seekerRate = configLoader.getInt("seekerRate");
-        int seekerCount = (int) Math.ceil(gamePlayers.size() / (float) seekerRate);
+        int seekerCount = (int) Math.ceil(gamePlayers.size() * ((float) seekerRate / 100));
         List<Integer> randomOrderList = new ArrayList<>();
         for (int i = 0; i < gamePlayers.size(); i++) {
             randomOrderList.add(i);
