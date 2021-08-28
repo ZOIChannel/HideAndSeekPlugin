@@ -4,6 +4,8 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import jp.hack.minecraft.hideandseek.Game;
+import jp.hack.minecraft.hideandseek.player.GamePlayer;
+import jp.hack.minecraft.hideandseek.player.Hider;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -28,9 +30,17 @@ public class BlockGui {
         pane = new OutlinePane(0, 0, 9, 5);
         reloadItemList(player);
         gui.addPane(pane);
+        gui.setOnClose(event -> {
+            Player clickedPlayer = (Player) event.getPlayer();
+            GamePlayer gamePlayer = game.getGamePlayer(clickedPlayer.getUniqueId());
+            if (gamePlayer != null && gamePlayer.isHider()) ((Hider) gamePlayer).setOpeningGui(false);
+        });
     }
 
     public void openGui(Player player) {
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+        if (!gamePlayer.isHider()) return;
+        ((Hider) gamePlayer).setOpeningGui(true);
         reloadItemList(player);
         gui.show(player);
     }
