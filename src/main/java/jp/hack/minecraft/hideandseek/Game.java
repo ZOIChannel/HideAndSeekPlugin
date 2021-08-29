@@ -842,7 +842,11 @@ public final class Game extends JavaPlugin {
             GameBoard gameBoard = gamePlayer.getGameBoard();
 //            gameBoard.setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
             gameBoard.resetText();
-            gameBoard.setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+
+            if (econ != null) {
+                gameBoard.setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+            }
+
             if (getCurrentState() != GameState.PLAYING) return;
             gameBoard.setText(1, "");
             gameBoard.setText(2, "-----");

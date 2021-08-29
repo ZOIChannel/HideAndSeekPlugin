@@ -7,6 +7,7 @@ import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Hider;
 import jp.hack.minecraft.hideandseek.system.Messages;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -49,10 +50,12 @@ public class BlockGui {
         itemList.clear();
         game.getPlayerUsableBlocks(player).forEach(usableBlock -> {
             ItemStack item = new ItemStack(usableBlock.getMaterial());
-            ItemMeta meta = item.getItemMeta();
-            assert meta != null;
-            meta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + "価格: " + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "$" + usableBlock.getPrice()));
-            item.setItemMeta(meta);
+            if (Game.getEconomy() != null) {
+                ItemMeta meta = item.getItemMeta();
+                assert meta != null;
+                meta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + "価格: " + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "$" + usableBlock.getPrice()));
+                item.setItemMeta(meta);
+            }
             itemList.add(item);
         });
         pane.clear();
@@ -64,14 +67,18 @@ public class BlockGui {
                 if (!usableBlockOptional.isPresent()) return;
                 System.out.println("-- event2 002");
                 UsableBlock usableBlock = usableBlockOptional.get();
-//                Game.getEconomy().depositPlayer(clickedPlayer, -1 * Game.getEconomy().getBalance(clickedPlayer));
-                if (Game.getEconomy().getBalance(clickedPlayer) < usableBlock.getPrice()) {
-                    clickedPlayer.sendMessage(Messages.redMessage("buy.noMoney"));
-                    System.out.println("-- event2 003");
-                    return;
+
+                Economy economy = Game.getEconomy();
+                if (economy != null) {
+                    if (economy.getBalance(clickedPlayer) < usableBlock.getPrice()) {
+                        clickedPlayer.sendMessage(Messages.redMessage("buy.noMoney"));
+                        System.out.println("-- event2 003");
+                        return;
+                    }
+
+                    System.out.println("-- event2 004");
+                    economy.withdrawPlayer(clickedPlayer, usableBlock.getPrice());
                 }
-                System.out.println("-- event2 004");
-                Game.getEconomy().withdrawPlayer(clickedPlayer, usableBlock.getPrice());
                 clickedPlayer.getWorld().playSound(clickedPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, 1F, 1F);
                 game.setHiderMaterial(clickedPlayer.getUniqueId(), item.getType());
                 game.reloadScoreboard();
