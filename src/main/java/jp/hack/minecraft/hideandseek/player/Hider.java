@@ -31,6 +31,8 @@ public class Hider extends GamePlayer {
     private Boolean isFrozen = false;
     private Boolean isCalledEvent = false;
 
+    private boolean isOpeningGui = false;
+
     public Hider(Player player) {
         super(player);
         player.setInvisible(true);
@@ -70,6 +72,14 @@ public class Hider extends GamePlayer {
 
     public void setCalledEvent(Boolean calledEvent) {
         isCalledEvent = calledEvent;
+    }
+
+    public boolean isOpeningGui() {
+        return isOpeningGui;
+    }
+
+    public void setOpeningGui(boolean openingGui) {
+        isOpeningGui = openingGui;
     }
 
     public Boolean isFBLived() {

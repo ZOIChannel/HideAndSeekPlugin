@@ -257,16 +257,13 @@ public final class Game extends JavaPlugin {
     }
 
     public void start() {
-        bStop = false;
-        destroyAllDummy();
-        StageData stageData = getCurrentStage();
-        if (stageData == null) {
-            this.gamePlayers.values().forEach(gamePlayer -> {
-                if (!gamePlayer.getPlayer().hasPermission("op")) return;
-                gamePlayer.getPlayer().sendMessage("ステージが存在しません。設定をしてください。");
-            });
+        if (!getCurrentStage().isPresent()) {
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
             return;
         }
+        bStop = false;
+        destroyAllDummy();
+        StageData stageData = getCurrentStage().get();
         if (!stageData.isInitialized()) {
             this.gamePlayers.values().forEach(gamePlayer -> {
                 if (!gamePlayer.getPlayer().hasPermission("op")) return;
@@ -278,7 +275,7 @@ public final class Game extends JavaPlugin {
         eventWatcher.start();
         currentState = GameState.PLAYING;
         int seekerRate = configLoader.getInt("seekerRate");
-        int seekerCount = (int) Math.ceil(gamePlayers.size() / (float) seekerRate);
+        int seekerCount = (int) Math.ceil(gamePlayers.size() * ((float) seekerRate / 100));
         List<Integer> randomOrderList = new ArrayList<>();
         for (int i = 0; i < gamePlayers.size(); i++) {
             randomOrderList.add(i);
@@ -305,10 +302,10 @@ public final class Game extends JavaPlugin {
 
         stageData.createBorder();
 
-        Location stage = getCurrentStage().getStage();
+        Location stage = stageData.getStage();
         getHiders().forEach(hider -> hider.getPlayer().teleport(stage));
 
-        Location seekerLobby = getCurrentStage().getSeekerLobby();
+        Location seekerLobby = stageData.getSeekerLobby();
         getSeekers().forEach(seeker -> {
             seeker.getPlayer().teleport(seekerLobby);
 //            {
@@ -422,12 +419,15 @@ public final class Game extends JavaPlugin {
     }
 
     public void stop() {
+        if (!getCurrentStage().isPresent()) {
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            return;
+        }
         // プレイヤーをどこかへTPさせる?
         destroyGamePlayers();
         clearHiLightTask();
         currentState = GameState.LOBBY;
-        if (getCurrentStage() != null)
-            getCurrentStage().deleteBorder();
+        getCurrentStage().get().deleteBorder();
         eventWatcher.stop();
         bStop = true;
         reloadScoreboard();
@@ -464,7 +464,11 @@ public final class Game extends JavaPlugin {
         Player player = gamePlayer.getPlayer();
         player.setGameMode(GameMode.SPECTATOR);
         player.getInventory().clear();
-        player.teleport(getCurrentStage().getStage());
+        if (!getCurrentStage().isPresent()) {
+            gamePlayers.values().forEach(gp -> gp.getPlayer().sendMessage(Messages.error("stage.none")));
+            return;
+        }
+        player.teleport(getCurrentStage().get().getStage());
         if (gamePlayer.isHider()) {
             Hider hider = (Hider) gamePlayer;
             hider.destroy();
@@ -489,11 +493,12 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.alreadyJoined"));
             return;
         }
-        Location lobby = getCurrentStage().getLobby();
-        if (lobby == null) {
+
+        if (!getCurrentStage().isPresent()) {
             gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
             return;
         }
+        Location lobby = getCurrentStage().get().getLobby();
         player.teleport(lobby);
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
         reloadScoreboard();
@@ -539,6 +544,10 @@ public final class Game extends JavaPlugin {
 
     public void damageHider(Hider hider) {
         if (hider.isDead()) return;
+        if (!getCurrentStage().isPresent()) {
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            return;
+        }
 
         gamePlayers.values().forEach(gamePlayer -> {
             if (hider.getPlayerUuid() == gamePlayer.getPlayerUuid()) {
@@ -553,7 +562,7 @@ public final class Game extends JavaPlugin {
             armorStands.get(hider.getPlayerUuid()).destroy();
         }
         hider.damage();
-        hider.getPlayer().teleport(getCurrentStage().getStage());
+        hider.getPlayer().teleport(getCurrentStage().get().getStage());
         reloadScoreboard();
         confirmGame();
     }
@@ -757,9 +766,9 @@ public final class Game extends JavaPlugin {
         return (loc1.distance(loc2) > 0.7d);
     }
 
-    public StageData getCurrentStage() {
-        if (stageList.size() == 0) return null;
-        return stageList.get(currentStageIndex);
+    public Optional<StageData> getCurrentStage() {
+        if (stageList.size() == 0) return Optional.empty();
+        return Optional.ofNullable(stageList.get(currentStageIndex));
     }
 
     public void makeAliveHiderDummy() {
