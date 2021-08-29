@@ -92,6 +92,7 @@ public final class Game extends JavaPlugin {
 
             new UsableBlock(Material.GRASS_BLOCK, 120)
     );
+
     private List<UsableBlock> usableBlocks;
 
     private final Map<UUID, DummyArmorStand> armorStands = new HashMap<>();
@@ -389,7 +390,7 @@ public final class Game extends JavaPlugin {
         allSendGreenTitle(20, 40, 20, "game.win", wonRole.toString());
         allSendGreenMessage("game.win.border", wonRole.toString());
 
-        timeBar.setVisible(false);
+
         giveReward(wonRole);
         reloadScoreboard();
 
@@ -424,6 +425,7 @@ public final class Game extends JavaPlugin {
             return;
         }
         // プレイヤーをどこかへTPさせる?
+        timeBar.setVisible(false);
         destroyGamePlayers();
         clearHiLightTask();
         currentState = GameState.LOBBY;
@@ -462,7 +464,8 @@ public final class Game extends JavaPlugin {
     private void destroyGamePlayer(GamePlayer gamePlayer) {
         clearPlayerEffect(gamePlayer);
         Player player = gamePlayer.getPlayer();
-        player.setGameMode(GameMode.SPECTATOR);
+        player.setGameMode(GameMode.ADVENTURE);
+        player.teleport(player.getWorld().getSpawnLocation());
         player.getInventory().clear();
         if (!getCurrentStage().isPresent()) {
             gamePlayers.values().forEach(gp -> gp.getPlayer().sendMessage(Messages.error("stage.none")));
