@@ -8,10 +8,7 @@ import jp.hack.minecraft.hideandseek.player.Seeker;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -56,13 +53,12 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void on(EntityTeleportEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
-        Player player = (Player) event.getEntity();
-        Hider hider = game.findHider(player.getUniqueId());
-        if (hider == null) return;
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        Player player = event.getPlayer();
+        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
+        if (gamePlayer == null) return;
 
-        if (player.getGameMode() != GameMode.SPECTATOR) return;
+        if (event.getCause() != PlayerTeleportEvent.TeleportCause.SPECTATE) return;
         event.setCancelled(true);
     }
 
@@ -112,6 +108,7 @@ public class EventManager implements Listener {
         Seeker seeker = game.findSeeker(player.getUniqueId());
         if (seeker == null) return;
 
+        if (rightClicked instanceof ItemFrame) event.setCancelled(true);
         if (!(rightClicked instanceof FallingBlock || rightClicked instanceof Player)) return;
 
         Hider hider;
