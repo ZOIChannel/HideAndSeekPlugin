@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public class HideAndSeekCommand extends PlayerCommandMaster {
     public HideAndSeekCommand(CommandManager manager) {
         super(manager);
-        addSubCommand(new StageCommand(manager));
+        addSubCommand(new ConfigCommand(manager));
         addSubCommand(new StartCommand(manager));
         addSubCommand(new StopCommand(manager));
         addSubCommand(new CancelCommand(manager));

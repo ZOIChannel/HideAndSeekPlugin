@@ -34,7 +34,7 @@ public class ForceJoinCommand extends AdminCommandMaster {
             return true;
         }
         if(args.length < 2) {
-            sender.sendMessage(Messages.error("command.tooShortArgument"));
+            sender.sendMessage(Messages.error("command.notEnoughArgument"));
             return true;
         }
         System.out.println(Arrays.toString(args));

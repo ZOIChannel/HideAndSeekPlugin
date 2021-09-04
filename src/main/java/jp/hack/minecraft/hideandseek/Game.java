@@ -164,11 +164,11 @@ public final class Game extends JavaPlugin {
         if (!setupEconomy()) {
             getServer().getLogger().info("Vault plugin is not found.");
         }
+        configLoader = new ConfigLoader(this);
 
         commandManager = new CommandManager(this);
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
 
-        configLoader = new ConfigLoader(this);
         initializeConst();
     }
 

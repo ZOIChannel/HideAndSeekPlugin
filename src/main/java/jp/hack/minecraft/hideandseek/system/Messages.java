@@ -52,9 +52,11 @@ public class Messages {
         errors.put("game.noPlayer", "そのようなプレイヤーはいません");
         errors.put("command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("command.illegalArgument","正しい引数を入力してください");
-        errors.put("command.tooShortArgument","引数が短すぎます");
+        errors.put("command.notEnoughArgument","引数が不足しています");
         errors.put("command.tooLongArgument","引数が長すぎます");
         errors.put("config.noSetting","設定「%s」が存在しません");
+        errors.put("config.usableBlock.alreadyExist","ブロック「%s」は既に存在します");
+        errors.put("config.usableBlock.notFound","ブロック「%s」が見つかりませんでした");
         errors.put("stage.none", "ステージが設定されていません");
         errors.put("stage.alreadyExist", "「%s」という名前のステージはすでに存在します");
         errors.put("stage.notFoundName", "「%s」という名前のステージは存在しません");

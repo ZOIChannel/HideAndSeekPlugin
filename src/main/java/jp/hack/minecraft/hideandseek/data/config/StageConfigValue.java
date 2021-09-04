@@ -1,7 +1,6 @@
-package jp.hack.minecraft.hideandseek.command.hideandseek.admin;
+package jp.hack.minecraft.hideandseek.data.config;
 
-import jp.hack.minecraft.hideandseek.command.AdminCommandMaster;
-import jp.hack.minecraft.hideandseek.command.CommandManager;
+import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.StageData;
 import jp.hack.minecraft.hideandseek.data.StageType;
 import jp.hack.minecraft.hideandseek.system.Messages;
@@ -15,14 +14,9 @@ import java.util.stream.Collectors;
 
 import static jp.hack.minecraft.hideandseek.data.StageType.*;
 
-public class StageCommand extends AdminCommandMaster {
-    public StageCommand(CommandManager manager) {
-        super(manager);
-    }
-
-    @Override
-    public String getName() {
-        return "stage";
+public class StageConfigValue extends ConfigValue<List<StageData>> {
+    public StageConfigValue(Game game, String key) {
+        super(game, key);
     }
 
     @Override
@@ -31,7 +25,7 @@ public class StageCommand extends AdminCommandMaster {
             sender.sendMessage(Messages.error("command.notPlayer"));
             return true;
         }
-        if (args.length <= 1) {
+        if (args.length < 2) {
             sender.sendMessage(Messages.error("command.illegalArgument"));
             return true;
         }
@@ -68,7 +62,7 @@ public class StageCommand extends AdminCommandMaster {
         }
         if (args[1].equals("create") && args.length == 3) return new ArrayList<>(Arrays.asList("(name)"));
         if ((args[1].equals("set") || args[1].equals("delete") || args[1].equals("edit")) && args.length == 3)
-            return manager.game.getStageList().stream().map(StageData::getName).collect(Collectors.toList());
+            return game.getStageList().stream().map(StageData::getName).collect(Collectors.toList());
         if (args[1].equals("edit") && args.length == 4)
             return new ArrayList<>(Arrays.asList("lobby", "seekerLobby", "stage", "radius"));
         return new ArrayList<>();
@@ -80,13 +74,13 @@ public class StageCommand extends AdminCommandMaster {
             return;
         }
         String name = args[2];
-        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) {
             player.sendMessage(Messages.error("stage.notFoundName", name));
             return;
         }
         StageData stageData = stageDataOptional.get();
-        manager.game.setStage(stageData);
+        game.setStage(stageData);
         player.sendMessage(Messages.greenMessage("stage.set", name));
     }
 
@@ -96,13 +90,13 @@ public class StageCommand extends AdminCommandMaster {
             return;
         }
         String name = args[2];
-        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) {
             player.sendMessage(Messages.error("stage.notFoundName", name));
             return;
         }
         StageData stageData = stageDataOptional.get();
-        manager.game.deleteStage(stageData);
+        game.deleteStage(stageData);
         player.sendMessage(Messages.greenMessage("stage.deleted", name));
     }
 
@@ -117,7 +111,7 @@ public class StageCommand extends AdminCommandMaster {
             player.sendMessage(Messages.error("command.tooLongArgument"));
             return;
         }
-        StageData stageData = manager.game.createNewStage(name);
+        StageData stageData = game.createNewStage(name);
         if (stageData == null) {
             player.sendMessage(Messages.error("stage.alreadyExist", name));
             return;
@@ -131,11 +125,11 @@ public class StageCommand extends AdminCommandMaster {
             return;
         }
         String name = args[2];
-        if (manager.game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
+        if (game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
             player.sendMessage(Messages.error("stage.notFoundName", name));
             return;
         }
-        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) return;
         StageData stageData = stageDataOptional.get();
         String type = args[3];
@@ -143,13 +137,13 @@ public class StageCommand extends AdminCommandMaster {
         switch (type) {
             case "lobby":
                 stageType = LOBBY;
-                stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
-                manager.game.getConfigLoader().setData("location.stage", player.getLocation());
+                stageData.setLocation(stageType, player.getLocation(), game.getConfigLoader());
+                game.getConfigLoader().setData("location.stage", player.getLocation());
                 break;
             case "seekerLobby":
                 stageType = SEEKER_LOBBY;
-                stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
-                manager.game.getConfigLoader().setData("location.stage", player.getLocation());
+                stageData.setLocation(stageType, player.getLocation(), game.getConfigLoader());
+                game.getConfigLoader().setData("location.stage", player.getLocation());
                 break;
             case "stage":
                 stageType = STAGE;
@@ -161,7 +155,7 @@ public class StageCommand extends AdminCommandMaster {
                 player.sendMessage(Messages.error("command.illegalArgument"));
                 break;
         }
-        stageData.setLocation(stageType, player.getLocation(), manager.game.getConfigLoader());
+        stageData.setLocation(stageType, player.getLocation(), game.getConfigLoader());
         player.sendMessage(Messages.greenMessage("stage.edited", name, type));
     }
 
@@ -171,22 +165,22 @@ public class StageCommand extends AdminCommandMaster {
             return;
         }
         String name = args[2];
-        if (manager.game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
+        if (game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
             player.sendMessage(Messages.error("stage.notFoundName", name));
             return;
         }
-        Optional<StageData> stageDataOptional = manager.game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
+        Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) return;
         StageData stageData = stageDataOptional.get();
 //        String type = args[3];
         double radius = Double.parseDouble(args[4]);
-        stageData.setRadius(radius, manager.game.getConfigLoader());
+        stageData.setRadius(radius, game.getConfigLoader());
         player.sendMessage(Messages.greenMessage("stage.edited", name, StageType.RADIUS));
     }
 
     private void listStage(Player player, String[] args) {
         List<String> sendTexts = new ArrayList<>();
-        manager.game.getStageList().forEach(stageData -> {
+        game.getStageList().forEach(stageData -> {
             StringBuilder builder = new StringBuilder();
             builder.append("| [" + stageData.getName() + "] :").append("\n")
                     .append("|     lobby: ").append(getMessageFromBoolean(stageData.getLobby() != null)).append("\n")
