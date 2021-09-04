@@ -868,9 +868,9 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !hider.isDead())
                     .collect(Collectors.toList());
             gameBoard.setText(3, "");
-            gameBoard.setText(4, "生存プレイヤー : " + getGamePlayers().values().stream()
+            gameBoard.setText(4, "生存プレイヤー : " + livingPlayerList.stream()
                     .filter(GamePlayer::isHider)
-                    .filter(gp -> !((Hider) gp).isDead()).count() + "人");
+                    .filter(gp -> !gp.isDead()).count() + "人");
             List<String> seekers = new ArrayList<>();
             getGamePlayers().values().stream().filter(GamePlayer::isSeeker)
                     .forEach(gp -> seekers.add(gp.getPlayer().getDisplayName()));
