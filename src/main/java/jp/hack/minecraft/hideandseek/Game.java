@@ -20,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,30 +38,28 @@ public final class Game extends JavaPlugin {
     private final Map<UUID, BlockGui> blockGuiMap = new HashMap<>();
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private final TimeBar timeBar = new TimeBar();
-    private BukkitTask seekerTeleportTimer;
-    private BukkitTask gameOverTimer;
     private boolean bStop = false;
 
     private final ItemStack DEFAULT_CAPTURE_ITEM = createItemStack(
             Material.IRON_AXE,
-            ChatColor.YELLOW.toString() + "プレイヤーを確保",
+            ChatColor.YELLOW + "プレイヤーを確保",
             Arrays.asList(
-                ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "左" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを鑑定",
-                ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーを確保"
+                    ChatColor.GREEN.toString() + ChatColor.BOLD + "左" + ChatColor.RESET + ChatColor.WHITE + "クリックでブロックを鑑定",
+                    ChatColor.AQUA.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでプレイヤーを確保"
             )
     );
     private final ItemStack DEFAULT_SPEED_ITEM = createItemStack(
             Material.FEATHER,
             ChatColor.YELLOW + "スピードアップ",
-            Arrays.asList(ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでスピードアップ")
+            Arrays.asList(ChatColor.YELLOW.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでスピードアップ")
     );
     private final ItemStack DEFAULT_HI_LIGHT_ITEM = createItemStack(
             Material.CLOCK,
-            ChatColor.GREEN.toString() + "プレイヤーをハイライト",
+            ChatColor.GREEN + "プレイヤーをハイライト",
             Arrays.asList(
-                    ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでプレイヤーをハイライト",
-                    ChatColor.WHITE.toString() + "効果時間は" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒",
-                    ChatColor.WHITE.toString() + "クールタイムは" + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + ChatColor.UNDERLINE.toString() + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET.toString() + ChatColor.WHITE.toString() +"秒"
+                    ChatColor.AQUA.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでプレイヤーをハイライト",
+                    ChatColor.WHITE + "効果時間は" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET + ChatColor.WHITE + "秒",
+                    ChatColor.WHITE + "クールタイムは" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET + ChatColor.WHITE + "秒"
             )
     );
     private ItemStack captureItem;
@@ -402,9 +399,7 @@ public final class Game extends JavaPlugin {
                     .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
             getGamePlayers().forEach((uuid, gamePlayer) -> {
                 gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "生存者:" + ChatColor.RESET);
-                livingHiders.forEach(name -> {
-                    gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET);
-                });
+                livingHiders.forEach(name -> gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET));
                 gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "-----------" + ChatColor.RESET);
             });
         }
@@ -450,13 +445,14 @@ public final class Game extends JavaPlugin {
 //        return hider;
 //    }
 
-    public Hider createHider(Player player){
+    public Hider createHider(Player player) {
         Hider hider = new Hider(player);
         getGamePlayers().put(hider.getPlayerUuid(), hider);
         getBlockGuiMap().put(hider.getPlayerUuid(), new BlockGui(this, player));
         return hider;
     }
-    public Seeker createSeeker(Player player){
+
+    public Seeker createSeeker(Player player) {
         Seeker seeker = new Seeker(player);
         getGamePlayers().put(seeker.getPlayerUuid(), seeker);
         return seeker;
@@ -681,8 +677,6 @@ public final class Game extends JavaPlugin {
                 });
                 getRunnable().runTaskLater(Game.this, type.getCoolTime() * 20L);
             }
-
-            ;
         };
         map.put(type, myRunnable);
         myRunnable.runTaskLater(Game.this, type.getDuration() * 20L);
