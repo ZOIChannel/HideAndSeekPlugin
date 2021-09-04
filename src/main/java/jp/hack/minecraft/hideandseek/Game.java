@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -496,7 +497,18 @@ public final class Game extends JavaPlugin {
             player.sendMessage(Messages.error("game.alreadyJoined"));
             return;
         }
+        addPlayer(player);
+    }
 
+    public void forceJoin(CommandSender sender, Player target) {
+        if (gamePlayers.containsKey(target.getUniqueId())) {
+            sender.sendMessage(Messages.error("game.otherAlreadyJoined", target.getDisplayName()));
+            return;
+        }
+        addPlayer(target);
+    }
+
+    private void addPlayer(Player player) {
         if (!getCurrentStage().isPresent()) {
             gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
             return;

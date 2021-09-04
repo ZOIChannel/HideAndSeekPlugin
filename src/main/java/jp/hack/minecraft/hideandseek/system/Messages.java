@@ -44,6 +44,7 @@ public class Messages {
 
         errors.put("game.alreadyStarted", "すでにゲームは始まっています");
         errors.put("game.alreadyJoined", "すでにゲームに参加しています");
+        errors.put("game.otherAlreadyJoined", "%sはすでにゲームに参加しています");
         errors.put("game.notJoined", "あなたはゲームに参加していません");
         errors.put("game.notStarted", "まだゲームが始まっていません");
         errors.put("game.noData", "%sの設定がありません");
@@ -51,6 +52,7 @@ public class Messages {
         errors.put("game.noPlayer", "そのようなプレイヤーはいません");
         errors.put("command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("command.illegalArgument","正しい引数を入力してください");
+        errors.put("command.tooShortArgument","引数が短すぎます");
         errors.put("command.tooLongArgument","引数が長すぎます");
         errors.put("config.noSetting","設定「%s」が存在しません");
         errors.put("stage.none", "ステージが設定されていません");
