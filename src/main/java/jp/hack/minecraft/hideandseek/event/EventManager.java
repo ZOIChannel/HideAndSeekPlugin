@@ -183,7 +183,7 @@ public class EventManager implements Listener {
     }
 
     private void onPlayerClickItem(PlayerInteractEvent event) {
-        if (event.hasBlock()) return;
+        if (event.useInteractedBlock() == Event.Result.ALLOW) return;
         Player player = event.getPlayer();
         Hider hider = game.findHider(player.getUniqueId());
         if (hider == null) return;
