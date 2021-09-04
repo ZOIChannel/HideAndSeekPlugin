@@ -10,6 +10,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.*;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -302,6 +303,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
+        if(game.getCurrentState() != GameState.PLAYING) return;
         UUID uuid = event.getPlayer().getUniqueId();
         if (!game.getGamePlayers().containsKey(uuid)) return;
         GamePlayer gamePlayer = game.getGamePlayer(uuid);
