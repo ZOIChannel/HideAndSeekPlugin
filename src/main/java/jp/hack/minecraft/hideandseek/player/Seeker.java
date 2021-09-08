@@ -23,7 +23,7 @@ public class Seeker extends GamePlayer {
 
     public Seeker(Player player) {
         super(player);
-        getPlayer().setPlayerListName(ChatColor.RED + getPlayer().getName() + ChatColor.RESET);
+        player.setPlayerListName(ChatColor.RED + getPlayer().getName() + ChatColor.RESET);
         player.setInvisible(false);
         giveEffect(EffectType.SEEKER_UP_SPEED);
     }

@@ -234,11 +234,12 @@ public class EventManager implements Listener {
         Location to = event.getTo();
 
         if (to == null) return;
-        if (player.getGameMode() == GameMode.SPECTATOR)
+        if (player.getGameMode() == GameMode.SPECTATOR) {
             if (from.getY() != to.getY()) {
                 event.setCancelled(true);
                 return;
             }
+        }
 
         if (!game.getCurrentStage().get().getWorldBorder().isInside(to)) {
             event.setCancelled(true);
@@ -282,16 +283,6 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void onPlayerBreakBlock(BlockBreakEvent event) {
-        Player player = event.getPlayer();
-        if (game.getCurrentState() != GameState.PLAYING) return;
-        GamePlayer gamePlayer = game.getGamePlayer(player.getUniqueId());
-        if (gamePlayer == null) return;
-        if (!gamePlayer.isSeeker()) return;
-        event.setCancelled(true);
-    }
-
-    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         String message = ChatColor.AQUA +
                 "Hide And Seek\n" +
@@ -307,7 +298,7 @@ public class EventManager implements Listener {
         UUID uuid = event.getPlayer().getUniqueId();
         if (!game.getGamePlayers().containsKey(uuid)) return;
         GamePlayer gamePlayer = game.getGamePlayer(uuid);
-        game.destroyOneGamePlayer(gamePlayer);
+        game.removeOneGamePlayer(gamePlayer);
         game.confirmGame();
     }
 }

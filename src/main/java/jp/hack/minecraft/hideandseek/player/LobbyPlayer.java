@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 public class LobbyPlayer extends GamePlayer{
     public LobbyPlayer(Player player) {
         super(player);
-        getPlayer().setPlayerListName(ChatColor.GREEN + getPlayer().getName() + ChatColor.RESET);
+        player.setPlayerListName(ChatColor.GREEN + getPlayer().getName() + ChatColor.RESET);
+        player.setInvisible(false);
     }
 }

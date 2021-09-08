@@ -422,7 +422,7 @@ public final class Game extends JavaPlugin {
         }
         // プレイヤーをどこかへTPさせる?
         timeBar.setVisible(false);
-        destroyGamePlayers();
+        removeGamePlayers();
         clearHiLightTask();
         currentState = GameState.LOBBY;
         getCurrentStage().get().deleteBorder();
@@ -464,6 +464,7 @@ public final class Game extends JavaPlugin {
         player.setGameMode(GameMode.ADVENTURE);
         player.teleport(player.getWorld().getSpawnLocation());
         player.getInventory().clear();
+        player.setPlayerListName(player.getDisplayName());
         if (!getCurrentStage().isPresent()) {
             gamePlayers.values().forEach(gp -> gp.getPlayer().sendMessage(Messages.error("stage.none")));
             return;
@@ -476,13 +477,13 @@ public final class Game extends JavaPlugin {
         }
     }
 
-    public void destroyOneGamePlayer(GamePlayer gamePlayer) {
+    public void removeOneGamePlayer(GamePlayer gamePlayer) {
         if (gamePlayer == null) return;
         destroyGamePlayer(gamePlayer);
         getGamePlayers().remove(gamePlayer.getPlayerUuid());
     }
 
-    private void destroyGamePlayers() {
+    private void removeGamePlayers() {
         if (gamePlayers.isEmpty()) return;
         gamePlayers.values().forEach(this::destroyGamePlayer);
         gamePlayers.clear();
@@ -514,7 +515,6 @@ public final class Game extends JavaPlugin {
         gamePlayers.put(player.getUniqueId(), new LobbyPlayer(player));
         reloadScoreboard();
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
-        resetPlayerState(player);
         gamePlayers.values().forEach(gamePlayer -> {
             if (gamePlayer.getPlayerUuid() == player.getUniqueId()) {
                 gamePlayer.sendGreenMessage("game.youJoinGame");
@@ -525,27 +525,20 @@ public final class Game extends JavaPlugin {
     }
 
     public void cancel(Player player) {
-        if (!gamePlayers.containsKey(player.getUniqueId())) {
+        GamePlayer gamePlayer = getGamePlayer(player.getUniqueId());
+        if (gamePlayer == null) {
             player.sendMessage(Messages.error("game.notJoined"));
             return;
         }
-        player.setPlayerListName(player.getDisplayName());
 //        allSendGreenMessage("game.youCancelGame");
-        gamePlayers.values().forEach(gamePlayer -> {
-            if (gamePlayer.getPlayerUuid() == player.getUniqueId()) {
-                gamePlayer.sendGreenMessage("game.youCancelGame");
+        gamePlayers.values().forEach(p -> {
+            if (p.getPlayerUuid() == player.getUniqueId()) {
+                p.sendGreenMessage("game.youCancelGame");
                 return;
             }
-            gamePlayer.sendGreenMessage("game.otherCancelGame", player.getDisplayName());
+            p.sendGreenMessage("game.otherCancelGame", player.getDisplayName());
         });
-        gamePlayers.remove(player.getUniqueId());
-        // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
-        resetPlayerState(player);
-    }
-
-    public void resetPlayerState(Player player) {
-        player.setGameMode(GameMode.SURVIVAL);
-        player.setInvisible(false);
+        removeOneGamePlayer(gamePlayer);
     }
 
     public void openGui(Hider hider) {
