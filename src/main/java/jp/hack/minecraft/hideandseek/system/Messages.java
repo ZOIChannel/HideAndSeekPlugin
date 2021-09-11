@@ -60,6 +60,7 @@ public class Messages {
         errors.put("stage.none", "ステージが設定されていません");
         errors.put("stage.alreadyExist", "「%s」という名前のステージはすでに存在します");
         errors.put("stage.notFoundName", "「%s」という名前のステージは存在しません");
+        errors.put("plugin.missing.vault", " [%s], - Valultのプラグインあるいは対応するエコノミープラグインがみつかりません！プラグインを無効にします");
 
         errors.put("error.notExistKey", "存在しないコードのメッセージを取得しようとしました");
     }

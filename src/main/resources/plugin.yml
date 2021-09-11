@@ -2,6 +2,8 @@ name: HideAndSeek
 version: @version@
 main: jp.hack.minecraft.hideandseek.Game
 api-version: 1.16
+depend:
+  - Vault
 commands:
   hideandseek:
     aliases: hs

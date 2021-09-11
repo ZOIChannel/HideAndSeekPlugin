@@ -22,9 +22,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class Game extends JavaPlugin {
+    protected static final Logger LOG = Logger.getLogger(Game.class.getSimpleName());
 
     //    private List<GamePlayer> playerList;
     private GameState currentState = GameState.LOBBY;
@@ -159,11 +161,15 @@ public final class Game extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         super.onEnable();
-        getServer().getPluginManager().registerEvents(eventManager, this);
 
+        //pluginチェック、Valultがはいっていない場合はプラグインを無効にしなにも処理をしない
         if (!setupEconomy()) {
-            getServer().getLogger().info("Vault plugin is not found.");
+            LOG.severe(Messages.error("plugin.missing.vault", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
         }
+
+        getServer().getPluginManager().registerEvents(eventManager, this);
         configLoader = new ConfigLoader(this);
 
         commandManager = new CommandManager(this);
