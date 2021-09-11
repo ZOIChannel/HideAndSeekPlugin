@@ -301,5 +301,14 @@ public class EventManager implements Listener {
         game.removeOneGamePlayer(gamePlayer);
         game.confirmGame();
     }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event)
+    {
+        if (event.getCause().equals(PlayerTeleportEvent.TeleportCause.SPECTATE))
+        {
+            event.setCancelled(true);
+        }
+    }
 }
 
