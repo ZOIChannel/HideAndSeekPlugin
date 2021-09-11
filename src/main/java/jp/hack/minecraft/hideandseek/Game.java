@@ -176,8 +176,6 @@ public final class Game extends JavaPlugin {
 
         commandManager = new CommandManager(this);
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
-
-        initializeConst();
     }
 
     @Override
