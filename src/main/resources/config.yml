@@ -1,5 +1,4 @@
-attackDamage: 4
-seekerRate: 5
+gameMode:
 seekerWaitTime: 30
 gameTime: 300
 borderRadius: 50

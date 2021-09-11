@@ -3,6 +3,7 @@ package jp.hack.minecraft.hideandseek.player;
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.BlockGui;
 import jp.hack.minecraft.hideandseek.data.EffectType;
+import jp.hack.minecraft.hideandseek.data.PluginGameMode;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -153,12 +154,14 @@ public class Hider extends GamePlayer {
         destroyFallingBlock();
     }
 
-    public void damage() {
+    public void damage(PluginGameMode currentGameMode) {
         if (isDead) return;
+        if (currentGameMode == PluginGameMode.NORMAL) {
+            getPlayer().setGameMode(GameMode.SPECTATOR);
+        }
+        destroy();
         getPlayer().setPlayerListName(ChatColor.BLACK + getPlayer().getName() + ChatColor.RESET);
         getPlayer().sendMessage(Messages.redMessage("game.you.found"));
-        getPlayer().setGameMode(GameMode.SPECTATOR);
-        destroy();
         getPlayer().playSound(getLocation(), Sound.ENTITY_PLAYER_HURT, 1F, 1F);
         Firework firework = getFirework();
         firework.detonate();
@@ -250,5 +253,9 @@ public class Hider extends GamePlayer {
         meta.setPower(1);
         firework.setFireworkMeta(meta);
         return firework;
+    }
+
+    public Seeker createSeeker() {
+        return new Seeker(getPlayer());
     }
 }

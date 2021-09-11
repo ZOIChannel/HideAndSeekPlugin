@@ -30,6 +30,7 @@ public final class Game extends JavaPlugin {
 
     //    private List<GamePlayer> playerList;
     private GameState currentState = GameState.LOBBY;
+    private PluginGameMode currentGameMode;
     private ConfigLoader configLoader;
     private int currentStageIndex = 0;
     private List<StageData> stageList = new ArrayList<>();
@@ -111,6 +112,10 @@ public final class Game extends JavaPlugin {
 
     public GameState getCurrentState() {
         return currentState;
+    }
+
+    public PluginGameMode getCurrentGameMode() {
+        return currentGameMode;
     }
 
     public ConfigLoader getConfigLoader() {
@@ -198,6 +203,13 @@ public final class Game extends JavaPlugin {
     }
 
     private void initializeConst() {
+        if (configLoader.contains("gameMode")) {
+            currentGameMode = PluginGameMode.valueOf(configLoader.getData("gameMode").toString());
+        } else {
+            currentGameMode = PluginGameMode.NORMAL;
+            configLoader.setData("gameMode", currentGameMode);
+        }
+
         if (!(configLoader.getData("stage") instanceof List)
                 || ((List<?>) configLoader.getData("stage")).stream().noneMatch(Objects::nonNull)) {
             stageList = new ArrayList<>();
@@ -571,8 +583,12 @@ public final class Game extends JavaPlugin {
         if (armorStands.containsKey(hider.getPlayerUuid())) {
             armorStands.get(hider.getPlayerUuid()).destroy();
         }
-        hider.damage();
-        hider.getPlayer().teleport(getCurrentStage().get().getStage());
+        hider.damage(currentGameMode);
+        if(currentGameMode == PluginGameMode.NORMAL){
+            hider.getPlayer().teleport(getCurrentStage().get().getStage());
+        }else if(currentGameMode == PluginGameMode.INCREASE){
+            gamePlayers.put(hider.getPlayerUuid(), hider.createSeeker());
+        }
         reloadScoreboard();
         confirmGame();
     }
