@@ -172,6 +172,8 @@ public final class Game extends JavaPlugin {
         getServer().getPluginManager().registerEvents(eventManager, this);
         configLoader = new ConfigLoader(this);
 
+        initializeConst();
+
         commandManager = new CommandManager(this);
         commandManager.addRootCommand(new HideAndSeekCommand(commandManager)); // plugin.ymlへの登録を忘れずに
 
