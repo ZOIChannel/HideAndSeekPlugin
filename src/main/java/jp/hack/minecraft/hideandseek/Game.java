@@ -521,6 +521,7 @@ public final class Game extends JavaPlugin {
     private void destroyGamePlayer(GamePlayer gamePlayer) {
         clearPlayerEffect(gamePlayer);
         Player player = gamePlayer.getPlayer();
+        player.setInvisible(false);
         player.setGameMode(GameMode.ADVENTURE);
         player.teleport(player.getWorld().getSpawnLocation());
         player.getInventory().clear();
