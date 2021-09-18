@@ -37,6 +37,8 @@ public class Messages {
         messages.put("game.win.border", "--- %s の勝利 ---");
         messages.put("game.gotMoney", "$%s 獲得しました");
 
+        messages.put("game.gameMode.changed", "ゲームモードが「%s」に変更されました");
+
         messages.put("stage.crated", "ステージ「%s」を作成しました");
         messages.put("stage.set", "「%s」をステージとして設定しました");
         messages.put("stage.deleted", "ステージ「%s」を削除しました");

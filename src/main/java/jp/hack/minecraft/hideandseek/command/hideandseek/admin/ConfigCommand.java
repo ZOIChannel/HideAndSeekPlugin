@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigCommand extends AdminCommandMaster {
-    private final List<ConfigValue> editableElements = new ArrayList<>();
+    private final List<CastConfigValue<?, ?>> editableElements = new ArrayList<>();
 
 
     public ConfigCommand(CommandManager manager) {
@@ -25,6 +25,7 @@ public class ConfigCommand extends AdminCommandMaster {
         editableElements.add(new IntConfigValue(manager.game, "seekerRate"));
         editableElements.add(new DoubleConfigValue(manager.game, "reward"));
         editableElements.add(new UsableBlockConfigValue(manager.game, "usableBlocks"));
+        editableElements.add(new GameModeConfigValue(manager.game, "gameMode"));
     }
 
     @Override
@@ -39,7 +40,7 @@ public class ConfigCommand extends AdminCommandMaster {
             return true;
         }
         String selectedKey = args[1];
-        for (ConfigValue configValue :
+        for (CastConfigValue<?, ?> configValue :
                 editableElements) {
             if (configValue.getKey().equals(selectedKey)) {
                 configValue.onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length));
@@ -53,9 +54,9 @@ public class ConfigCommand extends AdminCommandMaster {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 2) {
-            return editableElements.stream().map(ConfigValue::getKey).collect(Collectors.toList());
+            return editableElements.stream().map(CastConfigValue::getKey).collect(Collectors.toList());
         }
-        for (ConfigValue configValue :
+        for (CastConfigValue<?, ?> configValue :
                 editableElements) {
             if (configValue.getKey().equals(args[1])) {
                 return configValue.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
