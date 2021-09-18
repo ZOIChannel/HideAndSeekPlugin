@@ -35,7 +35,7 @@ public class ConfigCommand extends AdminCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length <= 1) {
-            sender.sendMessage(Messages.error("command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
             return true;
         }
         String selectedKey = args[1];
@@ -46,7 +46,7 @@ public class ConfigCommand extends AdminCommandMaster {
                 return true;
             }
         }
-        sender.sendMessage(Messages.error("config.noSetting"));
+        sender.sendMessage(Messages.error("error.config.noSetting"));
         return true;
     }
 
@@ -61,6 +61,6 @@ public class ConfigCommand extends AdminCommandMaster {
                 return configValue.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
             }
         }
-        return Collections.singletonList(Messages.error("config.noSetting"));
+        return Collections.singletonList(Messages.error("error.config.noSetting"));
     }
 }

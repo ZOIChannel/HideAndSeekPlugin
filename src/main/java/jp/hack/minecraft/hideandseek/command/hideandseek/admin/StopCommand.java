@@ -23,7 +23,7 @@ public class StopCommand extends AdminCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (manager.game.getCurrentState() != GameState.PLAYING) {
-            sender.sendMessage(Messages.error("game.notStarted"));
+            sender.sendMessage(Messages.error("error.game.notStarted"));
             return true;
         }
         manager.game.stop();

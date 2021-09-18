@@ -225,7 +225,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (!game.getCurrentStage().isPresent()) {
-            game.getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            game.getGamePlayers().values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
         Player player = event.getPlayer();

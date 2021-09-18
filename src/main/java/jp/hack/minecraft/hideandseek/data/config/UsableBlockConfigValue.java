@@ -1,11 +1,8 @@
 package jp.hack.minecraft.hideandseek.data.config;
 
 import jp.hack.minecraft.hideandseek.Game;
-import jp.hack.minecraft.hideandseek.data.StageData;
-import jp.hack.minecraft.hideandseek.data.StageType;
 import jp.hack.minecraft.hideandseek.data.UsableBlock;
 import jp.hack.minecraft.hideandseek.system.Messages;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,8 +10,6 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static jp.hack.minecraft.hideandseek.data.StageType.*;
 
 public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
     public UsableBlockConfigValue(Game game, String key) {
@@ -24,11 +19,11 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Messages.error("command.notPlayer"));
+            sender.sendMessage(Messages.error("error.command.notPlayer"));
             return true;
         }
         if (args.length < 2) {
-            sender.sendMessage(Messages.error("command.illegalArgument"));
+            sender.sendMessage(Messages.error("error.command.illegalArgument"));
             return true;
         }
         Player player = (Player) sender;
@@ -46,7 +41,7 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
                 listBlock(player, args);
                 break;
             default:
-                player.sendMessage(Messages.error("command.illegalArgument"));
+                player.sendMessage(Messages.error("error.command.illegalArgument"));
                 break;
         }
         return true;
@@ -80,24 +75,24 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
 
     private void addBlock(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         Material material = Material.matchMaterial(args[2]);
         if (material == null) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         int price;
         try {
             price = Integer.parseInt(args[3]);
         } catch (final NumberFormatException e) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         for (UsableBlock usableBlock : getData()) {
             if (usableBlock.getMaterial() == material) {
-                player.sendMessage(Messages.error("config.usableBlock.alreadyExist"));
+                player.sendMessage(Messages.error("error.config.usableBlock.alreadyExist"));
                 return;
             }
         }
@@ -108,19 +103,19 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
 
     private void setBlockPrice(Player player, String[] args) {
         if (args.length < 4) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         Material material = Material.matchMaterial(args[2]);
         if (material == null) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         int price;
         try {
             price = Integer.parseInt(args[3]);
         } catch (final NumberFormatException e) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         List<UsableBlock> blockList = getData();
@@ -131,17 +126,17 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
                 return;
             }
         }
-        player.sendMessage(Messages.error("config.usableBlock.notFound"));
+        player.sendMessage(Messages.error("error.config.usableBlock.notFound"));
     }
 
     private void deleteBlock(Player player, String[] args) {
         if (args.length < 3) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         Material material = Material.matchMaterial(args[2]);
         if (material == null) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         List<UsableBlock> blockList = getData();
@@ -152,7 +147,7 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
                 return;
             }
         }
-        player.sendMessage(Messages.error("config.usableBlock.notFound"));
+        player.sendMessage(Messages.error("error.config.usableBlock.notFound"));
     }
 
     private void listBlock(Player player, String[] args) {

@@ -30,18 +30,18 @@ public class ForceJoinCommand extends AdminCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (manager.game.getCurrentState() == GameState.PLAYING) {
-            sender.sendMessage(Messages.error("game.alreadyStarted"));
+            sender.sendMessage(Messages.error("error.game.alreadyStarted"));
             return true;
         }
         if(args.length < 2) {
-            sender.sendMessage(Messages.error("command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
             return true;
         }
         System.out.println(Arrays.toString(args));
         String playerName = args[1];
         Player target = Bukkit.getPlayer(playerName);
         if(target == null) {
-            sender.sendMessage(Messages.error("game.noPlayer"));
+            sender.sendMessage(Messages.error("error.game.noPlayer"));
             return true;
         }
         manager.game.forceJoin(sender, target);

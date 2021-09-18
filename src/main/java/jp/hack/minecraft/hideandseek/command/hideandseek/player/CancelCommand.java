@@ -24,15 +24,15 @@ public class CancelCommand extends PlayerCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (manager.game.getCurrentState() == GameState.PLAYING) {
-            sender.sendMessage(Messages.error("game.alreadyStarted"));
+            sender.sendMessage(Messages.error("error.game.alreadyStarted"));
             return true;
         }
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Messages.error("command.notPlayer"));
+            sender.sendMessage(Messages.error("error.command.notPlayer"));
             return true;
         }
         Player player = (Player)sender;
-        manager.game.cancel(player);
+        manager.game.leave(player);
         return true;
     }
 

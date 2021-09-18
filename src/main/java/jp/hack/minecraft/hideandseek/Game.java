@@ -182,7 +182,7 @@ public final class Game extends JavaPlugin {
 
         //pluginチェック、Valultがはいっていない場合はプラグインを無効にしなにも処理をしない
         if (!setupEconomy()) {
-            LOG.severe(Messages.error("plugin.missing.vault", getDescription().getName()));
+            LOG.severe(Messages.error("error.plugin.missing.vault", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -316,7 +316,7 @@ public final class Game extends JavaPlugin {
 
     public void start() {
         if (!getCurrentStage().isPresent()) {
-            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
         bStop = false;
@@ -476,7 +476,7 @@ public final class Game extends JavaPlugin {
 
     public void stop() {
         if (!getCurrentStage().isPresent()) {
-            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
         // プレイヤーをどこかへTPさせる?
@@ -527,7 +527,7 @@ public final class Game extends JavaPlugin {
         player.getInventory().clear();
         player.setPlayerListName(player.getDisplayName());
         if (!getCurrentStage().isPresent()) {
-            gamePlayers.values().forEach(gp -> gp.getPlayer().sendMessage(Messages.error("stage.none")));
+            gamePlayers.values().forEach(gp -> gp.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
         player.teleport(getCurrentStage().get().getStage());
@@ -553,7 +553,7 @@ public final class Game extends JavaPlugin {
 
     public void join(Player player) {
         if (gamePlayers.containsKey(player.getUniqueId())) {
-            player.sendMessage(Messages.error("game.alreadyJoined"));
+            player.sendMessage(Messages.error("error.game.alreadyJoined"));
             return;
         }
         addPlayer(player);
@@ -561,7 +561,7 @@ public final class Game extends JavaPlugin {
 
     public void forceJoin(CommandSender sender, Player target) {
         if (gamePlayers.containsKey(target.getUniqueId())) {
-            sender.sendMessage(Messages.error("game.otherAlreadyJoined", target.getDisplayName()));
+            sender.sendMessage(Messages.error("error.game.otherAlreadyJoined", target.getDisplayName()));
             return;
         }
         addPlayer(target);
@@ -569,7 +569,7 @@ public final class Game extends JavaPlugin {
 
     private void addPlayer(Player player) {
         if (!getCurrentStage().isPresent()) {
-            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
         Location lobby = getCurrentStage().get().getLobby();
@@ -579,26 +579,26 @@ public final class Game extends JavaPlugin {
         // 初期化処理、ゲーム終了後にも呼ぶのでどこかで関数にするほうがいいかもしれない。LobbyPlayerのなか?
         gamePlayers.values().forEach(gamePlayer -> {
             if (gamePlayer.getPlayerUuid() == player.getUniqueId()) {
-                gamePlayer.sendGreenMessage("game.youJoinGame");
+                gamePlayer.sendGreenMessage("game.you.join");
                 return;
             }
-            gamePlayer.sendGreenMessage("game.otherJoinGame", player.getDisplayName());
+            gamePlayer.sendGreenMessage("game.other.join", player.getDisplayName());
         });
     }
 
-    public void cancel(Player player) {
+    public void leave(Player player) {
         GamePlayer gamePlayer = getGamePlayer(player.getUniqueId());
         if (gamePlayer == null) {
-            player.sendMessage(Messages.error("game.notJoined"));
+            player.sendMessage(Messages.error("error.game.notJoined"));
             return;
         }
 //        allSendGreenMessage("game.youCancelGame");
         gamePlayers.values().forEach(p -> {
             if (p.getPlayerUuid() == player.getUniqueId()) {
-                p.sendGreenMessage("game.youCancelGame");
+                p.sendGreenMessage("game.you.left");
                 return;
             }
-            p.sendGreenMessage("game.otherCancelGame", player.getDisplayName());
+            p.sendGreenMessage("game.other.left", player.getDisplayName());
         });
         removeOneGamePlayer(gamePlayer);
     }
@@ -615,7 +615,7 @@ public final class Game extends JavaPlugin {
     public void damageHider(Hider hider) {
         if (hider.isDead()) return;
         if (!getCurrentStage().isPresent()) {
-            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("stage.none")));
+            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
 

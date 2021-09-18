@@ -17,14 +17,14 @@ public class DoubleConfigValue extends ConfigValue<Double> {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(Messages.error("command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
             return true;
         }
         double value;
         try {
             value = Double.parseDouble(args[1]);
         } catch (final NumberFormatException e) {
-            sender.sendMessage(Messages.error("command.illegalArgument"));
+            sender.sendMessage(Messages.error("error.command.illegalArgument"));
             return true;
         }
         setData(value);

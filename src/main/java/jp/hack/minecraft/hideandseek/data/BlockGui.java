@@ -71,7 +71,7 @@ public class BlockGui {
                 Economy economy = Game.getEconomy();
                 if (economy != null) {
                     if (economy.getBalance(clickedPlayer) < usableBlock.getPrice()) {
-                        clickedPlayer.sendMessage(Messages.redMessage("buy.noMoney"));
+                        clickedPlayer.sendMessage(Messages.redMessage("error.buy.noMoney"));
                         System.out.println("-- event2 003");
                         return;
                     }

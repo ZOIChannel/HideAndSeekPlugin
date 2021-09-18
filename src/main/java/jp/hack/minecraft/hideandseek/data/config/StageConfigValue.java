@@ -22,11 +22,11 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Messages.error("command.notPlayer"));
+            sender.sendMessage(Messages.error("error.command.notPlayer"));
             return true;
         }
         if (args.length < 2) {
-            sender.sendMessage(Messages.error("command.illegalArgument"));
+            sender.sendMessage(Messages.error("error.command.illegalArgument"));
             return true;
         }
         Player player = (Player) sender;
@@ -47,7 +47,7 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
                 listStage(player, args);
                 break;
             default:
-                player.sendMessage(Messages.error("command.illegalArgument"));
+                player.sendMessage(Messages.error("error.command.illegalArgument"));
                 break;
         }
         return true;
@@ -70,13 +70,13 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
 
     private void setStage(Player player, String[] args) {
         if (args.length <= 2) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         String name = args[2];
         Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) {
-            player.sendMessage(Messages.error("stage.notFoundName", name));
+            player.sendMessage(Messages.error("error.stage.notFoundName", name));
             return;
         }
         StageData stageData = stageDataOptional.get();
@@ -86,13 +86,13 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
 
     private void deleteStage(Player player, String[] args) {
         if (args.length <= 2) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         String name = args[2];
         Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
         if (!stageDataOptional.isPresent()) {
-            player.sendMessage(Messages.error("stage.notFoundName", name));
+            player.sendMessage(Messages.error("error.stage.notFoundName", name));
             return;
         }
         StageData stageData = stageDataOptional.get();
@@ -102,18 +102,18 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
 
     private void createStage(Player player, String[] args) {
         if (args.length <= 2) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         String name = args[2];
         // 9文字以上は却下
         if (name.length() > 9) {
-            player.sendMessage(Messages.error("command.tooLongArgument"));
+            player.sendMessage(Messages.error("error.command.tooLongArgument"));
             return;
         }
         StageData stageData = game.createNewStage(name);
         if (stageData == null) {
-            player.sendMessage(Messages.error("stage.alreadyExist", name));
+            player.sendMessage(Messages.error("error.stage.alreadyExist", name));
             return;
         }
         player.sendMessage(Messages.greenMessage("stage.crated", name));
@@ -121,12 +121,12 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
 
     private void editStage(Player player, String[] args) {
         if (args.length <= 2) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         String name = args[2];
         if (game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
-            player.sendMessage(Messages.error("stage.notFoundName", name));
+            player.sendMessage(Messages.error("error.stage.notFoundName", name));
             return;
         }
         Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();
@@ -152,7 +152,7 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
                 editStageRadius(player, args);
                 return;
             default:
-                player.sendMessage(Messages.error("command.illegalArgument"));
+                player.sendMessage(Messages.error("error.command.illegalArgument"));
                 break;
         }
         stageData.setLocation(stageType, player.getLocation(), game.getConfigLoader());
@@ -161,12 +161,12 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
 
     private void editStageRadius(Player player, String[] args) {
         if (args.length <= 3) {
-            player.sendMessage(Messages.error("command.illegalArgument"));
+            player.sendMessage(Messages.error("error.command.illegalArgument"));
             return;
         }
         String name = args[2];
         if (game.getStageList().stream().noneMatch(stageData -> stageData.getName().equals(name))) {
-            player.sendMessage(Messages.error("stage.notFoundName", name));
+            player.sendMessage(Messages.error("error.stage.notFoundName", name));
             return;
         }
         Optional<StageData> stageDataOptional = game.getStageList().stream().filter(stageData -> stageData.getName().equals(name)).findFirst();

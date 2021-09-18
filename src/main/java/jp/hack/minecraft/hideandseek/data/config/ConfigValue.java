@@ -14,7 +14,7 @@ public class ConfigValue<T> {
     public ConfigValue(Game game, String key) {
         this.game = game;
         this.key = key;
-        if(!game.getConfigLoader().contains(key)) throw new IllegalArgumentException(Messages.error("config.noSetting", key));
+        if(!game.getConfigLoader().contains(key)) throw new IllegalArgumentException(Messages.error("error.config.noSetting", key));
     }
 
     public String getKey(){

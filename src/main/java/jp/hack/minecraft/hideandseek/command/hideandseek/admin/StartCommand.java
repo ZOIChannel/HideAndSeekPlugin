@@ -23,11 +23,11 @@ public class StartCommand extends AdminCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (manager.game.getCurrentState() == GameState.PLAYING) {
-            sender.sendMessage(Messages.error("game.alreadyStarted"));
+            sender.sendMessage(Messages.error("error.game.alreadyStarted"));
             return true;
         }
         if(manager.game.getGamePlayers().size() < 2){
-            sender.sendMessage(Messages.error("game.notEnoughPlayer"));
+            sender.sendMessage(Messages.error("error.game.notEnoughPlayer"));
             return true;
         }
         manager.game.start();

@@ -11,10 +11,10 @@ public class Messages {
 
     {
         // この二つはバニラのメッセージと同じなので変えたほうがいいかもしれない
-        messages.put("game.youJoinGame", "ゲームに参加しました");
-        messages.put("game.otherJoinGame", "%sがゲームに参加しました");
-        messages.put("game.youCancelGame", "ゲームから退出しました");
-        messages.put("game.otherCancelGame", "%sがゲームから退出しました");
+        messages.put("game.you.join", "ゲームに参加しました");
+        messages.put("game.other.join", "%sがゲームに参加しました");
+        messages.put("game.you.left", "ゲームから退出しました");
+        messages.put("game.other.left", "%sがゲームから退出しました");
 
         messages.put("game.block.notPlayer", "プレイヤーではないようです...");
         messages.put("game.block.player", "プレイヤーを見つけました！！");
@@ -29,7 +29,7 @@ public class Messages {
         messages.put("game.other.hiLight", "ハイライト");
         messages.put("game.seeker.release", "鬼が放出された");
 
-        messages.put("buy.noMoney", "お金が足りません");
+        messages.put("error.buy.noMoney", "お金が足りません");
 
         messages.put("game.start", "ゲーム開始");
         messages.put("game.end", "ゲーム終了");
@@ -42,46 +42,46 @@ public class Messages {
         messages.put("stage.deleted", "ステージ「%s」を削除しました");
         messages.put("stage.edited", "ステージ「%s」の「%s」の設定を変更しました");
 
-        errors.put("game.alreadyStarted", "すでにゲームは始まっています");
-        errors.put("game.alreadyJoined", "すでにゲームに参加しています");
-        errors.put("game.otherAlreadyJoined", "%sはすでにゲームに参加しています");
-        errors.put("game.notJoined", "あなたはゲームに参加していません");
-        errors.put("game.notStarted", "まだゲームが始まっていません");
-        errors.put("game.noData", "%sの設定がありません");
-        errors.put("game.notEnoughPlayer", "ゲームを開始するのに十分なプレイヤーが参加していません");
-        errors.put("game.noPlayer", "そのようなプレイヤーはいません");
-        errors.put("command.notPlayer", "あなたはプレイヤーではないため実行できません");
-        errors.put("command.illegalArgument","正しい引数を入力してください");
-        errors.put("command.notEnoughArgument","引数が不足しています");
-        errors.put("command.tooLongArgument","引数が長すぎます");
-        errors.put("config.noSetting","設定「%s」が存在しません");
-        errors.put("config.usableBlock.alreadyExist","ブロック「%s」は既に存在します");
-        errors.put("config.usableBlock.notFound","ブロック「%s」が見つかりませんでした");
-        errors.put("stage.none", "ステージが設定されていません");
-        errors.put("stage.alreadyExist", "「%s」という名前のステージはすでに存在します");
-        errors.put("stage.notFoundName", "「%s」という名前のステージは存在しません");
-        errors.put("plugin.missing.vault", " [%s], - Valultのプラグインあるいは対応するエコノミープラグインがみつかりません！プラグインを無効にします");
+        errors.put("error.game.alreadyStarted", "すでにゲームは始まっています");
+        errors.put("error.game.alreadyJoined", "すでにゲームに参加しています");
+        errors.put("error.game.otherAlreadyJoined", "%sはすでにゲームに参加しています");
+        errors.put("error.game.notJoined", "あなたはゲームに参加していません");
+        errors.put("error.game.notStarted", "まだゲームが始まっていません");
+        errors.put("error.game.noData", "%sの設定がありません");
+        errors.put("error.game.notEnoughPlayer", "ゲームを開始するのに十分なプレイヤーが参加していません");
+        errors.put("error.game.noPlayer", "そのようなプレイヤーはいません");
+        errors.put("error.command.notPlayer", "あなたはプレイヤーではないため実行できません");
+        errors.put("error.command.illegalArgument","正しい引数を入力してください");
+        errors.put("error.command.notEnoughArgument","引数が不足しています");
+        errors.put("error.command.tooLongArgument","引数が長すぎます");
+        errors.put("error.config.noSetting","設定「%s」が存在しません");
+        errors.put("error.config.usableBlock.alreadyExist","ブロック「%s」は既に存在します");
+        errors.put("error.config.usableBlock.notFound","ブロック「%s」が見つかりませんでした");
+        errors.put("error.stage.none", "ステージが設定されていません");
+        errors.put("error.stage.alreadyExist", "「%s」という名前のステージはすでに存在します");
+        errors.put("error.stage.notFoundName", "「%s」という名前のステージは存在しません");
+        errors.put("error.plugin.missing.vault", " [%s], - Vaultのプラグインあるいは対応するエコノミープラグインがみつかりません！プラグインを無効にします");
 
         errors.put("error.notExistKey", "存在しないコードのメッセージを取得しようとしました");
     }
 
     public static String message(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return String.format(_instance.messages.get(code), args);
+        if (_instance.messages.containsKey(code)) return I18n.tl(code, args);
         return error("error.notExistKey");
     }
 
     public static String greenMessage(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return ChatColor.GREEN + String.format(_instance.messages.get(code), args) + ChatColor.RESET;
+        if (_instance.messages.containsKey(code)) return ChatColor.GREEN + I18n.tl(code, args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String redMessage(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return ChatColor.RED + String.format(_instance.messages.get(code), args) + ChatColor.RESET;
+        if (_instance.messages.containsKey(code)) return ChatColor.RED + I18n.tl(code, args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String error(String code, Object... args) {
-        if (_instance.errors.containsKey(code)) return ChatColor.RED + String.format(_instance.errors.get(code), args) + ChatColor.RESET;
+        if (_instance.errors.containsKey(code)) return ChatColor.RED + I18n.tl(code, args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 }

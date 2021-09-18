@@ -7,6 +7,8 @@ buildscript {
     }
 }
 
+
+import org.apache.tools.ant.filters.EscapeUnicode
 import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java'
@@ -46,5 +48,14 @@ dependencies {
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
+    }
+}
+
+tasks.withType(AbstractCompile)*.options*.encoding = tasks.withType(GroovyCompile)*.groovyOptions*.encoding = 'UTF-8'
+
+tasks.withType(ProcessResources){
+    filteringCharset = 'UTF-8'
+    filesMatching('**/*.properties') {
+        filter(EscapeUnicode)
     }
 }
