@@ -22,7 +22,6 @@ public class DummyArmorStand {
         armorStand.setCustomName(gamePlayer.getPlayer().getName());
         armorStand.setCustomNameVisible(true);
         armorStand.setArms(true);
-        armorStand.setInvulnerable(false);
 
         ItemStack skullStack = new ItemStack(Material.PLAYER_HEAD); // set damage 3 (short)
         SkullMeta skullMeta = (SkullMeta) skullStack.getItemMeta();

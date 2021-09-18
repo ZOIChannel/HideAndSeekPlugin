@@ -765,7 +765,6 @@ public final class Game extends JavaPlugin {
                 if (!myRunnable.getRunnable().isCancelled()) myRunnable.getRunnable().cancel();
         }
         isHiLight = false;
-        destroyAllDummy();
     }
 
     public void clearPlayerEffect(GamePlayer gamePlayer) {

@@ -21,6 +21,7 @@ public class HideAndSeekCommand extends PlayerCommandMaster {
         addSubCommand(new CancelCommand(manager));
         addSubCommand(new JoinCommand(manager));
         addSubCommand(new ForceJoinCommand(manager));
+        addSubCommand(new DeleteStandCommand(manager));
 //        addSubCommand(new TestCommand(manager));
     }
 
