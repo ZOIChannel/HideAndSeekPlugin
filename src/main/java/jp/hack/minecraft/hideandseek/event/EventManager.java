@@ -193,9 +193,14 @@ public class EventManager implements Listener {
         if (item == null) return;
         if (item.getItemMeta() == null) return;
         if (!item.getItemMeta().hasDisplayName()) return;
-        final String NAME = ChatColor.YELLOW + "ブロックを選択";
-        if (!item.getItemMeta().getDisplayName().equals(NAME)) return;
-        game.openGui(hider);
+        final String BLOCK_NAME = ChatColor.YELLOW + "ブロックを選択";
+        final String ACTION_NAME = ChatColor.YELLOW + "アクションを選択";
+        if (item.getItemMeta().getDisplayName().equals(BLOCK_NAME)) {
+            game.openBlockGui(hider);
+        } else if (item.getItemMeta().getDisplayName().equals(ACTION_NAME)) {
+            game.openActionGui(hider);
+        }
+
     }
 
     private void onClickForStage(Sign sign) {
@@ -294,7 +299,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if(game.getCurrentState() != GameState.PLAYING) return;
+        if (game.getCurrentState() != GameState.PLAYING) return;
         UUID uuid = event.getPlayer().getUniqueId();
         if (!game.getGamePlayers().containsKey(uuid)) return;
         GamePlayer gamePlayer = game.getGamePlayer(uuid);
@@ -303,10 +308,8 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
-    public void onTeleport(PlayerTeleportEvent event)
-    {
-        if (event.getCause().equals(PlayerTeleportEvent.TeleportCause.SPECTATE))
-        {
+    public void onTeleport(PlayerTeleportEvent event) {
+        if (event.getCause().equals(PlayerTeleportEvent.TeleportCause.SPECTATE)) {
             event.setCancelled(true);
         }
     }

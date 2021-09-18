@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Hider extends GamePlayer {
@@ -38,7 +39,9 @@ public class Hider extends GamePlayer {
         super(player);
         player.setInvisible(true);
         player.setPlayerListName(ChatColor.BLUE + player.getName() + ChatColor.RESET);
+        player.getInventory().clear();
         equipBlockList();
+        equipActionList();
 
         this.material = Material.MELON;
     }
@@ -110,7 +113,6 @@ public class Hider extends GamePlayer {
 
     public void equipBlockList() {
         Inventory inventory = getPlayer().getInventory();
-        inventory.clear();
 
         {
             ItemStack item = new ItemStack(Material.BOOK);
@@ -125,6 +127,22 @@ public class Hider extends GamePlayer {
             item.setItemMeta(meta);
             inventory.addItem(item);
         }
+    }
+
+    public void equipActionList() {
+        Inventory inventory = getPlayer().getInventory();
+
+        ItemStack item = new ItemStack(Material.COMPASS);
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+
+        final String NAME = ChatColor.YELLOW + "アクションを選択";
+        meta.setDisplayName(NAME);
+        final List<String> LORE = Collections.singletonList(ChatColor.WHITE.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでアクションを選択");
+        meta.setLore(LORE);
+
+        item.setItemMeta(meta);
+        inventory.addItem(item);
     }
 
     public void respawnFB() {

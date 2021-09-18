@@ -13,9 +13,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,9 +42,11 @@ public final class Game extends JavaPlugin {
     private final EventWatcher eventWatcher = new EventWatcher(this);
     private final EventManager eventManager = new EventManager(this);
     private final Map<UUID, BlockGui> blockGuiMap = new HashMap<>();
+    private final Map<UUID, ActionGui> actionGuiMap = new HashMap<>();
     private final Map<UUID, GamePlayer> gamePlayers = new HashMap<>();
     private final TimeBar timeBar = new TimeBar();
     private boolean bStop = false;
+    private final List<HiderAction> actions = new ArrayList<>();
 
     private final ItemStack DEFAULT_CAPTURE_ITEM = createItemStack(
             Material.IRON_AXE,
@@ -110,6 +115,10 @@ public final class Game extends JavaPlugin {
         return blockGuiMap;
     }
 
+    public Map<UUID, ActionGui> getActionGuiMap() {
+        return actionGuiMap;
+    }
+
     public GameState getCurrentState() {
         return currentState;
     }
@@ -160,6 +169,10 @@ public final class Game extends JavaPlugin {
 
     public List<UsableBlock> getUsableBlocks() {
         return usableBlocks;
+    }
+
+    public List<HiderAction> getActions() {
+        return actions;
     }
 
     @Override
@@ -271,6 +284,34 @@ public final class Game extends JavaPlugin {
             configLoader.setData("hiLightItem", hiLightItem);
         }
 
+        actions.addAll(Arrays.asList(
+                new HiderAction("花火", "自分のいる位置で花火が爆発します", 20, Material.FIREWORK_ROCKET, player -> {
+                    Firework firework = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
+                    FireworkMeta meta = firework.getFireworkMeta();
+                    meta.addEffect(FireworkEffect.builder()
+                            .with(FireworkEffect.Type.STAR)
+                            .withFlicker()
+                            .withColor(Color.RED, Color.YELLOW)
+                            .build()
+                    );
+                    meta.setPower(1);
+                    firework.setFireworkMeta(meta);
+                    firework.detonate();
+                }),
+                new HiderAction("花火(大)", "自分のいる位置で大きな花火が爆発します", 50, Material.FIREWORK_ROCKET, player -> {
+                    Firework firework = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
+                    FireworkMeta meta = firework.getFireworkMeta();
+                    meta.addEffect(FireworkEffect.builder()
+                            .with(FireworkEffect.Type.CREEPER)
+                            .withFlicker()
+                            .withColor(Color.GREEN, Color.BLUE)
+                            .build()
+                    );
+                    meta.setPower(3);
+                    firework.setFireworkMeta(meta);
+                    firework.detonate();
+                })
+        ));
     }
 
     public void start() {
@@ -467,6 +508,7 @@ public final class Game extends JavaPlugin {
         Hider hider = new Hider(player);
         getGamePlayers().put(hider.getPlayerUuid(), hider);
         getBlockGuiMap().put(hider.getPlayerUuid(), new BlockGui(this, player));
+        getActionGuiMap().put(hider.getPlayerUuid(), new ActionGui(this, player));
         return hider;
     }
 
@@ -492,6 +534,7 @@ public final class Game extends JavaPlugin {
             Hider hider = (Hider) gamePlayer;
             hider.destroy();
             blockGuiMap.remove(hider.getPlayerUuid());
+            actionGuiMap.remove(hider.getPlayerUuid());
         }
     }
 
@@ -559,8 +602,12 @@ public final class Game extends JavaPlugin {
         removeOneGamePlayer(gamePlayer);
     }
 
-    public void openGui(Hider hider) {
+    public void openBlockGui(Hider hider) {
         BlockGui gui = getBlockGuiMap().get(hider.getPlayerUuid());
+        gui.openGui(hider.getPlayer());
+    }
+    public void openActionGui(Hider hider) {
+        ActionGui gui = getActionGuiMap().get(hider.getPlayerUuid());
         gui.openGui(hider.getPlayer());
     }
 
@@ -584,9 +631,9 @@ public final class Game extends JavaPlugin {
             armorStands.get(hider.getPlayerUuid()).destroy();
         }
         hider.damage(currentGameMode);
-        if(currentGameMode == PluginGameMode.NORMAL){
+        if (currentGameMode == PluginGameMode.NORMAL) {
             hider.getPlayer().teleport(getCurrentStage().get().getStage());
-        }else if(currentGameMode == PluginGameMode.INCREASE){
+        } else if (currentGameMode == PluginGameMode.INCREASE) {
             gamePlayers.put(hider.getPlayerUuid(), hider.createSeeker());
         }
         reloadScoreboard();
