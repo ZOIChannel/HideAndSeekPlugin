@@ -138,12 +138,12 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
             case "lobby":
                 stageType = LOBBY;
                 stageData.setLocation(stageType, player.getLocation(), game.getConfigLoader());
-                game.getConfigLoader().setData("location.stage", player.getLocation());
+//                game.getConfigLoader().setData("location.stage", player.getLocation());
                 break;
             case "seekerLobby":
                 stageType = SEEKER_LOBBY;
                 stageData.setLocation(stageType, player.getLocation(), game.getConfigLoader());
-                game.getConfigLoader().setData("location.stage", player.getLocation());
+//                game.getConfigLoader().setData("location.stage", player.getLocation());
                 break;
             case "stage":
                 stageType = STAGE;

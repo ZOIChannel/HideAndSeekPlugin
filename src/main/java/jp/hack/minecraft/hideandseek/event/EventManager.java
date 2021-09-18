@@ -72,6 +72,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         System.out.println(event.getEventName());
+        if(game.getCurrentState() != GameState.PLAYING) return;
         if (event.getEntity() instanceof Player) event.setCancelled(true);
         if (event.getEntity() instanceof ArmorStand) event.setCancelled(true);
     }

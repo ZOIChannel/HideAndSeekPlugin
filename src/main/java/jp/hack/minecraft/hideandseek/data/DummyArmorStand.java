@@ -9,6 +9,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.UUID;
+
 public class DummyArmorStand {
     private ArmorStand armorStand;
     private GamePlayer gamePlayer;
@@ -37,5 +39,9 @@ public class DummyArmorStand {
     public void destroy(){
         armorStand.getEquipment().clear();
         armorStand.remove();
+    }
+
+    public UUID getUuid(){
+        return armorStand.getUniqueId();
     }
 }

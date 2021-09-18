@@ -13,10 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -220,7 +217,7 @@ public final class Game extends JavaPlugin {
             currentGameMode = PluginGameMode.valueOf(configLoader.getData("gameMode").toString());
         } else {
             currentGameMode = PluginGameMode.NORMAL;
-            configLoader.setData("gameMode", currentGameMode);
+            configLoader.setData("gameMode", currentGameMode.name());
         }
 
         if (!(configLoader.getData("stage") instanceof List)
@@ -282,6 +279,16 @@ public final class Game extends JavaPlugin {
         } else {
             hiLightItem = DEFAULT_HI_LIGHT_ITEM;
             configLoader.setData("hiLightItem", hiLightItem);
+        }
+        if (configLoader.contains("temp.armorStands")) {
+            List<UUID> savedArmorStands = ((List<String>) configLoader.getData("temp.armorStands")).stream().map(UUID::fromString).collect(Collectors.toList());
+            savedArmorStands.forEach(uuid -> {
+                ArmorStand stand = (ArmorStand) Bukkit.getEntity(uuid);
+                if(stand == null) return;
+                stand.getEquipment().clear();
+                stand.remove();
+            });
+            configLoader.setData("temp.armorStands", new ArrayList<>());
         }
 
         actions.addAll(Arrays.asList(
@@ -607,6 +614,7 @@ public final class Game extends JavaPlugin {
         BlockGui gui = getBlockGuiMap().get(hider.getPlayerUuid());
         gui.openGui(hider.getPlayer());
     }
+
     public void openActionGui(Hider hider) {
         ActionGui gui = getActionGuiMap().get(hider.getPlayerUuid());
         gui.openGui(hider.getPlayer());
@@ -629,7 +637,11 @@ public final class Game extends JavaPlugin {
         });
         clearPlayerEffect(hider);
         if (armorStands.containsKey(hider.getPlayerUuid())) {
-            armorStands.get(hider.getPlayerUuid()).destroy();
+            DummyArmorStand dummyArmorStand = armorStands.get(hider.getPlayerUuid());
+            dummyArmorStand.destroy();
+            armorStands.remove(hider.getPlayerUuid());
+
+            configLoader.setData("temp.armorStands", armorStands.values().stream().map(DummyArmorStand::getUuid).map(UUID::toString).collect(Collectors.toList()));
         }
         hider.damage(currentGameMode);
         if (currentGameMode == PluginGameMode.NORMAL) {
@@ -849,11 +861,14 @@ public final class Game extends JavaPlugin {
                     DummyArmorStand armorStand = new DummyArmorStand(hider);
                     armorStand.create();
                     armorStands.put(hider.getPlayerUuid(), armorStand);
+                    configLoader.setData("temp.armorStands", armorStands.values().stream().map(DummyArmorStand::getUuid).map(UUID::toString).collect(Collectors.toList()));
                 });
     }
 
     public void destroyAllDummy() {
         armorStands.values().forEach(DummyArmorStand::destroy);
+        armorStands.clear();
+        configLoader.setData("temp.armorStands", new ArrayList<>());
     }
 
     public void allSendGreenMessage(String code, Object... args) {
