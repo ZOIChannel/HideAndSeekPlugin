@@ -76,6 +76,8 @@ public final class Game extends JavaPlugin {
     private int gameTime;
     private final int DEFAULT_SEEKER_WAIT_TIME = 10;
     private int seekerWaitTime;
+    private final int DEFAULT_SEEKER_RATE = 15;
+    private int seekerRate;
     private final Double DEFAULT_REWARD = 60d;
     private Double reward;
     private final List<UsableBlock> DEFAULT_USABLE_BLOCKS = Arrays.asList(
@@ -252,6 +254,13 @@ public final class Game extends JavaPlugin {
             configLoader.setData("seekerWaitTime", seekerWaitTime);
         }
 
+        if (configLoader.contains("seekerRate")) {
+            seekerRate = configLoader.getInt("seekerRate");
+        } else {
+            seekerRate = DEFAULT_SEEKER_RATE;
+            configLoader.setData("seekerRate", seekerRate);
+        }
+
         if (configLoader.contains("reward")) {
             reward = configLoader.getDouble("reward");
         } else {
@@ -349,7 +358,6 @@ public final class Game extends JavaPlugin {
 
         eventWatcher.start();
         currentState = GameState.PLAYING;
-        int seekerRate = configLoader.getInt("seekerRate");
         int seekerCount = (int) Math.ceil(gamePlayers.size() * ((float) seekerRate / 100));
         List<Integer> randomOrderList = new ArrayList<>();
         for (int i = 0; i < gamePlayers.size(); i++) {

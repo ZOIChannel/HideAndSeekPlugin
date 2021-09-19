@@ -54,7 +54,7 @@ public class Messages {
         errors.put("error.game.noPlayer", "そのようなプレイヤーはいません");
         errors.put("error.command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("error.command.illegalArgument","正しい引数を入力してください");
-        errors.put("error.command.notEnoughArgument","引数が不足しています");
+        errors.put("error.command.noEnoughArgument","引数が不足しています");
         errors.put("error.command.tooLongArgument","引数が長すぎます");
         errors.put("error.config.noSetting","設定「%s」が存在しません");
         errors.put("error.config.usableBlock.alreadyExist","ブロック「%s」は既に存在します");

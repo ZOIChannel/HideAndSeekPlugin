@@ -17,7 +17,7 @@ public class IntConfigValue extends ConfigValue<Integer> {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.noEnoughArgument"));
             return true;
         }
         int value;

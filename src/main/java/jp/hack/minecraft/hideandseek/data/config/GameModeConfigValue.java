@@ -18,7 +18,7 @@ public class GameModeConfigValue extends EnumConfigValue<PluginGameMode> {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.noEnoughArgument"));
         }
         String valueName = args[1].toUpperCase();
         if (EnumSet.allOf(PluginGameMode.class).stream().map(PluginGameMode::name).collect(Collectors.toList()).contains(valueName)) {

@@ -20,7 +20,7 @@ public class ItemStackConfigValue extends ConfigValue<ItemStack> {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.noEnoughArgument"));
             return true;
         }
         Material material = Material.matchMaterial(args[1]);

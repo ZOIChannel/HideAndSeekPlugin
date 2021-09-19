@@ -36,7 +36,7 @@ public class ConfigCommand extends AdminCommandMaster {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length <= 1) {
-            sender.sendMessage(Messages.error("error.command.notEnoughArgument"));
+            sender.sendMessage(Messages.error("error.command.noEnoughArgument"));
             return true;
         }
         String selectedKey = args[1];
