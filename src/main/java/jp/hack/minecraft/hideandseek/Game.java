@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 public final class Game extends JavaPlugin {
     protected static final Logger LOG = Logger.getLogger(Game.class.getSimpleName());
+    private transient I18n i18n;
 
     //    private List<GamePlayer> playerList;
     private GameState currentState = GameState.LOBBY;
@@ -177,12 +178,16 @@ public final class Game extends JavaPlugin {
         // Plugin startup logic
         super.onEnable();
 
-        //pluginチェック、Valultがはいっていない場合はプラグインを無効にしなにも処理をしない
+        //pluginチェック、Vaultがはいっていない場合はプラグインを無効にしなにも処理をしない
         if (!setupEconomy()) {
             LOG.severe(Messages.error("error.plugin.missing.vault", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        this.i18n = new I18n(this);
+        this.i18n.onEnable();
+        this.i18n.updateLocale("ja");
 
         getServer().getPluginManager().registerEvents(eventManager, this);
         configLoader = new ConfigLoader(this);
@@ -197,6 +202,11 @@ public final class Game extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         super.onDisable();
+
+        if (this.i18n != null) {
+            this.i18n.onDisable();
+        }
+
         stop();
     }
 

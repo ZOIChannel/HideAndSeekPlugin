@@ -116,7 +116,7 @@ public class StageConfigValue extends ConfigValue<List<StageData>> {
             player.sendMessage(Messages.error("error.stage.alreadyExist", name));
             return;
         }
-        player.sendMessage(Messages.greenMessage("stage.crated", name));
+        player.sendMessage(Messages.greenMessage("stage.created", name));
     }
 
     private void editStage(Player player, String[] args) {

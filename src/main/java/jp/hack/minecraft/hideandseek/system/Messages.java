@@ -39,7 +39,7 @@ public class Messages {
 
         messages.put("game.gameMode.changed", "ゲームモードが「%s」に変更されました");
 
-        messages.put("stage.crated", "ステージ「%s」を作成しました");
+        messages.put("stage.created", "ステージ「%s」を作成しました");
         messages.put("stage.set", "「%s」をステージとして設定しました");
         messages.put("stage.deleted", "ステージ「%s」を削除しました");
         messages.put("stage.edited", "ステージ「%s」の「%s」の設定を変更しました");
