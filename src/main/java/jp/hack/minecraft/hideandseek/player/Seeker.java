@@ -3,12 +3,6 @@ package jp.hack.minecraft.hideandseek.player;
 import jp.hack.minecraft.hideandseek.data.EffectType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class Seeker extends GamePlayer {
     private int countHiLight = 0;
@@ -43,7 +37,7 @@ public class Seeker extends GamePlayer {
 
     public void hiLight(Boolean boo) {
         if (boo) {
-            sendGreenMessage("game.you.hiLight");
+            sendGreenMessage("game.you.highLight");
             getPlayer().playSound(getLocation(), Sound.AMBIENT_CAVE, 1.1F, 1.0F);
             addCountHiLight();
         } else {

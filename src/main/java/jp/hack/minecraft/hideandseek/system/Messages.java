@@ -25,8 +25,8 @@ public class Messages {
         messages.put("game.other.captured", "%sは捕まってしまいました！");
         messages.put("game.you.upSpeed", "スピードアップ！");
         messages.put("game.you.coolTime", "クールタイムが明けていません");
-        messages.put("game.you.hiLight", "プレイヤーの大まかな位置を表示しました");
-        messages.put("game.other.hiLight", "ハイライト");
+        messages.put("game.you.highLight", "プレイヤーの大まかな位置を表示しました");
+        messages.put("game.other.highLight", "ハイライト");
         messages.put("game.seeker.release", "鬼が放出された");
 
         messages.put("error.buy.noMoney", "お金が足りません");
@@ -50,13 +50,13 @@ public class Messages {
         errors.put("error.game.notJoined", "あなたはゲームに参加していません");
         errors.put("error.game.notStarted", "まだゲームが始まっていません");
         errors.put("error.game.noData", "%sの設定がありません");
-        errors.put("error.game.notEnoughPlayer", "ゲームを開始するのに十分なプレイヤーが参加していません");
+        errors.put("error.game.noEnoughPlayer", "ゲームを開始するのに十分なプレイヤーが参加していません");
         errors.put("error.game.noPlayer", "そのようなプレイヤーはいません");
         errors.put("error.command.notPlayer", "あなたはプレイヤーではないため実行できません");
         errors.put("error.command.illegalArgument","正しい引数を入力してください");
         errors.put("error.command.noEnoughArgument","引数が不足しています");
         errors.put("error.command.tooLongArgument","引数が長すぎます");
-        errors.put("error.config.noSetting","設定「%s」が存在しません");
+        errors.put("error.config.noConfig","設定「%s」が存在しません");
         errors.put("error.config.usableBlock.alreadyExist","ブロック「%s」は既に存在します");
         errors.put("error.config.usableBlock.notFound","ブロック「%s」が見つかりませんでした");
         errors.put("error.stage.none", "ステージが設定されていません");

@@ -27,7 +27,7 @@ abstract public class GamePlayer {
         this.player.setGameMode(GameMode.SURVIVAL);
         this.player.setFoodLevel(20);
         this.player.setCollidable(false);
-        gameBoard = new GameBoard(this, "Hide And Seek");
+        gameBoard = new GameBoard(this, Messages.message("hide-and-seek"));
 
         Inventory inventory = getPlayer().getInventory();
         inventory.clear();

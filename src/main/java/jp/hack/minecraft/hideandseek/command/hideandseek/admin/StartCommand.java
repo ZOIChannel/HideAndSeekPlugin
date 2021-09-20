@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.command.hideandseek.admin;
 
+import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.command.AdminCommandMaster;
 import jp.hack.minecraft.hideandseek.command.CommandManager;
 import jp.hack.minecraft.hideandseek.command.CommandMaster;
@@ -22,15 +23,24 @@ public class StartCommand extends AdminCommandMaster {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (manager.game.getCurrentState() == GameState.PLAYING) {
+        Game game = manager.game;
+        if (game.getCurrentState() == GameState.PLAYING) {
             sender.sendMessage(Messages.error("error.game.alreadyStarted"));
             return true;
         }
-        if(manager.game.getGamePlayers().size() < 2){
-            sender.sendMessage(Messages.error("error.game.notEnoughPlayer"));
+        if (game.getGamePlayers().size() < 2){
+            sender.sendMessage(Messages.error("error.game.noEnoughPlayer"));
             return true;
         }
-        manager.game.start();
+        if (!game.getCurrentStage().isPresent()) {
+            sender.sendMessage(Messages.error("error.stage.none"));
+            return true;
+        }
+        if (!game.getCurrentStage().get().isInitialized()) {
+            sender.sendMessage(Messages.error("error.stage.noEnoughData"));
+            return true;
+        }
+        game.start();
         return true;
     }
 

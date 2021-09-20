@@ -341,20 +341,9 @@ public final class Game extends JavaPlugin {
     }
 
     public void start() {
-        if (!getCurrentStage().isPresent()) {
-            gamePlayers.values().forEach(gamePlayer -> gamePlayer.getPlayer().sendMessage(Messages.error("error.stage.none")));
-            return;
-        }
         bStop = false;
         destroyAllDummy();
         StageData stageData = getCurrentStage().get();
-        if (!stageData.isInitialized()) {
-            this.gamePlayers.values().forEach(gamePlayer -> {
-                if (!gamePlayer.getPlayer().hasPermission("op")) return;
-                gamePlayer.getPlayer().sendMessage("ステージの設定が不十分です。設定をしてください。");
-            });
-            return;
-        }
 
         eventWatcher.start();
         currentState = GameState.PLAYING;
@@ -482,7 +471,7 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !((Hider) hider).isDead())
                     .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
             getGamePlayers().forEach((uuid, gamePlayer) -> {
-                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "生存者:" + ChatColor.RESET);
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + Messages.message("living-people") +": " + ChatColor.RESET);
                 livingHiders.forEach(name -> gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET));
                 gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "-----------" + ChatColor.RESET);
             });
@@ -733,7 +722,7 @@ public final class Game extends JavaPlugin {
     public Boolean playerHiLight(EffectType type) {
         if (isHiLight) return false;
         makeAliveHiderDummy();
-        allSendRedTitle(5, 20, 5, "game.other.hiLight");
+        allSendRedTitle(5, 20, 5, "game.other.highLight");
 
         myRunnable = new MyRunnable() {
             @Override
@@ -945,7 +934,7 @@ public final class Game extends JavaPlugin {
             gameBoard.resetText();
 
             if (econ != null) {
-                gameBoard.setText(0, "所持ポイント: " + getEconomy().getBalance(gamePlayer.getPlayer()));
+                gameBoard.setText(0, Messages.message("money")+": " + getEconomy().getBalance(gamePlayer.getPlayer()));
             }
 
             if (getCurrentState() != GameState.PLAYING) return;
@@ -957,13 +946,13 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !hider.isDead())
                     .collect(Collectors.toList());
             gameBoard.setText(3, "");
-            gameBoard.setText(4, "生存プレイヤー : " + livingPlayerList.stream()
+            gameBoard.setText(4, Messages.message("living-players")+": " + livingPlayerList.stream()
                     .filter(GamePlayer::isHider)
                     .filter(gp -> !gp.isDead()).count() + "人");
             List<String> seekers = new ArrayList<>();
             getGamePlayers().values().stream().filter(GamePlayer::isSeeker)
                     .forEach(gp -> seekers.add(gp.getPlayer().getDisplayName()));
-            gameBoard.setText(5, "鬼 :");
+            gameBoard.setText(5, Messages.message("seeker")+": ");
             for (int i = 0; i < seekers.size(); i++) {
                 gameBoard.setText(6 + i, "    " + seekers.get(i));
             }

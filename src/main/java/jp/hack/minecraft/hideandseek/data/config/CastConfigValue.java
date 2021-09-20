@@ -21,7 +21,7 @@ public class CastConfigValue<F, T> {
         this.convert = convert;
         this.restore = restore;
         if (!game.getConfigLoader().contains(key))
-            throw new IllegalArgumentException(Messages.error("error.config.noSetting", key));
+            throw new IllegalArgumentException(Messages.error("error.config.noConfig", key));
     }
 
     public String getKey() {

@@ -47,7 +47,7 @@ public class ConfigCommand extends AdminCommandMaster {
                 return true;
             }
         }
-        sender.sendMessage(Messages.error("error.config.noSetting"));
+        sender.sendMessage(Messages.error("error.config.noConfig", selectedKey));
         return true;
     }
 
@@ -62,6 +62,6 @@ public class ConfigCommand extends AdminCommandMaster {
                 return configValue.onTabComplete(sender, command, alias, Arrays.copyOfRange(args, 1, args.length));
             }
         }
-        return Collections.singletonList(Messages.error("error.config.noSetting"));
+        return Collections.singletonList(Messages.error("error.config.noConfig", args[1]));
     }
 }

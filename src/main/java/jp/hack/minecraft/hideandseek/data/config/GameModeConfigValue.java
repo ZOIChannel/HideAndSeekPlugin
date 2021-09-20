@@ -26,7 +26,7 @@ public class GameModeConfigValue extends EnumConfigValue<PluginGameMode> {
             setData(value);
             sender.sendMessage(Messages.greenMessage("gameMode.changed", value.name()));
         } else {
-            sender.sendMessage(Messages.error("error.config.noSetting", valueName));
+            sender.sendMessage(Messages.error("error.config.noConfig", valueName));
         }
         return true;
     }
