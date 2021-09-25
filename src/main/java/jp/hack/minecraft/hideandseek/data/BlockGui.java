@@ -53,7 +53,9 @@ public class BlockGui {
             if (Game.getEconomy() != null) {
                 ItemMeta meta = item.getItemMeta();
                 assert meta != null;
-                meta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + "価格: " + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "$" + usableBlock.getPrice()));
+                meta.setLore(Collections.singletonList(
+                        Messages.message("game.block.cost", ChatColor.YELLOW.toString() + ChatColor.BOLD + usableBlock.getPrice())));
+//                        ChatColor.WHITE.toString() + "価格: " + ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "$" + usableBlock.getPrice()));
                 item.setItemMeta(meta);
             }
             itemList.add(item);

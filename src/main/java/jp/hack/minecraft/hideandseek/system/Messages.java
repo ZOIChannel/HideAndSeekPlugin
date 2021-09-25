@@ -68,22 +68,26 @@ public class Messages {
     }
 
     public static String message(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return I18n.tl(code, args);
+        String s = I18n.tl(code, args);
+        if (!s.equals("")) return I18n.tl(code, args);
         return error("error.notExistKey");
     }
 
     public static String greenMessage(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return ChatColor.GREEN + I18n.tl(code, args) + ChatColor.RESET;
+        String s = I18n.tl(code, args);
+        if (!s.equals("")) return ChatColor.GREEN +  I18n.tl(code, args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String redMessage(String code, Object... args) {
-        if (_instance.messages.containsKey(code)) return ChatColor.RED + I18n.tl(code, args) + ChatColor.RESET;
+        String s = I18n.tl(code, args);
+        if (!s.equals("")) return ChatColor.RED +  I18n.tl(code, args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String error(String code, Object... args) {
-        if (_instance.errors.containsKey(code)) return ChatColor.RED + I18n.tl(code, args) + ChatColor.RESET;
+        String s = I18n.tl(code, args);
+        if (!s.equals("")) return ChatColor.RED +  I18n.tl(code, args) + ChatColor.RESET;
         return error("error.notExistKey");
     }
 }

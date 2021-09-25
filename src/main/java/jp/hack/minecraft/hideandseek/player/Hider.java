@@ -1,8 +1,5 @@
 package jp.hack.minecraft.hideandseek.player;
 
-import jp.hack.minecraft.hideandseek.Game;
-import jp.hack.minecraft.hideandseek.data.BlockGui;
-import jp.hack.minecraft.hideandseek.data.EffectType;
 import jp.hack.minecraft.hideandseek.data.PluginGameMode;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
@@ -13,8 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -119,9 +114,9 @@ public class Hider extends GamePlayer {
             ItemMeta meta = item.getItemMeta();
             assert meta != null;
 
-            final String NAME = ChatColor.YELLOW + "ブロックを選択";
+            final String NAME = ChatColor.YELLOW + Messages.message("game.block.select");
             meta.setDisplayName(NAME);
-            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD.toString() + "右" + ChatColor.RESET.toString() + ChatColor.WHITE.toString() + "クリックでブロックを選択");
+            final List<String> LORE = Arrays.asList(ChatColor.WHITE.toString() + ChatColor.BOLD + Messages.message("game.block.select.click"));
             meta.setLore(LORE);
 
             item.setItemMeta(meta);
@@ -136,9 +131,9 @@ public class Hider extends GamePlayer {
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
-        final String NAME = ChatColor.YELLOW + "アクションを選択";
+        final String NAME = ChatColor.YELLOW + Messages.message("game.action.select");
         meta.setDisplayName(NAME);
-        final List<String> LORE = Collections.singletonList(ChatColor.WHITE.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでアクションを選択");
+        final List<String> LORE = Collections.singletonList(ChatColor.WHITE.toString() + ChatColor.BOLD + Messages.message("game.block.action.click"));
         meta.setLore(LORE);
 
         item.setItemMeta(meta);

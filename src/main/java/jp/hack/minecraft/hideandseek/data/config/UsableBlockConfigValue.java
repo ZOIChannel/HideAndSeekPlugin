@@ -154,7 +154,8 @@ public class UsableBlockConfigValue extends ConfigValue<List<UsableBlock>> {
         StringBuilder message = new StringBuilder();
         message.append("-----\n");
         for (UsableBlock usableBlock : getData()) {
-            message.append(usableBlock.getMaterial().getKey()).append(" : ").append(usableBlock.getPrice()).append("円\n");
+            message.append(Messages.message("game.block.costMap",usableBlock.getMaterial().getKey(), usableBlock.getPrice()));
+//            message.append(usableBlock.getMaterial().getKey()).append(" : ").append(usableBlock.getPrice()).append("円\n");
         }
         message.append("-----");
         player.sendMessage(message.toString());

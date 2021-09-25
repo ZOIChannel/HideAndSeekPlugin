@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane;
 import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.player.GamePlayer;
 import jp.hack.minecraft.hideandseek.player.Hider;
+import jp.hack.minecraft.hideandseek.system.Messages;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -22,7 +23,7 @@ public class ActionGui {
 
     public ActionGui(Game game, Player player) {
         this.game = game;
-        gui = new ChestGui(5, "実行するアクションを選択");
+        gui = new ChestGui(5, Messages.message("game.action.gui.name"));
         pane = new OutlinePane(0, 0, 9, 5);
         reloadItemList(player);
         gui.addPane(pane);
@@ -51,7 +52,8 @@ public class ActionGui {
                 meta.setDisplayName(action.getName());
                 meta.setLore(new ArrayList<>(Arrays.asList(
                         action.getLore(),
-                        ChatColor.WHITE + "得られる金額: " + ChatColor.YELLOW + ChatColor.BOLD + "$" + action.getPrice()
+                        ChatColor.WHITE + Messages.message("game.action.reward",ChatColor.YELLOW.toString() + ChatColor.BOLD + action.getPrice())
+//                        ChatColor.WHITE + "得られる金額: " + ChatColor.YELLOW + ChatColor.BOLD + "$" + action.getPrice()
                 )));
                 item.setItemMeta(meta);
             }

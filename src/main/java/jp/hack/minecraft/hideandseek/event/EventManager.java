@@ -194,8 +194,8 @@ public class EventManager implements Listener {
         if (item == null) return;
         if (item.getItemMeta() == null) return;
         if (!item.getItemMeta().hasDisplayName()) return;
-        final String BLOCK_NAME = ChatColor.YELLOW + "ブロックを選択";
-        final String ACTION_NAME = ChatColor.YELLOW + "アクションを選択";
+        final String BLOCK_NAME = ChatColor.YELLOW + Messages.message("game.block.select");
+        final String ACTION_NAME = ChatColor.YELLOW + Messages.message("game.action.select");
         if (item.getItemMeta().getDisplayName().equals(BLOCK_NAME)) {
             game.openBlockGui(hider);
         } else if (item.getItemMeta().getDisplayName().equals(ACTION_NAME)) {
@@ -291,9 +291,7 @@ public class EventManager implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         String message = ChatColor.AQUA +
-                "Hide And Seek\n" +
-                "制作: ZOI, Ryokno\n" +
-                "ブロックになってかくれんぼをするミニゲームです。\n" +
+                Messages.message("plugin.description") +
                 ChatColor.RESET;
         event.getPlayer().sendMessage(message);
     }
