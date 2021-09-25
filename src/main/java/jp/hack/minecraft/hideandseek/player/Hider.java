@@ -1,5 +1,6 @@
 package jp.hack.minecraft.hideandseek.player;
 
+import jp.hack.minecraft.hideandseek.Game;
 import jp.hack.minecraft.hideandseek.data.PluginGameMode;
 import jp.hack.minecraft.hideandseek.system.Messages;
 import org.bukkit.*;
@@ -172,6 +173,7 @@ public class Hider extends GamePlayer {
         if (currentGameMode == PluginGameMode.NORMAL) {
             getPlayer().setGameMode(GameMode.SPECTATOR);
         }
+        getPlayer().getInventory().clear();
         destroy();
         getPlayer().setPlayerListName(ChatColor.BLACK + getPlayer().getName() + ChatColor.RESET);
         getPlayer().sendMessage(Messages.redMessage("game.you.found"));
@@ -268,7 +270,9 @@ public class Hider extends GamePlayer {
         return firework;
     }
 
-    public Seeker createSeeker() {
-        return new Seeker(getPlayer());
+    public Seeker createSeeker(Game game) {
+        Seeker seeker =  new Seeker(getPlayer());
+        game.equipItem(seeker);
+        return seeker;
     }
 }

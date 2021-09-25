@@ -419,7 +419,7 @@ public final class Game extends JavaPlugin {
                             Objects.requireNonNull(stage.getWorld()).playSound(stage, Sound.ENTITY_ENDER_DRAGON_AMBIENT, SoundCategory.AMBIENT, 1, 1);
                             getSeekers().forEach(seeker -> seeker.getPlayer().teleport(stage));
                             allSendRedTitle(20, 40, 20, "game.seeker.release", "");
-                            equipItems();
+                            equipItemsToEveryone();
                         }
                     }.runTask(Game.this);
                     new Thread(new BukkitRunnable() {
@@ -656,7 +656,7 @@ public final class Game extends JavaPlugin {
         if (currentGameMode == PluginGameMode.NORMAL) {
             hider.getPlayer().teleport(getCurrentStage().get().getStage());
         } else if (currentGameMode == PluginGameMode.INCREASE) {
-            gamePlayers.put(hider.getPlayerUuid(), hider.createSeeker());
+            gamePlayers.put(hider.getPlayerUuid(), hider.createSeeker(this));
         }
         reloadScoreboard();
         confirmGame();
@@ -802,12 +802,18 @@ public final class Game extends JavaPlugin {
         });
     }
 
-    public void equipItems() {
-        getSeekers().forEach(seeker -> {
-            seeker.equipItem(captureItem);
-            seeker.equipItem(hiLightItem);
-        });
-        getHiders().forEach(hider -> hider.equipItem(speedItem));
+    public void equipItemsToEveryone() {
+        getSeekers().forEach(this::equipItem);
+        getHiders().forEach(this::equipItem);
+    }
+
+    public void equipItem(Seeker seeker) {
+        seeker.equipItem(captureItem);
+        seeker.equipItem(hiLightItem);
+    }
+
+    public void equipItem(Hider hider) {
+        hider.equipItem(speedItem);
     }
 
     public Seeker findSeeker(UUID uuid) {
