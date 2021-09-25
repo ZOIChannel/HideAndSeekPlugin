@@ -128,7 +128,7 @@ public class Hider extends GamePlayer {
     public void equipActionList() {
         Inventory inventory = getPlayer().getInventory();
 
-        ItemStack item = new ItemStack(Material.COMPASS);
+        ItemStack item = new ItemStack(Material.CAMPFIRE);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
