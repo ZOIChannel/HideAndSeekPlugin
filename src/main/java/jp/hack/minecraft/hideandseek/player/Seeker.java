@@ -30,7 +30,7 @@ public class Seeker extends GamePlayer {
 
     public void gotcha() {
         System.out.println("----- event:002 -----");
-        sendGreenMessage("game.block.gotcha");
+        sendGreenMessage("game.block.gotchaPlayer");
         sendRedTitle(2, 20, 2, "game.block.gotcha", "");
         getPlayer().playSound(getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 0.5F, 1.0F);
     }
