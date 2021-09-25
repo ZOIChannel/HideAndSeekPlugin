@@ -193,7 +193,7 @@ public final class Game extends JavaPlugin {
 
         this.i18n = new I18n(this);
         I18n.onEnable(this.i18n);
-        this.i18n.updateLocale("ja");
+        this.i18n.updateLocale("ja_JP");
 
         getServer().getPluginManager().registerEvents(eventManager, this);
         configLoader = new ConfigLoader(this);
