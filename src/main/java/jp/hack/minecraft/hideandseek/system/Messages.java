@@ -69,25 +69,25 @@ public class Messages {
 
     public static String message(String code, Object... args) {
         String s = I18n.tl(code, args);
-        if (!s.equals("")) return I18n.tl(code, args);
+        if (!s.equals("")) return s;
         return error("error.notExistKey");
     }
 
     public static String greenMessage(String code, Object... args) {
         String s = I18n.tl(code, args);
-        if (!s.equals("")) return ChatColor.GREEN +  I18n.tl(code, args) + ChatColor.RESET;
+        if (!s.equals("")) return ChatColor.GREEN + s + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String redMessage(String code, Object... args) {
         String s = I18n.tl(code, args);
-        if (!s.equals("")) return ChatColor.RED +  I18n.tl(code, args) + ChatColor.RESET;
+        if (!s.equals("")) return ChatColor.RED + s + ChatColor.RESET;
         return error("error.notExistKey");
     }
 
     public static String error(String code, Object... args) {
         String s = I18n.tl(code, args);
-        if (!s.equals("")) return ChatColor.RED +  I18n.tl(code, args) + ChatColor.RESET;
-        return error("error.notExistKey");
+        if (!s.equals("")) return ChatColor.RED + s + ChatColor.RESET;
+        return ChatColor.RED + "ERROR MESSAGE NOT FOUND"+ ChatColor.RESET;
     }
 }
