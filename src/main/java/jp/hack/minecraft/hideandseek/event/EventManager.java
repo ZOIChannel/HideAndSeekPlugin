@@ -122,6 +122,7 @@ public class EventManager implements Listener {
             hider = game.findHider(rightClicked.getUniqueId());
         }
         if (hider == null) return;
+        seeker.gotcha();
         game.giveBounty(seeker);
         game.damageHider(hider);
     }
@@ -141,21 +142,20 @@ public class EventManager implements Listener {
             Seeker seeker = game.findSeeker(player.getUniqueId());
             if (seeker == null) return;
 
-            if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+            if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
             Block block = event.getClickedBlock();
 
             Hider hider = game.findHiderByBlock(block);
             System.out.println("----- event:006 : " + hider + " -----");
             if (hider == null) {
                 System.out.println("----- event:001 -----");
-                Location blockLoc = event.getClickedBlock().getLocation();
+                Location blockLoc = block.getLocation();
                 seeker.knock(blockLoc);
                 return;
             }
-            seeker.discover();
-
-            hider.found();
-            hider.blockMelt();
+            seeker.gotcha();
+            game.giveBounty(seeker);
+            game.damageHider(hider);
 
         } else if (havingItemType == game.getSpeedItem().getType()) {
 

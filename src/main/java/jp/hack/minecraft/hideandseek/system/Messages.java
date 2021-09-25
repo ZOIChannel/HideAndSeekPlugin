@@ -17,7 +17,7 @@ public class Messages {
         messages.put("game.other.left", "%sがゲームから退出しました");
 
         messages.put("game.block.notPlayer", "プレイヤーではないようです...");
-        messages.put("game.block.player", "プレイヤーを見つけました！！");
+        messages.put("game.block.gotcha", "プレイヤーを見つけました！！");
         messages.put("game.you.found", "鬼に見つかりました！！");
         messages.put("game.you.runaway", "逃げましょう！");
         messages.put("game.you.cannotHideHere", "ここで隠れることはできません");
