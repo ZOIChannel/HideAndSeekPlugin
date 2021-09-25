@@ -662,7 +662,7 @@ public final class Game extends JavaPlugin {
         if (currentGameMode == PluginGameMode.NORMAL) {
             hider.getPlayer().teleport(getCurrentStage().get().getStage());
         } else if (currentGameMode == PluginGameMode.INCREASE) {
-            createSeeker(hider.getPlayer());
+            equipItem(createSeeker(hider.getPlayer()));
         }
         reloadScoreboard();
         confirmGame();
