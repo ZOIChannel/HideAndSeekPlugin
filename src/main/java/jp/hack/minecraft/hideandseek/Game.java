@@ -48,24 +48,28 @@ public final class Game extends JavaPlugin {
 
     private final ItemStack DEFAULT_CAPTURE_ITEM = createItemStack(
             Material.IRON_AXE,
-            ChatColor.YELLOW + "プレイヤーを確保",
+            ChatColor.YELLOW + Messages.message("game.item.capture.name"),
             Arrays.asList(
-                    ChatColor.GREEN.toString() + ChatColor.BOLD + "左" + ChatColor.RESET + ChatColor.WHITE + "クリックでブロックを鑑定",
-                    ChatColor.AQUA.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでプレイヤーを確保"
+                    ChatColor.GREEN.toString() + ChatColor.BOLD + Messages.message("game.item.capture.lore")
             )
     );
     private final ItemStack DEFAULT_SPEED_ITEM = createItemStack(
             Material.FEATHER,
-            ChatColor.YELLOW + "スピードアップ",
-            Arrays.asList(ChatColor.YELLOW.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでスピードアップ")
+            ChatColor.YELLOW + Messages.message("game.item.speed.name"),
+            Arrays.asList(
+                    ChatColor.YELLOW.toString() + ChatColor.BOLD + Messages.message("game.item.speed.lore")
+            )
     );
     private final ItemStack DEFAULT_HI_LIGHT_ITEM = createItemStack(
             Material.CLOCK,
-            ChatColor.GREEN + "プレイヤーをハイライト",
+            ChatColor.GREEN + Messages.message("game.item.highlight.name"),
             Arrays.asList(
-                    ChatColor.AQUA.toString() + ChatColor.BOLD + "右" + ChatColor.RESET + ChatColor.WHITE + "クリックでプレイヤーをハイライト",
-                    ChatColor.WHITE + "効果時間は" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET + ChatColor.WHITE + "秒",
-                    ChatColor.WHITE + "クールタイムは" + ChatColor.YELLOW + ChatColor.BOLD + ChatColor.UNDERLINE + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET + ChatColor.WHITE + "秒"
+                    ChatColor.AQUA.toString() + ChatColor.BOLD
+                            + Messages.message(
+                            "game.item.highlight.lore",
+                            ChatColor.YELLOW.toString() + ChatColor.BOLD + ChatColor.UNDERLINE + EffectType.HI_LIGHT.getDuration() + ChatColor.RESET + ChatColor.WHITE,
+                            ChatColor.YELLOW.toString() + ChatColor.BOLD + ChatColor.UNDERLINE + EffectType.HI_LIGHT.getCoolTime() + ChatColor.RESET + ChatColor.WHITE
+                    ).replace("\n", "\n" + ChatColor.RESET + ChatColor.WHITE)
             )
     );
     private ItemStack captureItem;
@@ -301,7 +305,7 @@ public final class Game extends JavaPlugin {
             List<UUID> savedArmorStands = ((List<String>) configLoader.getData("temp.armorStands")).stream().map(UUID::fromString).collect(Collectors.toList());
             savedArmorStands.forEach(uuid -> {
                 ArmorStand stand = (ArmorStand) Bukkit.getEntity(uuid);
-                if(stand == null) return;
+                if (stand == null) return;
                 stand.getEquipment().clear();
                 stand.remove();
             });
@@ -309,7 +313,7 @@ public final class Game extends JavaPlugin {
         }
 
         actions.addAll(Arrays.asList(
-                new HiderAction("花火", "自分のいる位置で花火が爆発します", 20, Material.FIREWORK_ROCKET, player -> {
+                new HiderAction(Messages.message("game.action.firework.name"), Messages.message("game.action.firework.lore"), 20, Material.FIREWORK_ROCKET, player -> {
                     Firework firework = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
                     FireworkMeta meta = firework.getFireworkMeta();
                     meta.addEffect(FireworkEffect.builder()
@@ -322,7 +326,7 @@ public final class Game extends JavaPlugin {
                     firework.setFireworkMeta(meta);
                     firework.detonate();
                 }),
-                new HiderAction("花火(大)", "自分のいる位置で大きな花火が爆発します", 50, Material.FIREWORK_ROCKET, player -> {
+                new HiderAction(Messages.message("game.action.firework-big.name"), Messages.message("game.action.firework-big.lore"), 50, Material.FIREWORK_ROCKET, player -> {
                     Firework firework = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
                     FireworkMeta meta = firework.getFireworkMeta();
                     meta.addEffect(FireworkEffect.builder()
@@ -469,7 +473,7 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !((Hider) hider).isDead())
                     .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
             getGamePlayers().forEach((uuid, gamePlayer) -> {
-                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + Messages.message("living-people") +": " + ChatColor.RESET);
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + Messages.message("living-people") + ": " + ChatColor.RESET);
                 livingHiders.forEach(name -> gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET));
                 gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "-----------" + ChatColor.RESET);
             });
@@ -932,7 +936,7 @@ public final class Game extends JavaPlugin {
             gameBoard.resetText();
 
             if (econ != null) {
-                gameBoard.setText(0, Messages.message("money")+": " + getEconomy().getBalance(gamePlayer.getPlayer()));
+                gameBoard.setText(0, Messages.message("money") + ": " + getEconomy().getBalance(gamePlayer.getPlayer()));
             }
 
             if (getCurrentState() != GameState.PLAYING) return;
@@ -944,13 +948,13 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !hider.isDead())
                     .collect(Collectors.toList());
             gameBoard.setText(3, "");
-            gameBoard.setText(4, Messages.message("living-players")+": " + livingPlayerList.stream()
+            gameBoard.setText(4, Messages.message("living-players") + ": " + livingPlayerList.stream()
                     .filter(GamePlayer::isHider)
                     .filter(gp -> !gp.isDead()).count());
             List<String> seekers = new ArrayList<>();
             getGamePlayers().values().stream().filter(GamePlayer::isSeeker)
                     .forEach(gp -> seekers.add(gp.getPlayer().getDisplayName()));
-            gameBoard.setText(5, Messages.message("seeker")+": ");
+            gameBoard.setText(5, Messages.message("seeker") + ": ");
             for (int i = 0; i < seekers.size(); i++) {
                 gameBoard.setText(6 + i, "    " + seekers.get(i));
             }
