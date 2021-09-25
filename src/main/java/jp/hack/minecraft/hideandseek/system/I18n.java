@@ -50,11 +50,11 @@ public class I18n {
         this.customBundle = NULL_BUNDLE;
     }
 
-    public void onEnable() {
-        instance = this;
+    public static void onEnable(I18n i18n) {
+        instance = i18n;
     }
 
-    public void onDisable() {
+    public static void onDisable() {
         instance = null;
     }
 

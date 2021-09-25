@@ -188,7 +188,7 @@ public final class Game extends JavaPlugin {
         }
 
         this.i18n = new I18n(this);
-        this.i18n.onEnable();
+        I18n.onEnable(this.i18n);
         this.i18n.updateLocale("ja");
 
         getServer().getPluginManager().registerEvents(eventManager, this);
@@ -204,10 +204,8 @@ public final class Game extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         super.onDisable();
-
-        if (this.i18n != null) {
-            this.i18n.onDisable();
-        }
+        I18n.onDisable();
+        i18n = null;
 
         stop();
     }
