@@ -269,10 +269,4 @@ public class Hider extends GamePlayer {
         firework.setFireworkMeta(meta);
         return firework;
     }
-
-    public Seeker createSeeker(Game game) {
-        Seeker seeker =  new Seeker(getPlayer());
-        game.equipItem(seeker);
-        return seeker;
-    }
 }

@@ -362,7 +362,7 @@ public final class Game extends JavaPlugin {
         for (int i = 0; i < lobbyPlayers.size(); i++) {
             LobbyPlayer lobbyPlayer = lobbyPlayers.get(i);
             if (seekerIndex.contains(i)) {
-                createSeeker(lobbyPlayer.getPlayer());
+                createOriginalSeeker(lobbyPlayer.getPlayer());
             } else {
                 createHider(lobbyPlayer.getPlayer());
             }
@@ -528,8 +528,14 @@ public final class Game extends JavaPlugin {
         return hider;
     }
 
-    public Seeker createSeeker(Player player) {
+    public Seeker createOriginalSeeker(Player player) {
         Seeker seeker = new Seeker(player);
+        getGamePlayers().put(seeker.getPlayerUuid(), seeker);
+        return seeker;
+    }
+
+    public Seeker createSeeker(Player player) {
+        Seeker seeker = new Seeker(player, false);
         getGamePlayers().put(seeker.getPlayerUuid(), seeker);
         return seeker;
     }
@@ -656,7 +662,7 @@ public final class Game extends JavaPlugin {
         if (currentGameMode == PluginGameMode.NORMAL) {
             hider.getPlayer().teleport(getCurrentStage().get().getStage());
         } else if (currentGameMode == PluginGameMode.INCREASE) {
-            gamePlayers.put(hider.getPlayerUuid(), hider.createSeeker(this));
+            createSeeker(hider.getPlayer());
         }
         reloadScoreboard();
         confirmGame();
@@ -693,11 +699,16 @@ public final class Game extends JavaPlugin {
         return itemStack;
     }
 
-    public void giveBounty(GamePlayer gamePlayer) {
+    public void giveBounty(Seeker seeker) {
         System.out.println("giveBounty");
         if (econ == null) return;
         System.out.println("econ: notNull");
-        giveMoney(gamePlayer, reward / 10);
+        final double REWARD = (reward / 10);
+        if (seeker.isOriginal()) {
+            giveMoney(seeker, REWARD);
+        } else {
+            giveMoney(seeker, REWARD / 2);
+        }
     }
 
     public void giveReward(Role wonRole) {
@@ -706,9 +717,27 @@ public final class Game extends JavaPlugin {
         System.out.println("econ: notNull");
         gamePlayers.values().forEach(gamePlayer -> {
             if (gamePlayer.isSameRole(wonRole)) {
-                giveMoney(gamePlayer, reward);
+
+                if (wonRole == Role.SEEKER) {
+                    Seeker seeker = (Seeker) gamePlayer;
+                    if (seeker.isOriginal()) {
+                        giveMoney(gamePlayer, reward);
+                    } else {
+                        giveMoney(gamePlayer, reward / 3);
+                    }
+                }
+
             } else {
-                giveMoney(gamePlayer, reward / 3);
+
+                if (wonRole != Role.SEEKER) {
+                    Seeker seeker = (Seeker) gamePlayer;
+                    if (seeker.isOriginal()) {
+                        giveMoney(gamePlayer, reward / 3);
+                    }
+                } else {
+                    giveMoney(gamePlayer, reward / 3);
+                }
+
             }
         });
     }
