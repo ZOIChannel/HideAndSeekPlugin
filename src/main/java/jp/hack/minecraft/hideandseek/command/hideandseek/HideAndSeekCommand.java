@@ -21,6 +21,7 @@ public class HideAndSeekCommand extends PlayerCommandMaster {
         addSubCommand(new CancelCommand(manager));
         addSubCommand(new JoinCommand(manager));
         addSubCommand(new ForceJoinCommand(manager));
+        addSubCommand(new ForceCancelCommand(manager));
         addSubCommand(new DeleteStandCommand(manager));
 //        addSubCommand(new TestCommand(manager));
     }
@@ -32,7 +33,7 @@ public class HideAndSeekCommand extends PlayerCommandMaster {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        for (String s : args) System.out.println(s);
+//        for (String s : args) System.out.println(s);
         if (args.length < 2) return false;
         if (!subCommands.containsKey(args[1].toLowerCase())) return false;
         return subCommands.get(args[1]).onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length));

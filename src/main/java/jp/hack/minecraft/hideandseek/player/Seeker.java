@@ -33,13 +33,13 @@ public class Seeker extends GamePlayer {
     }
 
     public void knock(Location loc) {
-        System.out.println("----- event:005 -----");
+//        System.out.println("----- event:005 -----");
         sendRedMessage("game.block.notPlayer");
         getPlayer().playSound(loc, Sound.ENTITY_ITEM_PICKUP, SoundCategory.MASTER, 1.0F, 1.0F);
     }
 
     public void gotcha() {
-        System.out.println("----- event:002 -----");
+//        System.out.println("----- event:002 -----");
         sendGreenMessage("game.block.gotchaPlayer");
         sendRedTitle(2, 20, 2, "game.block.gotcha", "");
         getPlayer().playSound(getLocation(), Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 0.5F, 1.0F);

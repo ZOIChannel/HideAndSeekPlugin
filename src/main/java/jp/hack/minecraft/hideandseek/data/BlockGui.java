@@ -63,22 +63,20 @@ public class BlockGui {
         pane.clear();
         itemList.forEach(item -> {
             pane.addItem(new GuiItem(item, event -> {
-                System.out.println("-- event2 001");
                 Player clickedPlayer = (Player) event.getWhoClicked();
                 Optional<UsableBlock> usableBlockOptional = game.getUsableBlocks().stream().filter(uBlock -> uBlock.getMaterial() == item.getType()).findFirst();
                 if (!usableBlockOptional.isPresent()) return;
-                System.out.println("-- event2 002");
                 UsableBlock usableBlock = usableBlockOptional.get();
 
                 Economy economy = Game.getEconomy();
                 if (economy != null) {
                     if (economy.getBalance(clickedPlayer) < usableBlock.getPrice()) {
                         clickedPlayer.sendMessage(Messages.redMessage("error.buy.noMoney"));
-                        System.out.println("-- event2 003");
+//                        System.out.println("-- event2 003");
                         return;
                     }
 
-                    System.out.println("-- event2 004");
+//                    System.out.println("-- event2 004");
                     economy.withdrawPlayer(clickedPlayer, usableBlock.getPrice());
                 }
                 clickedPlayer.getWorld().playSound(clickedPlayer.getLocation(), Sound.BLOCK_ANVIL_USE, 1F, 1F);

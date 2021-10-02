@@ -442,7 +442,7 @@ public final class Game extends JavaPlugin {
                                     e.printStackTrace();
                                 }
                             }
-                            if (!bStop) new BukkitRunnable() {
+                            new BukkitRunnable() {
                                 @Override
                                 public void run() {
                                     Game.this.gameOver();
@@ -473,7 +473,7 @@ public final class Game extends JavaPlugin {
                     .filter(hider -> !((Hider) hider).isDead())
                     .forEach(hider -> livingHiders.add(hider.getPlayer().getDisplayName()));
             getGamePlayers().forEach((uuid, gamePlayer) -> {
-                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + Messages.message("living-people") + ": " + ChatColor.RESET);
+                gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + Messages.message("living-players") + ": " + ChatColor.RESET);
                 livingHiders.forEach(name -> gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "    " + name + ChatColor.RESET));
                 gamePlayer.getPlayer().sendMessage(ChatColor.GREEN + "-----------" + ChatColor.RESET);
             });
@@ -552,7 +552,7 @@ public final class Game extends JavaPlugin {
             gamePlayers.values().forEach(gp -> gp.getPlayer().sendMessage(Messages.error("error.stage.none")));
             return;
         }
-        player.teleport(getCurrentStage().get().getStage());
+//        player.teleport(getCurrentStage().get().getStage());
         if (gamePlayer.isHider()) {
             Hider hider = (Hider) gamePlayer;
             hider.destroy();
@@ -569,6 +569,7 @@ public final class Game extends JavaPlugin {
 
     private void removeGamePlayers() {
         if (gamePlayers.isEmpty()) return;
+        System.out.println("a");
         gamePlayers.values().forEach(this::destroyGamePlayer);
         gamePlayers.clear();
     }
@@ -624,6 +625,14 @@ public final class Game extends JavaPlugin {
         });
         removeOneGamePlayer(gamePlayer);
     }
+    public void forceLeave(CommandSender sender, Player target) {
+        if (!gamePlayers.containsKey(target.getUniqueId())) {
+            sender.sendMessage(Messages.error("error.game.otherNotJoined", target.getDisplayName()));
+            return;
+        }
+        leave(target);
+    }
+    // forceLeave
 
     public void openBlockGui(Hider hider) {
         BlockGui gui = getBlockGuiMap().get(hider.getPlayerUuid());
@@ -684,7 +693,7 @@ public final class Game extends JavaPlugin {
 
     public List<UsableBlock> getPlayerUsableBlocks(Player player) {
         if (econ == null) return usableBlocks;
-        System.out.println(usableBlocks);
+//        System.out.println(usableBlocks);
         double balance = econ.getBalance(player);
         return usableBlocks.stream().filter(v -> v.getPrice() <= balance).collect(Collectors.toList());
     }
@@ -700,9 +709,9 @@ public final class Game extends JavaPlugin {
     }
 
     public void giveBounty(Seeker seeker) {
-        System.out.println("giveBounty");
+//        System.out.println("giveBounty");
         if (econ == null) return;
-        System.out.println("econ: notNull");
+//        System.out.println("econ: notNull");
         final double REWARD = (reward / 10);
         if (seeker.isOriginal()) {
             giveMoney(seeker, REWARD);
@@ -712,9 +721,9 @@ public final class Game extends JavaPlugin {
     }
 
     public void giveReward(Role wonRole) {
-        System.out.println("giveReward");
+//        System.out.println("giveReward");
         if (econ == null) return;
-        System.out.println("econ: notNull");
+//        System.out.println("econ: notNull");
         gamePlayers.values().forEach(gamePlayer -> {
             if (gamePlayer.isSameRole(wonRole)) {
 
@@ -894,6 +903,7 @@ public final class Game extends JavaPlugin {
     }
 
     public Optional<StageData> getCurrentStage() {
+        if (stageList.size() <= currentStageIndex) currentStageIndex = 0;
         if (stageList.size() == 0) return Optional.empty();
         return Optional.ofNullable(stageList.get(currentStageIndex));
     }
@@ -942,11 +952,11 @@ public final class Game extends JavaPlugin {
     }
 
     public void selectNextStage() {
-        System.out.println(currentStageIndex);
+//        System.out.println(currentStageIndex);
         currentStageIndex++;
-        System.out.println(currentStageIndex);
+//        System.out.println(currentStageIndex);
         if (currentStageIndex >= stageList.size()) currentStageIndex = 0;
-        System.out.println(currentStageIndex);
+//        System.out.println(currentStageIndex);
     }
 
     public StageData createNewStage(String name) {

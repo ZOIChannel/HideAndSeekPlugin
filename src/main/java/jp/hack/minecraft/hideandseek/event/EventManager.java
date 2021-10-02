@@ -71,7 +71,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        System.out.println(event.getEventName());
+//        System.out.println(event.getEventName());
         if(game.getCurrentState() != GameState.PLAYING) return;
         if (event.getEntity() instanceof Player) event.setCancelled(true);
         if (event.getEntity() instanceof ArmorStand) event.setCancelled(true);
@@ -87,10 +87,10 @@ public class EventManager implements Listener {
         hider.blockFreeze();
     }
 
-    @EventHandler
-    public void onEntityPickupItem(EntityPickupItemEvent event) {
-        event.setCancelled(true);
-    }
+//    @EventHandler
+//    public void onEntityPickupItem(EntityPickupItemEvent event) {
+//        event.setCancelled(true);
+//    }
 
     @EventHandler
     public void onPlayerArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
@@ -101,7 +101,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
-        System.out.println(event.getEventName() + "; Entity:" + event.getRightClicked().getName());
+//        System.out.println(event.getEventName() + "; Entity:" + event.getRightClicked().getName());
 
         Player player = event.getPlayer();
         Entity rightClicked = event.getRightClicked();
@@ -129,7 +129,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        System.out.println(event.getEventName());
+//        System.out.println(event.getEventName());
         onPlayerClickSign(event);
         onPlayerClickItem(event);
 
@@ -137,7 +137,7 @@ public class EventManager implements Listener {
         if (player.getGameMode() == GameMode.SPECTATOR) event.setCancelled(true);
         Material havingItemType = player.getInventory().getItemInMainHand().getType();
         if (havingItemType == game.getCaptureItem().getType()) {
-            System.out.println("----- event:007 : -----");
+//            System.out.println("----- event:007 : -----");
 
             Seeker seeker = game.findSeeker(player.getUniqueId());
             if (seeker == null) return;
@@ -146,9 +146,9 @@ public class EventManager implements Listener {
             Block block = event.getClickedBlock();
 
             Hider hider = game.findHiderByBlock(block);
-            System.out.println("----- event:006 : " + hider + " -----");
+//            System.out.println("----- event:006 : " + hider + " -----");
             if (hider == null) {
-                System.out.println("----- event:001 -----");
+//                System.out.println("----- event:001 -----");
                 Location blockLoc = block.getLocation();
                 seeker.knock(blockLoc);
                 return;
@@ -298,12 +298,16 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if (game.getCurrentState() != GameState.PLAYING) return;
         UUID uuid = event.getPlayer().getUniqueId();
         if (!game.getGamePlayers().containsKey(uuid)) return;
         GamePlayer gamePlayer = game.getGamePlayer(uuid);
-        game.removeOneGamePlayer(gamePlayer);
-        game.confirmGame();
+        if (game.getCurrentState() == GameState.PLAYING) {
+
+            game.removeOneGamePlayer(gamePlayer);
+            game.confirmGame();
+        }else if(game.getCurrentState() == GameState.LOBBY) {
+            game.leave(gamePlayer.getPlayer());
+        }
     }
 
     @EventHandler
